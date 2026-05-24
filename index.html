@@ -32,7 +32,6 @@
             pointer-events: none; z-index: 0;
         }
         
-        /* НАВИГАЦИЯ */
         nav {
             position: sticky; top: 0; z-index: 100;
             background: rgba(6,6,9,0.92); backdrop-filter: blur(16px);
@@ -50,7 +49,6 @@
         
         .container { max-width: 1000px; margin: 0 auto; padding: 20px 20px 60px; position: relative; z-index: 1; }
         
-        /* HERO */
         .hero { text-align: center; padding: 70px 20px 50px; }
         .hero-badge {
             display: inline-block; background: rgba(2,132,199,0.2); color: var(--blue);
@@ -84,7 +82,6 @@
         .btn-outline { background: transparent; color: var(--blue); border-color: var(--border); }
         .btn-outline:hover { border-color: var(--blue); background: rgba(56,189,248,0.05); }
         
-        /* СЕКЦИИ */
         .section-title {
             font-size: 1.5em; font-weight: 800; color: #f8fafc;
             margin: 50px 0 20px; padding-left: 16px; border-left: 4px solid var(--blue);
@@ -107,19 +104,16 @@
         .green { color: var(--green); font-weight: 700; }
         .gold { color: var(--gold); font-weight: 700; }
         
-        /* ТАБЛИЦЫ */
         table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
         th { text-align: left; padding: 13px 14px; color: var(--text-muted); text-transform: uppercase; font-size: 0.72em; letter-spacing: 1px; border-bottom: 2px solid var(--border); }
         td { padding: 12px 14px; border-bottom: 1px solid #111; color: #cbd5e1; }
         
-        /* СТАТУС */
         .status-badge {
             display: inline-block; padding: 8px 18px; border-radius: 50px; font-weight: 700; font-size: 0.9em;
         }
         .status-offline { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
         .status-online { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
         
-        /* ROADMAP */
         .roadmap-item {
             border-left: 3px solid var(--blue); padding: 0 0 20px 20px; position: relative;
         }
@@ -137,7 +131,6 @@
         .badge-soon { background: #1e3a5f; color: var(--blue); }
         .badge-future { background: #1e293b; color: #94a3b8; }
         
-        /* МАНИФЕСТ */
         .manifest-box {
             background: linear-gradient(135deg, #0d0d14, #111122);
             border: 1px solid var(--border); border-radius: var(--radius);
@@ -153,7 +146,6 @@
 </head>
 <body>
 
-    <!-- НАВИГАЦИЯ -->
     <nav>
         <div class="nav-inner">
             <a href="#" class="logo">RAMCOIN</a>
@@ -170,7 +162,6 @@
 
     <div class="container">
         
-        <!-- HERO -->
         <div class="hero">
             <div class="hero-badge">🧪 Тестнет • Соло-майнинг • Anti-ASIC</div>
             <h1>RAMCOIN</h1>
@@ -185,19 +176,17 @@
             
             <div class="btn-row">
                 <a href="https://github.com/ramcoinnode-debug/ramcoin" target="_blank" class="btn btn-primary">💻 GitHub</a>
-                <a href="https://github.com/ramcoinnode-debug/ramcoin/raw/main/docs/ramcoin_whitepaper.pdf" target="_blank" class="btn btn-secondary">📄 Whitepaper</a>
+                <a href="https://github.com/ramcoinnode-debug/ramcoin/blob/main/docs/ramcoin_whitepaper.pdf" target="_blank" class="btn btn-secondary">📄 Whitepaper</a>
                 <a href="https://t.me/ramcoin_pow" target="_blank" class="btn btn-outline">📱 Telegram</a>
             </div>
         </div>
         
-        <!-- СТАТУС НОДЫ -->
         <div class="card" style="text-align:center;">
             <span class="status-badge status-offline pulse">🔴 Нода офлайн</span>
             <p style="margin-top:12px;">Публичный сервер 24/7 скоро будет запущен.</p>
             <p style="font-size:0.88em;color:var(--text-muted);">Сейчас нода работает локально у разработчика. Следите за анонсами в Telegram.</p>
         </div>
         
-        <!-- О ПРОЕКТЕ -->
         <h2 class="section-title" id="about">🚀 О проекте</h2>
         <div class="grid-2">
             <div class="card">
@@ -218,14 +207,12 @@
             </div>
         </div>
         
-        <!-- ПРОЗРАЧНОСТЬ -->
         <div class="card" style="margin-top:16px;">
             <h3>🔍 Полная прозрачность</h3>
             <p>Вся история блокчейна хранится в открытой базе данных SQLite. <span class="highlight">Любой может проверить</span> все блоки, все транзакции, все балансы. Никаких скрытых начислений. Всё как на ладони.</p>
             <p style="margin-top:8px;">📂 База данных: <code style="background:#0a0a10;padding:2px 8px;border-radius:4px;">blockchain_v7.db</code> (SQLite3, можно открыть любым просмотрщиком)</p>
         </div>
         
-        <!-- ТОКЕНОМИКА -->
         <h2 class="section-title" id="tokenomics">📊 Токеномика</h2>
         <div class="card">
             <table>
@@ -241,7 +228,6 @@
             </table>
         </div>
         
-        <!-- МАЙНИНГ -->
         <h2 class="section-title" id="mining">⛏️ Как начать майнить</h2>
         <div class="grid-2">
             <div class="card">
@@ -268,7 +254,6 @@
             </div>
         </div>
         
-        <!-- РЕФЕРАЛЬНАЯ СИСТЕМА -->
         <div class="card" style="margin-top:16px;border-color:var(--green);">
             <h3>👥 Реферальная система <span style="color:var(--green);font-size:0.7em;animation:pulse 2s infinite;">NEW</span></h3>
             <p>Приглашай друзей — получай бонусы:</p>
@@ -279,7 +264,6 @@
             </ul>
         </div>
         
-        <!-- ROADMAP -->
         <h2 class="section-title" id="roadmap">🗺️ Дорожная карта</h2>
         <div class="card">
             <div class="roadmap-item">
@@ -300,7 +284,6 @@
             </div>
         </div>
         
-        <!-- МАНИФЕСТ -->
         <h2 class="section-title" id="manifest">💡 Манифест</h2>
         <div class="manifest-box">
             <p style="font-size:1.1em;color:var(--text);max-width:700px;margin:0 auto;line-height:1.8;">
@@ -317,7 +300,6 @@
             <a href="https://t.me/ramcoin_pow" target="_blank" class="btn btn-primary" style="margin-top:14px;">📱 Зайти в Telegram</a>
         </div>
         
-        <!-- СООБЩЕСТВО -->
         <h2 class="section-title" id="community">🔗 Сообщество</h2>
         <div class="grid-3">
             <div class="card" style="text-align:center;">
@@ -337,7 +319,6 @@
             </div>
         </div>
         
-        <!-- ДИСКЛЕЙМЕР -->
         <div class="card" style="margin-top:20px;border-left:4px solid var(--red);">
             <p style="font-size:0.85em;color:var(--text-secondary);">
                 <strong>⚖️ Дисклеймер:</strong> RAMCOIN — экспериментальное программное обеспечение. Разработчик не несёт ответственности за финансовые потери. Инвестируйте только те средства, которые готовы потерять. DYOR.
