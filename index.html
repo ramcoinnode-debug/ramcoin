@@ -137,18 +137,11 @@
         .badge-soon { background: #1e3a5f; color: var(--blue); }
         .badge-future { background: #1e293b; color: #94a3b8; }
         
-        /* ПОДДЕРЖКА */
-        .donate-box {
+        /* МАНИФЕСТ */
+        .manifest-box {
             background: linear-gradient(135deg, #0d0d14, #111122);
-            border: 1px solid var(--gold); border-radius: var(--radius);
-            padding: 24px; text-align: center; margin: 20px 0;
-        }
-        .donate-box h3 { color: var(--gold); }
-        .donate-addr {
-            background: #0a0a10; border: 1px solid var(--border);
-            border-radius: 8px; padding: 12px; font-family: 'Consolas', monospace;
-            font-size: 0.78em; color: #cbd5e1; word-break: break-all;
-            margin: 12px 0; user-select: all;
+            border: 1px solid var(--border); border-radius: var(--radius);
+            padding: 30px 24px; text-align: center; margin: 20px 0;
         }
         
         .footer { text-align: center; padding: 30px; color: var(--text-muted); font-size: 0.8em; border-top: 1px solid var(--border); margin-top: 40px; }
@@ -169,6 +162,7 @@
                 <li><a href="#tokenomics">Токеномика</a></li>
                 <li><a href="#mining">Майнинг</a></li>
                 <li><a href="#roadmap">Roadmap</a></li>
+                <li><a href="#manifest">Манифест</a></li>
                 <li><a href="#community">Сообщество</a></li>
             </ul>
         </div>
@@ -224,7 +218,7 @@
             </div>
         </div>
         
-        <!-- ПОЧЕМУ ЭТО ВАЖНО -->
+        <!-- ПРОЗРАЧНОСТЬ -->
         <div class="card" style="margin-top:16px;">
             <h3>🔍 Полная прозрачность</h3>
             <p>Вся история блокчейна хранится в открытой базе данных SQLite. <span class="highlight">Любой может проверить</span> все блоки, все транзакции, все балансы. Никаких скрытых начислений. Всё как на ладони.</p>
@@ -306,15 +300,21 @@
             </div>
         </div>
         
-        <!-- ПОДДЕРЖКА -->
-        <h2 class="section-title">🤝 Поддержать проект</h2>
-        <div class="donate-box">
-            <h3>💰 Помоги запустить сервер 24/7</h3>
-            <p style="color:var(--text-secondary);margin:10px 0;">Все средства пойдут на покупку мини-ПК для публичной ноды.</p>
-            <div class="donate-addr" onclick="navigator.clipboard.writeText(this.textContent);alert('Адрес скопирован!')" title="Нажми чтобы скопировать">
-                RAM_04a9b30816a61686f377f152435f528e542b61eb7f0c9403778fdd19862600eb18a4faffe64d6a88a8077da4bf5bf908b74f2729c7fe044ddf5528521f5dcbd75a
-            </div>
-            <p style="font-size:0.8em;color:var(--text-muted);">👆 Нажми на адрес чтобы скопировать. Отправить можно через кошелёк RAMCOIN.</p>
+        <!-- МАНИФЕСТ -->
+        <h2 class="section-title" id="manifest">💡 Манифест</h2>
+        <div class="manifest-box">
+            <p style="font-size:1.1em;color:var(--text);max-width:700px;margin:0 auto;line-height:1.8;">
+                Я устал от того, что майнингом правят фермы, ASIC и корпорации.<br>
+                <strong>Я хочу вернуть крипту обычным людям.</strong>
+            </p>
+            <p style="color:var(--text-secondary);margin-top:16px;">
+                RAMCOIN — это мой личный протест. Никаких инвесторов, никаких пулов.<br>
+                Только код, только домашний ПК, только честный майнинг.
+            </p>
+            <p style="color:var(--blue);font-weight:700;margin-top:16px;">
+                Присоединяйся. Давай строить сеть вместе.
+            </p>
+            <a href="https://t.me/ramcoin_pow" target="_blank" class="btn btn-primary" style="margin-top:14px;">📱 Зайти в Telegram</a>
         </div>
         
         <!-- СООБЩЕСТВО -->
