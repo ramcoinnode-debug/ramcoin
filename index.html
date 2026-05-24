@@ -4,238 +4,158 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAMCOIN (RAM) — Честный блокчейн | CPU-майнинг без ASIC | Соло-майнинг</title>
-    <meta name="description" content="RAMCOIN — децентрализованный блокчейн с защитой от ASIC и GPU. Честный соло-майнинг на домашнем ПК. Эмиссия 17.5 млн монет. Фиксированная комиссия 0.001 RAM.">
-    <meta name="keywords" content="ramcoin, криптовалюта, майнинг, cpu mining, anti-asic, соло-майнинг, блокчейн, ram, memory-hard, честный майнинг, крипта">
-    <meta name="author" content="RAMCOIN Team">
+    <meta name="description" content="RAMCOIN — новый блокчейн с нуля на Python. Честный CPU-майнинг, защита от ASIC и серверов, соло-майнинг для домашних ПК. Без премайна, без ICO.">
+    <meta name="keywords" content="ramcoin, криптовалюта, майнинг, cpu mining, anti-asic, соло-майнинг, блокчейн, ram, memory-hard, честный майнинг, python блокчейн">
+    <meta name="author" content="RAMCOIN Developer">
     <meta name="robots" content="index, follow">
     <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 32 32'><rect width='32' height='32' rx='6' fill='%231e293b'/><text x='50%25' y='55%25' text-anchor='middle' dy='.1em' font-size='20' font-weight='bold' fill='%2338bdf8'>R</text></svg>">
     <style>
         :root {
-            --bg: #060609;
-            --bg-card: #0d0d14;
-            --bg-card-hover: #111122;
-            --border: #1a1a2e;
-            --border-hover: #38bdf844;
-            --blue: #38bdf8;
-            --blue-dark: #0284c7;
-            --green: #10b981;
-            --green-dark: #059669;
-            --gold: #fbbf24;
-            --purple: #a78bfa;
-            --red: #ef4444;
-            --text: #e4e4e7;
-            --text-secondary: #a1a1aa;
-            --text-muted: #71717a;
-            --radius: 12px;
+            --bg: #060609; --bg-card: #0d0d14; --border: #1a1a2e;
+            --blue: #38bdf8; --green: #10b981; --gold: #fbbf24;
+            --purple: #a78bfa; --red: #ef4444;
+            --text: #e4e4e7; --text-secondary: #a1a1aa; --text-muted: #71717a;
+            --radius: 14px;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; }
         body {
-            font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-            background: var(--bg);
-            color: var(--text);
-            line-height: 1.7;
-            -webkit-font-smoothing: antialiased;
+            font-family: 'Inter', 'Segoe UI', system-ui, sans-serif;
+            background: var(--bg); color: var(--text);
+            line-height: 1.7; -webkit-font-smoothing: antialiased;
         }
         body::before {
-            content: '';
-            position: fixed; inset: 0;
-            background-image:
-                radial-gradient(circle at 10% 15%, rgba(56,189,248,0.03) 0%, transparent 40%),
-                radial-gradient(circle at 90% 80%, rgba(139,92,246,0.03) 0%, transparent 40%),
-                radial-gradient(circle at 50% 50%, rgba(16,185,129,0.02) 0%, transparent 50%);
+            content: ''; position: fixed; inset: 0;
+            background: radial-gradient(circle at 10% 15%, rgba(56,189,248,0.05) 0%, transparent 40%),
+                        radial-gradient(circle at 90% 80%, rgba(139,92,246,0.05) 0%, transparent 40%),
+                        radial-gradient(circle at 50% 50%, rgba(16,185,129,0.03) 0%, transparent 50%);
             pointer-events: none; z-index: 0;
         }
+        
+        /* НАВИГАЦИЯ */
         nav {
             position: sticky; top: 0; z-index: 100;
             background: rgba(6,6,9,0.92); backdrop-filter: blur(16px);
             border-bottom: 1px solid var(--border); padding: 0 20px;
         }
         nav .nav-inner {
-            max-width: 1080px; margin: 0 auto;
-            display: flex; align-items: center; justify-content: space-between;
-            height: 56px;
+            max-width: 1000px; margin: 0 auto;
+            display: flex; align-items: center; justify-content: space-between; height: 56px;
         }
         nav .logo { font-size: 1.4em; font-weight: 900; color: var(--blue); text-decoration: none; letter-spacing: -1px; }
         nav .nav-links { display: flex; gap: 24px; list-style: none; }
-        nav .nav-links a {
-            color: var(--text-secondary); text-decoration: none;
-            font-size: 0.88em; font-weight: 600; transition: color 0.2s;
-        }
+        nav .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.88em; font-weight: 600; transition: color 0.2s; }
         nav .nav-links a:hover { color: var(--blue); }
-        @media(max-width:768px) { nav .nav-links { display: none; } }
-        .hero {
-            position: relative; z-index: 1; text-align: center;
-            padding: 70px 20px 55px;
-            background: linear-gradient(180deg, #08080f 0%, #0c0c16 60%, transparent 100%);
-            border-bottom: 1px solid var(--border);
-        }
+        @media(max-width:700px) { nav .nav-links { display: none; } }
+        
+        .container { max-width: 1000px; margin: 0 auto; padding: 20px 20px 60px; position: relative; z-index: 1; }
+        
+        /* HERO */
+        .hero { text-align: center; padding: 70px 20px 50px; }
         .hero-badge {
-            display: inline-block; background: rgba(2,132,199,0.15);
-            color: var(--blue); border: 1px solid var(--blue);
-            padding: 7px 18px; border-radius: 50px; font-size: 0.8em;
-            font-weight: 700; letter-spacing: 1.5px; text-transform: uppercase; margin-bottom: 24px;
+            display: inline-block; background: rgba(2,132,199,0.2); color: var(--blue);
+            border: 1px solid var(--blue); padding: 8px 20px; border-radius: 50px;
+            font-weight: 700; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 24px;
         }
         .hero h1 {
-            font-size: clamp(2.6em, 7vw, 4.4em); font-weight: 900; letter-spacing: -2px;
+            font-size: clamp(2.6em, 6vw, 4.2em); font-weight: 900; letter-spacing: -2px;
             background: linear-gradient(135deg, #38bdf8 0%, #818cf8 40%, #c084fc 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            background-clip: text; margin-bottom: 16px; line-height: 1.1;
+            margin-bottom: 16px; line-height: 1.1;
         }
-        .hero-subtitle { font-size: 1.15em; color: var(--text-secondary); max-width: 650px; margin: 0 auto 10px; }
-        .hero-subtitle strong { color: #fff; }
-        .hero-stats-row { display: flex; justify-content: center; gap: 28px; margin: 28px 0 32px; flex-wrap: wrap; }
-        .hero-stat { text-align: center; min-width: 85px; }
-        .hero-stat .num { font-size: 2.2em; font-weight: 900; color: #fff; line-height: 1; }
-        .hero-stat .lbl { font-size: 0.76em; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-top: 5px; }
-        .btn-row { display: flex; justify-content: center; gap: 14px; flex-wrap: wrap; }
+        .hero p { color: var(--text-secondary); font-size: 1.15em; max-width: 600px; margin: 0 auto; }
+        .hero p strong { color: #fff; }
+        
+        .stats-row { display: flex; justify-content: center; gap: 30px; margin: 30px 0; flex-wrap: wrap; }
+        .stat-item { text-align: center; min-width: 80px; }
+        .stat-item .num { font-size: 2.2em; font-weight: 900; color: #fff; line-height: 1; }
+        .stat-item .lbl { color: var(--text-muted); text-transform: uppercase; font-size: 0.75em; letter-spacing: 1.5px; margin-top: 5px; }
+        
+        .btn-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
         .btn {
             display: inline-flex; align-items: center; gap: 8px;
-            padding: 15px 32px; border-radius: 10px; font-weight: 700; font-size: 0.96em;
-            text-decoration: none; cursor: pointer; transition: all 0.25s; border: 1px solid transparent;
+            padding: 14px 28px; border-radius: 10px; font-weight: 700; font-size: 0.95em;
+            text-decoration: none; transition: all 0.25s; border: 1px solid transparent;
         }
-        .btn-primary { background: var(--blue-dark); color: #fff; border-color: var(--blue); box-shadow: 0 0 30px rgba(56,189,248,0.3); }
-        .btn-primary:hover { background: #0369a1; box-shadow: 0 0 50px rgba(56,189,248,0.5); transform: translateY(-2px); }
-        .btn-secondary { background: var(--green-dark); color: #d1fae5; border-color: var(--green); box-shadow: 0 0 25px rgba(16,185,129,0.3); }
-        .btn-secondary:hover { background: #064e3b; box-shadow: 0 0 40px rgba(16,185,129,0.5); transform: translateY(-2px); }
-        .container { max-width: 1080px; margin: 0 auto; padding: 20px 20px 80px; position: relative; z-index: 1; }
+        .btn-primary { background: #0284c7; color: #fff; border-color: var(--blue); box-shadow: 0 0 25px rgba(2,132,199,0.3); }
+        .btn-primary:hover { background: #0369a1; transform: translateY(-2px); box-shadow: 0 0 40px rgba(2,132,199,0.5); }
+        .btn-secondary { background: #059669; color: #d1fae5; border-color: var(--green); box-shadow: 0 0 20px rgba(5,150,105,0.3); }
+        .btn-secondary:hover { background: #064e3b; transform: translateY(-2px); box-shadow: 0 0 35px rgba(5,150,105,0.5); }
+        .btn-outline { background: transparent; color: var(--blue); border-color: var(--border); }
+        .btn-outline:hover { border-color: var(--blue); background: rgba(56,189,248,0.05); }
+        
+        /* СЕКЦИИ */
         .section-title {
             font-size: 1.5em; font-weight: 800; color: #f8fafc;
-            margin: 50px 0 22px; padding-left: 16px; border-left: 4px solid var(--blue);
-            display: flex; align-items: center; gap: 10px;
+            margin: 50px 0 20px; padding-left: 16px; border-left: 4px solid var(--blue);
         }
-        .section-title .live-dot { animation: pulse 2s infinite; color: #10b981; font-size: 0.6em; }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
-        .network-stats {
-            display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr));
-            gap: 10px; margin-bottom: 25px;
-        }
-        .stat-card {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 18px 14px; text-align: center;
-            transition: all 0.3s;
-        }
-        .stat-card:hover { border-color: var(--border-hover); background: var(--bg-card-hover); }
-        .stat-card .label { font-size: 0.7em; text-transform: uppercase; letter-spacing: 1.5px; color: var(--text-muted); font-weight: 700; margin-bottom: 6px; }
-        .stat-card .value { font-size: 1.7em; font-weight: 800; color: var(--blue); line-height: 1.1; }
-        .stat-card .value.green { color: var(--green); }
-        .stat-card .value.gold { color: var(--gold); }
-        .chart-wrap {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 22px 20px 18px; margin: 20px 0;
-        }
-        .chart-wrap h3 {
-            margin: 0 0 6px; color: #f8fafc; font-size: 0.95em; font-weight: 700;
-            display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 8px;
-        }
-        .chart-stats { font-size: 0.76em; color: var(--text-muted); display: flex; gap: 14px; }
-        .chart-stats span { color: #cbd5e1; font-weight: 700; }
-        .chart-container { position: relative; width: 100%; height: 260px; margin-top: 6px; }
-        #diffChart { width: 100%; height: 100%; display: block; }
-        .card-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; margin: 18px 0; }
-        @media(max-width:768px) { .card-grid { grid-template-columns: 1fr; } }
+        
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 16px; }
+        @media(max-width:750px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
+        
         .card {
             background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 22px 20px; transition: all 0.3s;
+            border-radius: var(--radius); padding: 24px; transition: all 0.3s;
         }
-        .card:hover { border-color: var(--border-hover); transform: translateY(-2px); background: var(--bg-card-hover); }
-        .card h3 { font-size: 1.05em; font-weight: 700; margin-bottom: 8px; color: #f8fafc; }
-        .card p, .card li { color: var(--text-secondary); font-size: 0.9em; line-height: 1.7; }
+        .card:hover { border-color: #38bdf844; transform: translateY(-2px); }
+        .card h3 { color: #f8fafc; margin-bottom: 10px; font-size: 1.1em; }
+        .card p, .card li { color: var(--text-secondary); line-height: 1.8; font-size: 0.93em; }
         .card-full { grid-column: 1 / -1; }
-        .tokenomics-table {
-            width: 100%; border-collapse: collapse; font-size: 0.88em;
-            background: var(--bg-card); border-radius: var(--radius); overflow: hidden;
+        
+        .highlight { color: var(--blue); font-weight: 700; }
+        .green { color: var(--green); font-weight: 700; }
+        .gold { color: var(--gold); font-weight: 700; }
+        
+        /* ТАБЛИЦЫ */
+        table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
+        th { text-align: left; padding: 13px 14px; color: var(--text-muted); text-transform: uppercase; font-size: 0.72em; letter-spacing: 1px; border-bottom: 2px solid var(--border); }
+        td { padding: 12px 14px; border-bottom: 1px solid #111; color: #cbd5e1; }
+        
+        /* СТАТУС */
+        .status-badge {
+            display: inline-block; padding: 8px 18px; border-radius: 50px; font-weight: 700; font-size: 0.9em;
         }
-        .tokenomics-table th {
-            background: #0a0a10; padding: 14px 16px; text-align: left;
-            color: var(--text-muted); font-size: 0.72em; text-transform: uppercase;
-            letter-spacing: 1.2px; font-weight: 700; border-bottom: 2px solid var(--border);
-        }
-        .tokenomics-table td { padding: 13px 16px; border-bottom: 1px solid #11111a; color: #cbd5e1; }
-        .tokenomics-table tr:last-child td { border-bottom: none; }
-        .tokenomics-table .highlight { color: var(--blue); font-weight: 700; }
-        .table-wrap {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius); overflow-x: auto;
-        }
-        table { width: 100%; border-collapse: collapse; font-size: 0.84em; }
-        th {
-            padding: 13px 14px; text-align: left; color: var(--text-muted);
-            font-size: 0.7em; text-transform: uppercase; letter-spacing: 1.2px;
-            font-weight: 700; border-bottom: 2px solid var(--border); background: #0a0a10;
-        }
-        td { padding: 11px 14px; border-bottom: 1px solid #11111a; color: #cbd5e1; }
-        tr:hover td { background: rgba(56,189,248,0.02); }
-        .system-row td { color: var(--purple) !important; }
-        .mono { font-family: 'Consolas', 'SF Mono', monospace; font-size: 0.84em; }
-        .top-accounts {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 20px; margin: 20px 0;
-        }
-        .top-accounts h3 { margin: 0 0 12px; color: #f8fafc; font-size: 0.95em; }
-        .top-item {
-            display: flex; justify-content: space-between; align-items: center;
-            padding: 9px 8px; border-bottom: 1px solid #11111a; transition: background 0.2s;
-        }
-        .top-item:hover { background: rgba(56,189,248,0.03); }
-        .top-item:last-child { border-bottom: none; }
-        .top-rank { color: var(--gold); font-weight: 700; margin-right: 12px; min-width: 26px; text-align: center; }
-        .top-addr { font-family: 'Consolas', monospace; font-size: 0.83em; color: #cbd5e1; flex: 1; }
-        .top-balance { color: var(--green); font-weight: 700; font-size: 0.92em; }
-        .tag-server {
-            display: inline-block; background: rgba(239,68,68,0.15); color: var(--red);
-            font-size: 0.65em; padding: 2px 8px; border-radius: 4px; margin-left: 6px;
-            font-weight: 700; text-transform: uppercase; letter-spacing: 0.5px;
-        }
+        .status-offline { background: rgba(239,68,68,0.12); color: #ef4444; border: 1px solid rgba(239,68,68,0.3); }
+        .status-online { background: rgba(16,185,129,0.12); color: #10b981; border: 1px solid rgba(16,185,129,0.3); }
+        
+        /* ROADMAP */
         .roadmap-item {
-            border-left: 3px solid var(--blue); padding: 0 0 22px 20px; position: relative;
+            border-left: 3px solid var(--blue); padding: 0 0 20px 20px; position: relative;
         }
         .roadmap-item::before {
             content: ''; position: absolute; left: -7px; top: 4px;
-            width: 11px; height: 11px; background: var(--blue);
-            border-radius: 50%; box-shadow: 0 0 14px var(--blue);
+            width: 11px; height: 11px; background: var(--blue); border-radius: 50%;
+            box-shadow: 0 0 14px var(--blue);
         }
         .roadmap-item:last-child { border-left-color: transparent; padding-bottom: 0; }
         .badge {
             display: inline-block; padding: 4px 12px; border-radius: 30px;
-            font-size: 0.74em; font-weight: 700; letter-spacing: 0.5px; margin-bottom: 6px;
+            font-size: 0.76em; font-weight: 700; margin-bottom: 6px;
         }
         .badge-done { background: #065f46; color: #6ee7b7; }
-        .badge-now { background: #1e3a5f; color: var(--blue); }
-        .badge-next { background: #1e293b; color: #94a3b8; }
-        .calculator {
-            background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 24px; margin: 20px 0;
+        .badge-soon { background: #1e3a5f; color: var(--blue); }
+        .badge-future { background: #1e293b; color: #94a3b8; }
+        
+        /* ПОДДЕРЖКА */
+        .donate-box {
+            background: linear-gradient(135deg, #0d0d14, #111122);
+            border: 1px solid var(--gold); border-radius: var(--radius);
+            padding: 24px; text-align: center; margin: 20px 0;
         }
-        .calculator h3 { margin: 0 0 16px; color: #f8fafc; }
-        .calc-row { display: flex; gap: 16px; margin-bottom: 14px; flex-wrap: wrap; }
-        .calc-field { flex: 1; min-width: 180px; }
-        .calc-field label { display: block; font-size: 0.78em; color: var(--text-muted); margin-bottom: 4px; font-weight: 600; }
-        .calc-field input {
-            width: 100%; padding: 10px 14px; background: #0a0a10; border: 1px solid var(--border);
-            border-radius: 8px; color: #fff; font-size: 0.94em; font-family: inherit;
+        .donate-box h3 { color: var(--gold); }
+        .donate-addr {
+            background: #0a0a10; border: 1px solid var(--border);
+            border-radius: 8px; padding: 12px; font-family: 'Consolas', monospace;
+            font-size: 0.78em; color: #cbd5e1; word-break: break-all;
+            margin: 12px 0; user-select: all;
         }
-        .calc-result {
-            margin-top: 16px; padding: 16px; background: #0a0a10;
-            border-radius: 8px; border: 1px solid var(--border);
-            font-size: 0.9em; line-height: 2;
-        }
-        .calc-result span { color: var(--green); font-weight: 700; }
-        .disclaimer {
-            background: #0c0c12; border: 1px solid #2d1f1f; border-left: 4px solid var(--red);
-            padding: 18px 22px; border-radius: 10px; font-size: 0.82em;
-            color: var(--text-secondary); line-height: 1.8; margin-top: 30px;
-        }
-        .footer {
-            text-align: center; padding: 30px 20px; color: var(--text-muted);
-            font-size: 0.78em; border-top: 1px solid var(--border); margin-top: 40px;
-        }
+        
+        .footer { text-align: center; padding: 30px; color: var(--text-muted); font-size: 0.8em; border-top: 1px solid var(--border); margin-top: 40px; }
         .footer a { color: var(--blue); text-decoration: none; }
-        .connection-status {
-            display: inline-block; width: 8px; height: 8px; border-radius: 50%; margin-right: 8px;
-        }
-        .connection-status.online { background: #10b981; box-shadow: 0 0 8px #10b981; }
-        .connection-status.offline { background: #ef4444; box-shadow: 0 0 8px #ef4444; }
+        
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        .pulse { animation: pulse 2s infinite; }
     </style>
 </head>
 <body>
@@ -245,526 +165,191 @@
         <div class="nav-inner">
             <a href="#" class="logo">RAMCOIN</a>
             <ul class="nav-links">
-                <li><a href="#stats">Сеть</a></li>
-                <li><a href="#invest">Инвестору</a></li>
+                <li><a href="#about">О проекте</a></li>
+                <li><a href="#tokenomics">Токеномика</a></li>
                 <li><a href="#mining">Майнинг</a></li>
                 <li><a href="#roadmap">Roadmap</a></li>
-                <li><a href="#api">API</a></li>
+                <li><a href="#community">Сообщество</a></li>
             </ul>
         </div>
     </nav>
 
-    <!-- HERO -->
-    <section class="hero">
-        <div class="hero-badge">🧪 Тестнет • Соло-майнинг • Anti-ASIC</div>
-        <h1>RAMCOIN</h1>
-        <p class="hero-subtitle">
-            <strong>Честный блокчейн.</strong> Никаких ASIC. Никаких пулов.<br>
-            Только домашний компьютер и оперативная память.
-        </p>
-        <div class="hero-stats-row">
-            <div class="hero-stat"><div class="num">4 MB</div><div class="lbl">RAM на поток</div></div>
-            <div class="hero-stat"><div class="num">0.001</div><div class="lbl">RAM комиссия</div></div>
-            <div class="hero-stat"><div class="num">~30 лет</div><div class="lbl">Эмиссия</div></div>
-            <div class="hero-stat"><div class="num">17.5M</div><div class="lbl">Всего монет</div></div>
-        </div>
-        <div class="btn-row">
-            <a href="https://disk.yandex.ru/d/OtkMuX3nTP60RQ" target="_blank" class="btn btn-primary">⚡ Скачать Майнер</a>
-            <a href="https://disk.yandex.ru/d/OtkMuX3nTP60RQ" target="_blank" class="btn btn-secondary">💼 Скачать Кошелёк</a>
-        </div>
-    </section>
-
     <div class="container">
-
-        <!-- СТАТИСТИКА СЕТИ -->
-        <h2 class="section-title" id="stats">
-            <span class="connection-status" id="conn-status"></span> Сеть RAMCOIN <span class="live-dot">● LIVE</span>
-        </h2>
-        <div class="network-stats">
-            <div class="stat-card"><div class="label">Высота</div><div class="value" id="stat-height">—</div></div>
-            <div class="stat-card"><div class="label">Сложность</div><div class="value" id="stat-diff" style="font-size:1.2em;">—</div></div>
-            <div class="stat-card"><div class="label">Награда</div><div class="value gold" id="stat-reward">—</div></div>
-            <div class="stat-card"><div class="label">Комиссия</div><div class="value green">0.001</div></div>
-            <div class="stat-card"><div class="label">Мемпул</div><div class="value" id="stat-mempool">0</div></div>
-            <div class="stat-card"><div class="label">Майнеров</div><div class="value" id="stat-miners">0</div></div>
-            <div class="stat-card"><div class="label">TX всего</div><div class="value" id="stat-tx-total">0</div></div>
-            <div class="stat-card"><div class="label">Аптайм</div><div class="value" id="stat-uptime" style="font-size:1.1em;">—</div></div>
-        </div>
-
-        <!-- ГРАФИК -->
-        <div class="chart-wrap">
-            <h3>
-                📈 Сложность сети (RAM-Hash/s)
-                <div class="chart-stats">
-                    Сейчас: <span id="chart-now">—</span>
-                    Мин: <span id="chart-min">—</span>
-                    Макс: <span id="chart-max">—</span>
-                </div>
-            </h3>
-            <div class="chart-container"><canvas id="diffChart"></canvas></div>
-        </div>
-
-        <!-- ТОП АДРЕСОВ -->
-        <div class="top-accounts">
-            <h3>🏆 Топ адресов</h3>
-            <div id="top-list" style="color:var(--text-muted);">Загрузка...</div>
-        </div>
-
-        <!-- ДЛЯ ИНВЕСТОРОВ -->
-        <h2 class="section-title" id="invest">💎 Для инвесторов</h2>
-        <div class="card-grid">
-            <div class="card">
-                <h3>📉 Контролируемая эмиссия</h3>
-                <p>~17.5 млн RAM. Халвинг каждые 876 000 блоков (~10 месяцев). Майнинг рассчитан на ~30 лет.</p>
+        
+        <!-- HERO -->
+        <div class="hero">
+            <div class="hero-badge">🧪 Тестнет • Соло-майнинг • Anti-ASIC</div>
+            <h1>RAMCOIN</h1>
+            <p><strong>Честный блокчейн.</strong> Написан с нуля на Python.<br>CPU-майнинг без ASIC, без пулов, только домашний ПК.</p>
+            
+            <div class="stats-row">
+                <div class="stat-item"><div class="num">4 MB</div><div class="lbl">RAM на поток</div></div>
+                <div class="stat-item"><div class="num">0.001</div><div class="lbl">RAM комиссия</div></div>
+                <div class="stat-item"><div class="num">~30 лет</div><div class="lbl">Эмиссия</div></div>
+                <div class="stat-item"><div class="num">17.5M</div><div class="lbl">Всего монет</div></div>
             </div>
-            <div class="card">
-                <h3>🔒 Справедливый старт</h3>
-                <p>Без премайна, без ICO. Только 100 RAM в генезисе у разработчика. Всё остальное добывается.</p>
-            </div>
-            <div class="card">
-                <h3>🌍 Огромный рынок</h3>
-                <p>Майнит любой ПК с 4 ГБ ОЗУ. Потенциальная аудитория — сотни миллионов пользователей.</p>
-            </div>
-            <div class="card">
-                <h3>🛡️ Защита от ASIC</h3>
-                <p>Memory-hard алгоритм (4 МБ scratchpad). GPU и ASIC неэффективны. Только CPU.</p>
+            
+            <div class="btn-row">
+                <a href="https://github.com/ramcoinnode-debug/ramcoin" target="_blank" class="btn btn-primary">💻 GitHub</a>
+                <a href="https://github.com/ramcoinnode-debug/ramcoin/raw/main/docs/ramcoin_whitepaper.pdf" target="_blank" class="btn btn-secondary">📄 Whitepaper</a>
+                <a href="https://t.me/ramcoin_pow" target="_blank" class="btn btn-outline">📱 Telegram</a>
             </div>
         </div>
-
+        
+        <!-- СТАТУС НОДЫ -->
+        <div class="card" style="text-align:center;">
+            <span class="status-badge status-offline pulse">🔴 Нода офлайн</span>
+            <p style="margin-top:12px;">Публичный сервер 24/7 скоро будет запущен.</p>
+            <p style="font-size:0.88em;color:var(--text-muted);">Сейчас нода работает локально у разработчика. Следите за анонсами в Telegram.</p>
+        </div>
+        
+        <!-- О ПРОЕКТЕ -->
+        <h2 class="section-title" id="about">🚀 О проекте</h2>
+        <div class="grid-2">
+            <div class="card">
+                <h3>🖥️ CPU-only майнинг</h3>
+                <p>Майнит <span class="highlight">любой домашний ПК</span> с 4 ГБ ОЗУ. Никаких видеокарт, никаких ASIC. Только процессор и оперативная память.</p>
+            </div>
+            <div class="card">
+                <h3>🛡️ Защита от серверов</h3>
+                <p>Встроенный детектор серверных CPU. <span class="green">Штраф 75%</span> для Xeon, EPYC, Threadripper. Всё по-честному — домашние ПК в приоритете.</p>
+            </div>
+            <div class="card">
+                <h3>⚡ Соло-майнинг</h3>
+                <p>Никаких пулов. Нашёл блок — <span class="gold">забрал всю награду</span>. Ни с кем не делишься. Как Bitcoin в 2009 году.</p>
+            </div>
+            <div class="card">
+                <h3>💰 Честный старт</h3>
+                <p><span class="highlight">0 премайна</span>. 0 ICO. 0 инвесторов. Разработчик майнит наравне со всеми с первого блока. Код открыт — проверь сам.</p>
+            </div>
+        </div>
+        
+        <!-- ПОЧЕМУ ЭТО ВАЖНО -->
+        <div class="card" style="margin-top:16px;">
+            <h3>🔍 Полная прозрачность</h3>
+            <p>Вся история блокчейна хранится в открытой базе данных SQLite. <span class="highlight">Любой может проверить</span> все блоки, все транзакции, все балансы. Никаких скрытых начислений. Всё как на ладони.</p>
+            <p style="margin-top:8px;">📂 База данных: <code style="background:#0a0a10;padding:2px 8px;border-radius:4px;">blockchain_v7.db</code> (SQLite3, можно открыть любым просмотрщиком)</p>
+        </div>
+        
         <!-- ТОКЕНОМИКА -->
-        <div class="card" style="margin-top:14px;">
-            <h3>📊 Токеномика</h3>
-            <div style="overflow-x:auto;">
-                <table class="tokenomics-table">
-                    <thead><tr><th>Параметр</th><th>Значение</th></tr></thead>
-                    <tbody>
-                        <tr><td>Всего монет</td><td class="highlight">~17 520 000 RAM</td></tr>
-                        <tr><td>Награда за блок</td><td>10 RAM (халвинг каждые 876K блоков)</td></tr>
-                        <tr><td>Время блока</td><td>30 секунд</td></tr>
-                        <tr><td>Халвинг</td><td>Каждые ~10 месяцев</td></tr>
-                        <tr><td>Комиссия</td><td>0.001 RAM (фиксированная)</td></tr>
-                        <tr><td>Алгоритм</td><td>Memory-Hard PoW (CPU-only)</td></tr>
-                        <tr><td>Генезис</td><td>100 RAM (разработчик)</td></tr>
-                        <tr><td>Защита от серверов</td><td>Штраф 75% за серверные CPU</td></tr>
-                    </tbody>
-                </table>
-            </div>
+        <h2 class="section-title" id="tokenomics">📊 Токеномика</h2>
+        <div class="card">
+            <table>
+                <tr><td>Всего монет</td><td class="highlight">~17 520 000 RAM</td></tr>
+                <tr><td>Награда за блок</td><td>10 RAM (халвинг каждые 876 000 блоков)</td></tr>
+                <tr><td>Время блока</td><td>30 секунд</td></tr>
+                <tr><td>Халвинг</td><td>Каждые ~10 месяцев</td></tr>
+                <tr><td>Комиссия за TX</td><td>0.001 RAM (фиксированная)</td></tr>
+                <tr><td>Алгоритм</td><td>Memory-Hard Proof-of-Work (CPU-only)</td></tr>
+                <tr><td>Генезис</td><td>100 RAM (разработчик)</td></tr>
+                <tr><td>Защита от серверов</td><td class="green">Штраф 75% за серверные CPU</td></tr>
+                <tr><td>Распределение комиссии</td><td>90% майнеру, 10% разработчику</td></tr>
+            </table>
         </div>
-
-        <!-- ДЛЯ МАЙНЕРОВ -->
-        <h2 class="section-title" id="mining">⛏️ Для майнеров</h2>
-        <div class="card-grid">
+        
+        <!-- МАЙНИНГ -->
+        <h2 class="section-title" id="mining">⛏️ Как начать майнить</h2>
+        <div class="grid-2">
             <div class="card">
-                <h3>🖥️ Системные требования</h3>
-                <ul style="list-style:none;padding:0;">
-                    <li>✅ CPU: Любой (AMD/Intel)</li>
-                    <li>✅ ОЗУ: 4+ ГБ</li>
-                    <li>✅ ОС: Windows / Linux</li>
-                    <li>❌ GPU: Не нужен</li>
-                    <li>❌ ASIC: Бесполезен</li>
-                </ul>
-            </div>
-            <div class="card">
-                <h3>📥 Скачать</h3>
-                <p style="margin-bottom:12px;">Готовые сборки — просто запусти:</p>
-                <a href="https://disk.yandex.ru/d/OtkMuX3nTP60RQ" target="_blank" class="btn btn-primary" style="display:inline-flex;margin-bottom:8px;">⚡ Майнер</a>
-                <a href="https://disk.yandex.ru/d/OtkMuX3nTP60RQ" target="_blank" class="btn btn-secondary" style="display:inline-flex;">💼 Кошелёк</a>
-                <p style="margin-top:10px;font-size:0.82em;color:var(--text-muted);">Или вручную: Python 3.10+, <code>pip install websocket-client psutil pycryptodome cryptography</code></p>
+                <h3>📥 Быстрый старт</h3>
+                <ol style="padding-left:18px;color:var(--text-secondary);line-height:2.2;">
+                    <li>Установи <strong>Python 3.10+</strong></li>
+                    <li><code style="background:#0a0a10;padding:2px 6px;border-radius:4px;">pip install -r requirements.txt</code></li>
+                    <li>Скачай файлы с GitHub</li>
+                    <li>Запусти: <code style="background:#0a0a10;padding:2px 6px;border-radius:4px;">python miner.py</code></li>
+                    <li>Кошелёк создастся автоматически</li>
+                </ol>
+                <a href="https://github.com/ramcoinnode-debug/ramcoin" target="_blank" class="btn btn-primary" style="margin-top:12px;">💻 Скачать с GitHub</a>
             </div>
             <div class="card">
                 <h3>⚡ Производительность</h3>
-                <p>Хешрейт зависит от L3-кэша процессора.<br>
-                Ryzen 5 5600X (32MB L3): ~30-50 Ram/s<br>
-                Ryzen 5 5500U (8MB L3): ~8-15 Ram/s<br>
-                i5-12400 (18MB L3): ~20-35 Ram/s</p>
-            </div>
-            <div class="card">
-                <h3>🔗 Подключение</h3>
-                <p>Майнер сам найдёт ноду. По умолчанию:<br>
-                <code>http://localhost:5000</code><br>
-                Для удалённой ноды укажи IP в коде майнера.</p>
+                <p>Хешрейт зависит от <span class="highlight">L3-кэша</span> процессора:</p>
+                <ul style="list-style:none;padding:0;margin-top:8px;">
+                    <li>🖥️ Ryzen 5 5600X (32MB L3): ~30-50 Ram/s</li>
+                    <li>💻 Ryzen 5 5500U (8MB L3): ~8-15 Ram/s</li>
+                    <li>🖥️ i5-12400 (18MB L3): ~20-35 Ram/s</li>
+                    <li>🖥️ i3-12100 (12MB L3): ~10-20 Ram/s</li>
+                </ul>
+                <p style="margin-top:10px;font-size:0.85em;color:var(--text-muted);">Майнер сам определит ваш процессор и подберёт оптимальные настройки.</p>
             </div>
         </div>
-
-        <!-- КАЛЬКУЛЯТОР -->
-        <div class="calculator">
-            <h3>🧮 Калькулятор дохода</h3>
-            <div class="calc-row">
-                <div class="calc-field">
-                    <label>Ваш хешрейт (Ram/s)</label>
-                    <input type="number" id="calc-hashrate" value="10" min="0.1" step="0.1">
-                </div>
-                <div class="calc-field">
-                    <label>Сложность сети</label>
-                    <input type="text" id="calc-diff" value="—" readonly>
-                </div>
-                <div class="calc-field">
-                    <label>Награда за блок (RAM)</label>
-                    <input type="text" id="calc-block-reward" value="10" readonly>
-                </div>
-            </div>
-            <div class="calc-result">
-                Ожидаемый доход: <span id="calc-income">—</span> RAM/сутки<br>
-                Блоков в сутки: <span id="calc-blocks">—</span><br>
-                Доход в месяц: <span id="calc-monthly">—</span> RAM
-            </div>
+        
+        <!-- РЕФЕРАЛЬНАЯ СИСТЕМА -->
+        <div class="card" style="margin-top:16px;border-color:var(--green);">
+            <h3>👥 Реферальная система <span style="color:var(--green);font-size:0.7em;animation:pulse 2s infinite;">NEW</span></h3>
+            <p>Приглашай друзей — получай бонусы:</p>
+            <ul style="list-style:none;padding:0;margin-top:8px;color:var(--text-secondary);">
+                <li>🔗 Твой реферальный код — это <span class="highlight">твой адрес RAM</span></li>
+                <li>🎁 Когда приглашённый найдёт первый блок — ты получаешь <span class="gold">5 RAM</span></li>
+                <li>💰 Бонус начисляется автоматически</li>
+            </ul>
         </div>
-
-        <!-- ТРАНЗАКЦИИ -->
-        <h2 class="section-title">⛓️ Последние транзакции</h2>
-        <div class="table-wrap">
-            <table>
-                <thead><tr><th>Блок</th><th>Время</th><th>Отправитель</th><th>Получатель</th><th>Сумма (RAM)</th></tr></thead>
-                <tbody id="tx-body">
-                    <tr><td colspan="5" style="text-align:center;padding:25px;color:var(--text-muted);">⏳ Загрузка...</td></tr>
-                </tbody>
-            </table>
-        </div>
-
+        
         <!-- ROADMAP -->
         <h2 class="section-title" id="roadmap">🗺️ Дорожная карта</h2>
-        <div class="card" style="padding:28px 24px;">
+        <div class="card">
             <div class="roadmap-item">
                 <span class="badge badge-done">✅ Q2 2026 — Сделано</span>
-                <p style="color:#cbd5e1;margin-top:6px;">Ядро ноды v7.0 • SQLite3 • REST API • WebSocket • Соло-майнинг • Кошелёк • Сайт</p>
+                <p>Ядро ноды v7.0 • SQLite3 • REST API • WebSocket • Соло-майнинг • Кошелёк • Сайт • GitHub • Whitepaper • Токеномика • Стресс-тест пройден</p>
             </div>
             <div class="roadmap-item">
-                <span class="badge badge-now">🔄 Q3 2026 — В процессе</span>
-                <p style="color:#cbd5e1;margin-top:6px;">.EXE сборки • Публичный сервер 24/7 • API для бирж • Веб-эксплорер • Аудит безопасности</p>
+                <span class="badge badge-soon">🔄 Q3 2026 — Скоро</span>
+                <p>Публичный сервер 24/7 • Запуск сети в мир • Первые майнеры • Листинг на CoinMarketCap и CoinGecko</p>
             </div>
             <div class="roadmap-item">
-                <span class="badge badge-next">📋 Q4 2026</span>
-                <p style="color:#cbd5e1;margin-top:6px;">P2P-протокол • Децентрализация • Запуск основной сети</p>
+                <span class="badge badge-future">📋 Q4 2026</span>
+                <p>Листинг на биржах • P2P-протокол • Децентрализация • Смарт-контракты</p>
             </div>
             <div class="roadmap-item">
-                <span class="badge badge-next">📋 2027</span>
-                <p style="color:#cbd5e1;margin-top:6px;">Мобильные кошельки • Смарт-контракты • Листинг на биржах • Маркетинг</p>
+                <span class="badge badge-future">📋 2027</span>
+                <p>Мобильные кошельки • NFT • Маркетплейс • Массовое принятие</p>
             </div>
         </div>
-
-        <!-- API -->
-        <h2 class="section-title" id="api">🔌 API для бирж и сервисов</h2>
-        <div class="card">
-            <h3>📡 Доступные эндпоинты</h3>
-            <div style="overflow-x:auto;">
-                <table class="tokenomics-table" style="margin-top:8px;">
-                    <thead><tr><th>Метод</th><th>Эндпоинт</th><th>Описание</th></tr></thead>
-                    <tbody>
-                        <tr><td>GET</td><td><code>/health</code></td><td>Статус ноды</td></tr>
-                        <tr><td>GET</td><td><code>/stats</code></td><td>Статистика сети</td></tr>
-                        <tr><td>GET</td><td><code>/chain?limit=50</code></td><td>Последние блоки</td></tr>
-                        <tr><td>GET</td><td><code>/block/{index}</code></td><td>Блок по номеру</td></tr>
-                        <tr><td>GET</td><td><code>/tx/{hash}</code></td><td>Транзакция по хешу</td></tr>
-                        <tr><td>GET</td><td><code>/address/{addr}</code></td><td>Баланс и история</td></tr>
-                        <tr><td>GET</td><td><code>/pending</code></td><td>Мемпул</td></tr>
-                        <tr><td>GET</td><td><code>/top?limit=100</code></td><td>Топ адресов</td></tr>
-                        <tr><td>POST</td><td><code>/tx</code></td><td>Отправить транзакцию</td></tr>
-                        <tr><td>WS</td><td><code>/ws</code></td><td>WebSocket майнеров</td></tr>
-                    </tbody>
-                </table>
+        
+        <!-- ПОДДЕРЖКА -->
+        <h2 class="section-title">🤝 Поддержать проект</h2>
+        <div class="donate-box">
+            <h3>💰 Помоги запустить сервер 24/7</h3>
+            <p style="color:var(--text-secondary);margin:10px 0;">Все средства пойдут на покупку мини-ПК для публичной ноды.</p>
+            <div class="donate-addr" onclick="navigator.clipboard.writeText(this.textContent);alert('Адрес скопирован!')" title="Нажми чтобы скопировать">
+                RAM_04a9b30816a61686f377f152435f528e542b61eb7f0c9403778fdd19862600eb18a4faffe64d6a88a8077da4bf5bf908b74f2729c7fe044ddf5528521f5dcbd75a
             </div>
-            <p style="margin-top:14px;color:var(--text-secondary);font-size:0.88em;">
-                📄 Документация: <a href="#" style="color:var(--blue);">docs.ramcoin.network</a> (скоро)
+            <p style="font-size:0.8em;color:var(--text-muted);">👆 Нажми на адрес чтобы скопировать. Отправить можно через кошелёк RAMCOIN.</p>
+        </div>
+        
+        <!-- СООБЩЕСТВО -->
+        <h2 class="section-title" id="community">🔗 Сообщество</h2>
+        <div class="grid-3">
+            <div class="card" style="text-align:center;">
+                <h3>💻 GitHub</h3>
+                <p style="font-size:0.9em;">Код, документация, релизы</p>
+                <a href="https://github.com/ramcoinnode-debug/ramcoin" target="_blank" class="btn btn-primary" style="margin-top:10px;">Перейти</a>
+            </div>
+            <div class="card" style="text-align:center;">
+                <h3>📱 Telegram</h3>
+                <p style="font-size:0.9em;">Новости, обсуждения, помощь</p>
+                <a href="https://t.me/ramcoin_pow" target="_blank" class="btn btn-primary" style="margin-top:10px;background:#2b5278;">Подписаться</a>
+            </div>
+            <div class="card" style="text-align:center;">
+                <h3>▶️ Rutube</h3>
+                <p style="font-size:0.9em;">Стримы, туториалы, майнинг</p>
+                <a href="https://rutube.ru/channel/38441251/" target="_blank" class="btn btn-secondary" style="margin-top:10px;">Смотреть</a>
+            </div>
+        </div>
+        
+        <!-- ДИСКЛЕЙМЕР -->
+        <div class="card" style="margin-top:20px;border-left:4px solid var(--red);">
+            <p style="font-size:0.85em;color:var(--text-secondary);">
+                <strong>⚖️ Дисклеймер:</strong> RAMCOIN — экспериментальное программное обеспечение. Разработчик не несёт ответственности за финансовые потери. Инвестируйте только те средства, которые готовы потерять. DYOR.
             </p>
         </div>
-
-        <div class="disclaimer">
-            <strong>⚖️ Дисклеймер:</strong> RAMCOIN — экспериментальное ПО. Разработчик не несёт ответственности за финансовые потери. DYOR.
+        
+        <div class="footer">
+            © 2026 RAMCOIN Network. Все права защищены.<br>
+            <a href="https://github.com/ramcoinnode-debug/ramcoin" target="_blank">GitHub</a> · 
+            <a href="https://t.me/ramcoin_pow" target="_blank">Telegram</a> · 
+            <a href="https://rutube.ru/channel/38441251/" target="_blank">Rutube</a>
         </div>
     </div>
-
-    <div class="footer">
-        © 2026 RAMCOIN Network. Все права защищены.<br>
-        <a href="#">GitHub</a> · <a href="#">Telegram</a> · <a href="#">Twitter (X)</a>
-    </div>
-
-    <script>
-        // Без BigInt — чистый JavaScript
-        var API = "http://localhost:5000";
-        var COIN = 100000000;
-
-        function truncate(s, n) {
-            n = n || 8;
-            if (!s) return '';
-            return s.length > n*2+3 ? s.substring(0,n)+'...'+s.substring(s.length-n) : s;
-        }
-
-        function fmtRAM(v) {
-            return (Number(v)/COIN).toFixed(4);
-        }
-
-        function timeAgo(ts) {
-            var s = Math.floor(Date.now()/1000) - ts;
-            if (s < 60) return s + 'с';
-            if (s < 3600) return Math.floor(s/60) + 'м';
-            if (s < 86400) return Math.floor(s/3600) + 'ч';
-            return Math.floor(s/86400) + 'д';
-        }
-
-        // Статус соединения
-        function setOnline(v) {
-            var el = document.getElementById('conn-status');
-            if (el) {
-                el.className = 'connection-status ' + (v ? 'online' : 'offline');
-            }
-        }
-
-        // ==================== ГРАФИК (БЕЗ BigInt) ====================
-        var diffData = [];
-        var diffLabels = [];
-
-        function drawChart() {
-            var canvas = document.getElementById('diffChart');
-            if (!canvas) return;
-            var ctx = canvas.getContext('2d');
-            var container = canvas.parentElement;
-            canvas.width = container.clientWidth;
-            canvas.height = container.clientHeight;
-            var w = canvas.width, h = canvas.height;
-
-            if (diffData.length < 2) {
-                ctx.fillStyle = '#71717a';
-                ctx.font = '14px Inter, sans-serif';
-                ctx.textAlign = 'center';
-                ctx.fillText('Недостаточно данных', w/2, h/2);
-                return;
-            }
-
-            var padL = 60, padR = 20, padT = 15, padB = 35;
-            var plotW = w - padL - padR, plotH = h - padT - padB;
-            var maxV = Math.max.apply(null, diffData);
-            var minV = Math.min.apply(null, diffData);
-            var range = maxV - minV || 1;
-            var yMin = Math.max(0, minV - range*0.15);
-            var yMax = maxV + range*0.15;
-            var yRange = yMax - yMin;
-
-            ctx.clearRect(0, 0, w, h);
-
-            // Сетка
-            var gridN = 5;
-            ctx.strokeStyle = '#1e293b';
-            ctx.lineWidth = 1;
-            for (var i = 0; i <= gridN; i++) {
-                var gy = padT + (plotH/gridN)*i;
-                ctx.beginPath();
-                ctx.setLineDash([4,8]);
-                ctx.moveTo(padL, gy);
-                ctx.lineTo(w-padR, gy);
-                ctx.stroke();
-                ctx.setLineDash([]);
-                ctx.fillStyle = '#94a3b8';
-                ctx.font = '10px Inter';
-                ctx.textAlign = 'right';
-                ctx.fillText((yMax - (yRange/gridN)*i).toFixed(1), padL-6, gy+4);
-            }
-
-            // Градиент
-            var grad = ctx.createLinearGradient(0, padT, 0, padT+plotH);
-            grad.addColorStop(0, 'rgba(56,189,248,0.22)');
-            grad.addColorStop(0.5, 'rgba(56,189,248,0.06)');
-            grad.addColorStop(1, 'rgba(56,189,248,0.01)');
-
-            ctx.beginPath();
-            ctx.moveTo(padL, padT+plotH);
-            for (var i = 0; i < diffData.length; i++) {
-                var gx = padL + (plotW/(diffData.length-1))*i;
-                var gy = padT + plotH - ((diffData[i]-yMin)/yRange)*plotH;
-                ctx.lineTo(gx, gy);
-            }
-            ctx.lineTo(padL+plotW, padT+plotH);
-            ctx.closePath();
-            ctx.fillStyle = grad;
-            ctx.fill();
-
-            // Линия
-            ctx.beginPath();
-            ctx.strokeStyle = '#38bdf8';
-            ctx.lineWidth = 2.5;
-            ctx.shadowColor = 'rgba(56,189,248,0.5)';
-            ctx.shadowBlur = 8;
-            for (var i = 0; i < diffData.length; i++) {
-                var gx = padL + (plotW/(diffData.length-1))*i;
-                var gy = padT + plotH - ((diffData[i]-yMin)/yRange)*plotH;
-                if (i === 0) ctx.moveTo(gx, gy);
-                else ctx.lineTo(gx, gy);
-            }
-            ctx.stroke();
-            ctx.shadowBlur = 0;
-
-            // Точки
-            for (var i = 0; i < diffData.length; i += Math.max(1, Math.floor(diffData.length/30))) {
-                var gx = padL + (plotW/(diffData.length-1))*i;
-                var gy = padT + plotH - ((diffData[i]-yMin)/yRange)*plotH;
-                ctx.beginPath();
-                ctx.arc(gx, gy, 2, 0, Math.PI*2);
-                ctx.fillStyle = '#38bdf8';
-                ctx.fill();
-            }
-
-            // Последняя точка
-            if (diffData.length > 0) {
-                var lx = padL + plotW;
-                var ly = padT + plotH - ((diffData[diffData.length-1]-yMin)/yRange)*plotH;
-                ctx.beginPath();
-                ctx.arc(lx, ly, 6, 0, Math.PI*2);
-                ctx.fillStyle = '#38bdf8';
-                ctx.fill();
-                ctx.strokeStyle = '#fff';
-                ctx.lineWidth = 2;
-                ctx.stroke();
-            }
-
-            document.getElementById('chart-now').textContent = diffData[diffData.length-1] ? diffData[diffData.length-1].toFixed(1) : '—';
-            document.getElementById('chart-min').textContent = minV.toFixed(1);
-            document.getElementById('chart-max').textContent = maxV.toFixed(1);
-        }
-
-        window.addEventListener('resize', drawChart);
-
-        // ==================== КАЛЬКУЛЯТОР ====================
-        function updateCalculator() {
-            var hr = parseFloat(document.getElementById('calc-hashrate').value) || 0;
-            var diff = parseFloat(document.getElementById('calc-diff').value) || 1;
-            var reward = parseFloat(document.getElementById('calc-block-reward').value) || 10;
-            if (hr <= 0 || diff <= 0) {
-                document.getElementById('calc-income').textContent = '0';
-                document.getElementById('calc-blocks').textContent = '0';
-                document.getElementById('calc-monthly').textContent = '0';
-                return;
-            }
-            var blocksPerDay = (hr / diff) * (86400 / 30);
-            var income = blocksPerDay * reward;
-            document.getElementById('calc-income').textContent = income.toFixed(2);
-            document.getElementById('calc-blocks').textContent = blocksPerDay.toFixed(1);
-            document.getElementById('calc-monthly').textContent = (income*30).toFixed(2);
-        }
-
-        document.addEventListener('DOMContentLoaded', function() {
-            var el = document.getElementById('calc-hashrate');
-            if (el) el.addEventListener('input', updateCalculator);
-        });
-
-        // ==================== ЗАГРУЗКА ДАННЫХ ====================
-        async function fetchAll() {
-            try {
-                var chainResp = null;
-                var statsResp = null;
-                var topResp = null;
-
-                try {
-                    var r1 = await fetch(API + '/chain');
-                    chainResp = await r1.json();
-                } catch(e) {}
-
-                try {
-                    var r2 = await fetch(API + '/stats');
-                    statsResp = await r2.json();
-                } catch(e) {}
-
-                try {
-                    var r3 = await fetch(API + '/top?limit=8');
-                    topResp = await r3.json();
-                } catch(e) {}
-
-                setOnline(true);
-
-                // Статистика из chain
-                if (chainResp) {
-                    document.getElementById('stat-height').textContent = '#' + chainResp.length;
-                    document.getElementById('stat-diff').textContent = chainResp.diff_string || '—';
-                    document.getElementById('stat-mempool').textContent = chainResp.mempool_size || 0;
-
-                    var halvings = Math.floor(chainResp.length / 876000);
-                    var reward = (10 / Math.pow(2, halvings)).toFixed(2);
-                    document.getElementById('stat-reward').textContent = reward + ' RAM';
-                    document.getElementById('calc-block-reward').value = reward;
-
-                    // График
-                    if (chainResp.chain && chainResp.chain.length > 0) {
-                        diffData = [];
-                        diffLabels = [];
-                        for (var i = 0; i < chainResp.chain.length; i++) {
-                            var b = chainResp.chain[i];
-                            var t = parseFloat(b.target) || 1;
-                            // MAX_TARGET / target = сложность
-                            var maxTarget = 1.157920892373162e77; // ~2^256
-                            var diff = t > 0 ? (maxTarget / t) : 0;
-                            diffData.push(diff);
-                            diffLabels.push('#' + b.index);
-                        }
-                        drawChart();
-                        if (diffData.length > 0) {
-                            document.getElementById('calc-diff').value = diffData[diffData.length-1].toFixed(1);
-                        }
-                    }
-
-                    // Таблица TX
-                    var tbody = document.getElementById('tx-body');
-                    tbody.innerHTML = '';
-                    var cnt = 0;
-                    var rev = (chainResp.chain || []).slice().reverse();
-                    for (var i = 0; i < rev.length && cnt < 10; i++) {
-                        var blk = rev[i];
-                        var txs = blk.transactions || [];
-                        for (var j = 0; j < txs.length && cnt < 10; j++) {
-                            var tx = txs[j];
-                            cnt++;
-                            var sys = tx.sender === 'SYSTEM';
-                            var tr = document.createElement('tr');
-                            if (sys) tr.className = 'system-row';
-                            tr.innerHTML =
-                                '<td style="color:#38bdf8;font-weight:700;">#' + blk.index + '</td>' +
-                                '<td style="color:var(--text-muted);">' + timeAgo(blk.timestamp) + '</td>' +
-                                '<td class="mono">' + (sys ? '⛏️ Награда' : truncate(tx.sender, 6)) + '</td>' +
-                                '<td class="mono">' + truncate(tx.recipient, 6) + '</td>' +
-                                '<td style="color:#10b981;font-weight:700;">+' + fmtRAM(tx.amount) + '</td>';
-                            tbody.appendChild(tr);
-                        }
-                    }
-                    if (cnt === 0) {
-                        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;padding:25px;color:var(--text-muted);">Нет транзакций</td></tr>';
-                    }
-                }
-
-                // Статистика из stats
-                if (statsResp) {
-                    document.getElementById('stat-miners').textContent = statsResp.active_miners || 0;
-                    document.getElementById('stat-tx-total').textContent = statsResp.total_transactions || 0;
-                    var uptime = parseInt(statsResp.uptime || 0);
-                    var h = Math.floor(uptime / 3600);
-                    var m = Math.floor((uptime % 3600) / 60);
-                    document.getElementById('stat-uptime').textContent = h + 'ч ' + m + 'м';
-                }
-
-                // Топ адресов
-                if (topResp) {
-                    var list = document.getElementById('top-list');
-                    list.innerHTML = '';
-                    for (var i = 0; i < topResp.length; i++) {
-                        var a = topResp[i];
-                        var div = document.createElement('div');
-                        div.className = 'top-item';
-                        var serverTag = a.is_server ? '<span class="tag-server">SERVER</span>' : '';
-                        div.innerHTML =
-                            '<span class="top-rank">#' + (i+1) + '</span>' +
-                            '<span class="top-addr" title="' + a.address + '">' + truncate(a.address, 10) + serverTag + '</span>' +
-                            '<span class="top-balance">' + a.balance.toFixed(2) + ' RAM</span>';
-                        list.appendChild(div);
-                    }
-                }
-
-                updateCalculator();
-
-            } catch(e) {
-                setOnline(false);
-                document.getElementById('stat-height').textContent = 'Офлайн';
-            }
-        }
-
-        // Запуск
-        setInterval(fetchAll, 5000);
-        fetchAll();
-    </script>
 </body>
 </html>
