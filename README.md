@@ -1,4 +1,4 @@
-# 🖥️ RAMCOIN (RAM)
+# RAMCOIN (RAM)
 
 **Честный блокчейн с CPU-майнингом. Без ASIC, без пулов, только домашний ПК.**
 
@@ -6,66 +6,61 @@
 
 ---
 
-## 🇷🇺 Русский
+## Текущая версия: v7.0.2
 
-### Что такое RAMCOIN?
+---
 
-RAMCOIN — это полностью новый блокчейн, написанный с нуля на Python. Никаких форков, никакого копирования. Проект создан одним разработчиком с целью вернуть майнинг обычным людям.
+## Возможности
 
-### Особенности
-
-- 🖥️ **CPU-only** — майнит любой домашний компьютер с 4 ГБ ОЗУ
+- 🖥️ **CPU-only майнинг** — любой ПК с 4 ГБ ОЗУ
 - 🔒 **Memory-Hard PoW** — 4 МБ scratchpad, защита от ASIC и GPU
-- 🛡️ **Анти-сервер** — штраф 75% для серверных CPU (Xeon, EPYC)
-- ⚡ **Соло-майнинг** — никаких пулов, майнишь напрямую на ноду
+- 🛡️ **Анти-сервер** — штраф 75% для серверных CPU (Xeon, EPYC, Threadripper)
+- ⚡ **Соло-майнинг** — нашёл блок, забрал всё
+- 🤝 **Пул-майнинг** — стабильный доход, 98% майнерам
+- 🔥 **Сжигание** — 1% с каждого блока пула уходит на BURN адрес
 - 💰 **Честный старт** — без премайна, без ICO, без инвесторов
 - 📊 **17.5M монет** — эмиссия на 30 лет, халвинг каждые 10 месяцев
 - 💸 **Фиксированная комиссия** — 0.001 RAM за транзакцию
 
-### Быстрый старт
+---
+
+## Быстрый старт
 
 ```bash
 pip install -r requirements.txt
 python miner.py
-Структура проекта
-Файл	Назначение
-miner.py	Майнер
+Выбери режим: 1 = SOLO, 2 = POOL.
+
+Файлы
+Файл	Описание
+main.py	Нода блокчейна
+miner.py	Майнер (соло + пул)
 wallet.py	Кошелёк
-index.html	Сайт сети
+index.html	Сайт
+blockchain_v7.db	Полная история блокчейна (SQLite3)
+RamcoinMiner.exe	Майнер для Windows
 Документация
 Whitepaper (PDF)
 
 Токеномика (PDF)
 
+Блокчейн (SQLite3)
 
+Ссылки
+🌐 Сайт
 
-🇬🇧 English
-What is RAMCOIN?
-RAMCOIN is a brand new blockchain written from scratch in Python. No forks, no copy-paste. Built by a solo developer to bring mining back to regular people.
+📱 Telegram
 
-Features
-🖥️ CPU-only mining — works on any home PC with 4 GB RAM
+▶️ Rutube
 
-🔒 Memory-Hard PoW — 4 MB scratchpad, ASIC and GPU resistant
+🎮 Twitch
 
-🛡️ Anti-server protection — 75% penalty for server CPUs (Xeon, EPYC)
+🟢 Kick
 
-⚡ Solo mining — no pools, mine directly to the node
+Аптайм
+Текущая версия ноды проработала 200+ часов без сбоев. 14 000+ блоков добыто. 0 rejected.
 
-💰 Fair launch — no premine, no ICO, no investors
-
-📊 17.5M supply — 30-year emission, halving every 10 months
-
-💸 Fixed fee — 0.001 RAM per transaction
-
-Quick Start
-bash
-pip install -r requirements.txt
-python miner.py
-Links
-
-
-⚖️ Disclaimer
-RAMCOIN is experimental software. Use at your own risk. DYOR.
+Лицензия
+MIT License — делай что хочешь, но помни: это экспериментальное ПО.
 
 © 2026 RAMCOIN Network
