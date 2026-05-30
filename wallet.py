@@ -1,7 +1,6 @@
 #!/usr/bin/env python3
 """
-RAMCOIN WALLET v5.0.0 — Кошелёк для ноды v7
-Совместим с node_v7.py
+RAMCOIN WALLET v5.0.1 — Совместим с нодой v7.0.2
 """
 
 import hashlib
@@ -17,8 +16,8 @@ from Crypto.Cipher import AES
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives import serialization, hashes
 
-# ═══════════════════ КОНСТАНТЫ ═══════════════════
-VERSION = "5.0.0"
+# ==================== КОНСТАНТЫ ====================
+VERSION = "5.0.1"
 NODE_URL = "http://localhost:5000"
 WALLET_FILE = "ramcoin_wallet.json"
 OFFLINE_TX_FILE = "ramcoin_offline_txs.json"
@@ -38,7 +37,7 @@ DIM = '\033[2m'
 RESET = '\033[0m'
 
 
-# ═══════════════════ БЕЗОПАСНОЕ ШИФРОВАНИЕ ═══════════════════
+# ==================== ШИФРОВАНИЕ ====================
 class CryptoWallet:
     SALT_SIZE = 32
     ITERATIONS = 600_000
@@ -66,7 +65,7 @@ class CryptoWallet:
             return None
 
 
-# ═══════════════════ ГЕНЕРАЦИЯ КЛЮЧЕЙ ═══════════════════
+# ==================== ГЕНЕРАЦИЯ КЛЮЧЕЙ ====================
 class KeyGenerator:
     WORDLIST = [
         "abandon","ability","able","about","above","absent","absorb","abstract",
@@ -340,319 +339,187 @@ class KeyGenerator:
         priv_key = ec.derive_private_key(seed_int, ec.SECP256K1())
         priv_hex = hex(priv_key.private_numbers().private_value)[2:].zfill(64)
         pub_key = priv_key.public_key()
-        pub_bytes = pub_key.public_bytes(
-            encoding=serialization.Encoding.X962,
-            format=serialization.PublicFormat.UncompressedPoint
-        )
+        pub_bytes = pub_key.public_bytes(encoding=serialization.Encoding.X962, format=serialization.PublicFormat.UncompressedPoint)
         address = f"RAM_{pub_bytes.hex()}"
         return priv_hex, address
 
 
-# ═══════════════════ ВАЛИДАЦИЯ ═══════════════════
+# ==================== ВАЛИДАЦИЯ ====================
 def validate_address(address):
-    if not address.startswith("RAM_"):
-        return False, "Адрес должен начинаться с 'RAM_'"
+    if not address.startswith("RAM_"): return False, "Адрес должен начинаться с 'RAM_'"
     pub_hex = address[4:]
-    if len(pub_hex) != 130:
-        return False, f"Неверная длина: {len(address)} символов (ожидается 134)"
+    if len(pub_hex) != 130: return False, f"Неверная длина"
     try:
         pub_bytes = bytes.fromhex(pub_hex)
         ec.EllipticCurvePublicKey.from_encoded_point(ec.SECP256K1(), pub_bytes)
-        return True, "Валидный адрес RAMCOIN"
-    except:
-        return False, "Некорректный публичный ключ"
+        return True, "Валидный адрес"
+    except: return False, "Некорректный ключ"
 
 
-# ═══════════════════ АДРЕСНАЯ КНИГА ═══════════════════
+# ==================== АДРЕСНАЯ КНИГА ====================
 class AddressBook:
     @staticmethod
     def load():
         if os.path.exists(ADDRESS_BOOK_FILE):
             try:
-                with open(ADDRESS_BOOK_FILE, "r", encoding="utf-8") as f:
-                    return json.load(f)
-            except:
-                pass
+                with open(ADDRESS_BOOK_FILE, "r", encoding="utf-8") as f: return json.load(f)
+            except: pass
         return {}
 
     @staticmethod
     def save(book):
-        with open(ADDRESS_BOOK_FILE, "w", encoding="utf-8") as f:
-            json.dump(book, f, indent=4)
+        with open(ADDRESS_BOOK_FILE, "w", encoding="utf-8") as f: json.dump(book, f, indent=4)
 
     @staticmethod
     def add(name, address):
-        book = AddressBook.load()
-        book[name] = address
-        AddressBook.save(book)
-        print(f"✅ {name} → {address[:30]}... добавлен")
+        book = AddressBook.load(); book[name] = address; AddressBook.save(book)
+        print(f"✅ {name} добавлен")
 
     @staticmethod
     def remove(name):
         book = AddressBook.load()
-        if name in book:
-            del book[name]
-            AddressBook.save(book)
-            print(f"✅ {name} удалён")
-        else:
-            print(f"❌ {name} не найден")
+        if name in book: del book[name]; AddressBook.save(book); print(f"✅ {name} удалён")
+        else: print(f"❌ {name} не найден")
 
     @staticmethod
     def list_all():
         book = AddressBook.load()
         if book:
             print("\n📒 АДРЕСНАЯ КНИГА:")
-            print("-" * 40)
-            for name, addr in book.items():
-                print(f"  {name}: {addr[:30]}...")
-        else:
-            print("📒 Адресная книга пуста")
+            for name, addr in book.items(): print(f"  {name}: {addr[:30]}...")
+        else: print("📒 Адресная книга пуста")
 
     @staticmethod
     def find(name):
-        book = AddressBook.load()
-        return book.get(name, None)
+        return AddressBook.load().get(name, None)
 
 
-# ═══════════════════ СЕТЕВЫЕ ФУНКЦИИ ═══════════════════
+# ==================== СЕТЕВЫЕ ФУНКЦИИ ====================
 def api_get(path):
-    """GET запрос к ноде"""
     try:
         req = urllib.request.Request(f"{NODE_URL}{path}", method="GET")
-        with urllib.request.urlopen(req, timeout=3) as r:
-            return json.loads(r.read().decode())
-    except:
-        return None
-
+        with urllib.request.urlopen(req, timeout=3) as r: return json.loads(r.read().decode())
+    except: return None
 
 def api_post(path, data):
-    """POST запрос к ноде"""
     try:
-        req = urllib.request.Request(
-            f"{NODE_URL}{path}",
-            data=json.dumps(data).encode(),
-            headers={"Content-Type": "application/json"},
-            method="POST"
-        )
-        with urllib.request.urlopen(req, timeout=5) as r:
-            return json.loads(r.read().decode())
+        req = urllib.request.Request(f"{NODE_URL}{path}", data=json.dumps(data).encode(), headers={"Content-Type": "application/json"}, method="POST")
+        with urllib.request.urlopen(req, timeout=5) as r: return json.loads(r.read().decode())
     except urllib.error.HTTPError as e:
-        try:
-            return json.loads(e.read().decode())
-        except:
-            return {"status": "error", "reason": f"HTTP {e.code}"}
-    except Exception as e:
-        return {"status": "error", "reason": str(e)}
-
+        try: return json.loads(e.read().decode())
+        except: return {"status": "error", "reason": f"HTTP {e.code}"}
+    except Exception as e: return {"status": "error", "reason": str(e)}
 
 def get_balance(address):
-    """Получить баланс и nonce адреса"""
     data = api_get(f"/address/{address}")
-    if data and "balance" in data:
-        return int(data["balance"] * COIN), int(data.get("nonce", 0))
+    if data and "balance" in data: return int(data["balance"] * COIN), int(data.get("nonce", 0))
     return None, None
 
-
 def get_pending_transactions():
-    """Получить мемпул"""
     return api_get("/pending") or []
 
-
 def get_pending_weight(address):
-    """Сумма заблокированных средств в мемпуле"""
     weight = 0
     for tx in get_pending_transactions():
-        if tx.get("sender") == address:
-            weight += int(tx.get("amount", 0)) + FIXED_NETWORK_FEE
+        if tx.get("sender") == address: weight += int(tx.get("amount", 0)) + FIXED_NETWORK_FEE
     return weight
 
-
 def get_transaction_history(address):
-    """История транзакций адреса"""
     data = api_get(f"/address/{address}")
-    if data and "transactions" in data:
-        return data["transactions"]
+    if data and "transactions" in data: return data["transactions"]
     return []
 
 
-# ═══════════════════ ОФЛАЙН ТРАНЗАКЦИИ ═══════════════════
+# ==================== ОФЛАЙН ТРАНЗАКЦИИ ====================
 def push_offline_transaction(tx):
     txs = []
     if os.path.exists(OFFLINE_TX_FILE):
         try:
-            with open(OFFLINE_TX_FILE, "r", encoding="utf-8") as f:
-                txs = json.load(f)
-        except:
-            txs = []
+            with open(OFFLINE_TX_FILE, "r", encoding="utf-8") as f: txs = json.load(f)
+        except: txs = []
     txs.append(tx)
-    with open(OFFLINE_TX_FILE, "w", encoding="utf-8") as f:
-        json.dump(txs, f, indent=4)
-
+    with open(OFFLINE_TX_FILE, "w", encoding="utf-8") as f: json.dump(txs, f, indent=4)
 
 def sync_offline_transactions():
-    if not os.path.exists(OFFLINE_TX_FILE):
-        return
+    if not os.path.exists(OFFLINE_TX_FILE): return
     try:
-        with open(OFFLINE_TX_FILE, "r", encoding="utf-8") as f:
-            txs = json.load(f)
-    except:
-        return
-    if not txs:
-        return
-
-    print(f"\n⏳ Отложенных транзакций: {len(txs)}. Отправка...")
+        with open(OFFLINE_TX_FILE, "r", encoding="utf-8") as f: txs = json.load(f)
+    except: return
+    if not txs: return
+    print(f"\n⏳ Отложенных TX: {len(txs)}. Отправка...")
     successful = []
     for tx in txs:
         resp = api_post("/tx", tx)
-        if resp and resp.get("status") == "ok":
-            print(f"  ✅ TX (nonce: {tx.get('nonce')}) доставлена")
-            successful.append(tx)
-        else:
-            reason = resp.get("reason", "unknown") if resp else "no response"
-            print(f"  ❌ TX (nonce: {tx.get('nonce')}) — {reason}")
-            break
-
+        if resp and resp.get("status") == "ok": print(f"  ✅ TX (nonce: {tx.get('nonce')}) доставлена"); successful.append(tx)
+        else: print(f"  ❌ TX (nonce: {tx.get('nonce')}) — {resp.get('reason', '?') if resp else 'no response'}"); break
     remaining = [t for t in txs if t not in successful]
-    with open(OFFLINE_TX_FILE, "w", encoding="utf-8") as f:
-        json.dump(remaining, f, indent=4)
+    with open(OFFLINE_TX_FILE, "w", encoding="utf-8") as f: json.dump(remaining, f, indent=4)
 
 
-# ═══════════════════ УПРАВЛЕНИЕ КОШЕЛЬКОМ ═══════════════════
+# ==================== УПРАВЛЕНИЕ КОШЕЛЬКОМ ====================
 def save_wallet_file(address, private_key, mnemonic, last_balance=0, last_nonce=0, password=None):
     if not password:
         while True:
-            print("\n🔒 Придумайте надёжный пароль (мин. 8 символов):")
+            print("\n🔒 Придумайте пароль (мин. 8 символов):")
             password = input("👉 ").strip()
-            if len(password) < 8:
-                print("❌ Слишком короткий пароль!")
-                continue
-            password_confirm = input("🔒 Повторите пароль: ").strip()
-            if password != password_confirm:
-                print("❌ Пароли не совпадают!")
-                continue
+            if len(password) < 8: print("❌ Слишком короткий!"); continue
+            if password != input("🔒 Повторите пароль: ").strip(): print("❌ Пароли не совпадают!"); continue
             break
-
-    wallet_data = {
-        "address": address,
-        "private_key_hex": private_key,
-        "mnemonic": mnemonic,
-        "last_balance": int(last_balance),
-        "last_nonce": int(last_nonce),
-        "created_at": int(time.time()),
-        "version": VERSION
-    }
-
+    wallet_data = {"address": address, "private_key_hex": private_key, "mnemonic": mnemonic,
+                   "last_balance": int(last_balance), "last_nonce": int(last_nonce),
+                   "created_at": int(time.time()), "version": VERSION}
     encrypted = CryptoWallet.encrypt_data(json.dumps(wallet_data), password)
-
-    wallet_file_content = {
-        "type": "RAMCOIN_WALLET",
-        "version": VERSION,
-        "address": address,
-        "crypto_data": encrypted,
-        "kdf": "pbkdf2-sha512",
-        "cipher": "aes-256-gcm"
-    }
-
-    with open(WALLET_FILE, "w", encoding="utf-8") as f:
-        json.dump(wallet_file_content, f, indent=4)
-
+    wallet_file_content = {"type": "RAMCOIN_WALLET", "version": VERSION, "address": address,
+                           "crypto_data": encrypted, "kdf": "pbkdf2-sha512", "cipher": "aes-256-gcm"}
+    with open(WALLET_FILE, "w", encoding="utf-8") as f: json.dump(wallet_file_content, f, indent=4)
     return wallet_data
 
-
 def create_new_wallet():
-    print(f"\n{CYAN}🆕 СОЗДАНИЕ КОШЕЛЬКА RAMCOIN{RESET}")
-    print("=" * 55)
-
+    print(f"\n{CYAN}🆕 СОЗДАНИЕ КОШЕЛЬКА{RESET}")
     mnemonic = KeyGenerator.generate_mnemonic()
-
-    print(f"{YELLOW}⚠️  ЗАПИШИТЕ ЭТИ 12 СЛОВ:{RESET}")
-    print("—" * 55)
-    print(f"   📝 {BOLD}{mnemonic}{RESET}")
-    print("—" * 55)
-    print(f"{RED}🔐 Это единственный способ восстановить доступ!{RESET}\n")
-
+    print(f"{YELLOW}⚠️  ЗАПИШИТЕ 12 СЛОВ:{RESET}\n📝 {BOLD}{mnemonic}{RESET}\n")
     input("Нажмите ENTER когда запишете...")
-
     priv_hex, address = KeyGenerator.get_keys(mnemonic)
-
-    print(f"\n✅ Кошелёк создан!")
-    print(f"📍 Адрес: {address}")
-    print(f"💰 Комиссия сети: {FIXED_NETWORK_FEE / COIN} RAM")
-    print(f"   • Разработчику: {DEVELOPER_SHARE}% • Майнеру: {MINER_SHARE}%")
-
+    print(f"\n✅ Кошелёк создан!\n📍 Адрес: {address}")
     return save_wallet_file(address, priv_hex, mnemonic)
-
 
 def restore_wallet_by_mnemonic():
-    print(f"\n{CYAN}📦 ВОССТАНОВЛЕНИЕ КОШЕЛЬКА{RESET}")
-    print("Введите 12 слов через пробел:")
-    mnemonic = input("👉 ").strip()
-
-    if len(mnemonic.split()) < 12:
-        print("❌ Нужно ровно 12 слов!")
-        return None
-
+    print(f"\n{CYAN}📦 ВОССТАНОВЛЕНИЕ{RESET}")
+    mnemonic = input("Введите 12 слов через пробел: ").strip()
+    if len(mnemonic.split()) < 12: print("❌ Нужно 12 слов!"); return None
     priv_hex, address = KeyGenerator.get_keys(mnemonic)
-
-    print(f"\n🔑 Кошелёк восстановлен!")
-    print(f"📍 Адрес: {address}")
-
+    print(f"\n🔑 Кошелёк восстановлен!\n📍 Адрес: {address}")
     return save_wallet_file(address, priv_hex, mnemonic)
 
-
 def load_wallet():
-    if not os.path.exists(WALLET_FILE):
-        print("❌ Файл кошелька не найден!")
-        return None
-
+    if not os.path.exists(WALLET_FILE): print("❌ Файл кошелька не найден!"); return None
     try:
-        with open(WALLET_FILE, "r", encoding="utf-8") as f:
-            wallet_file = json.load(f)
-
+        with open(WALLET_FILE, "r", encoding="utf-8") as f: wallet_file = json.load(f)
         print(f"\n🔑 Загрузка: {wallet_file.get('address', 'Unknown')[:30]}...")
         password = input("🔒 Пароль: ").strip()
-
         decrypted = CryptoWallet.decrypt_data(wallet_file["crypto_data"], password)
-
-        if decrypted is None:
-            print("❌ Неверный пароль!")
-            return None
-
+        if decrypted is None: print("❌ Неверный пароль!"); return None
         wallet_data = json.loads(decrypted)
-        print(f"✅ Кошелёк загружен!")
-        return wallet_data
-
-    except Exception as e:
-        print(f"❌ Ошибка: {e}")
-        return None
+        print(f"✅ Кошелёк загружен!"); return wallet_data
+    except Exception as e: print(f"❌ Ошибка: {e}"); return None
 
 
-# ═══════════════════ ТРАНЗАКЦИИ ═══════════════════
+# ==================== ТРАНЗАКЦИИ ====================
 def send_transaction(sender_address, private_key_hex, recipient, amount_ram, wallet_data=None, password=None):
-    # Валидация адреса
     is_valid, err_msg = validate_address(recipient)
-    if not is_valid:
-        print(f"❌ {err_msg}")
-        return False
-
-    if sender_address == recipient:
-        print("❌ Нельзя отправить RAM самому себе!")
-        return False
-
-    if amount_ram <= 0:
-        print("❌ Сумма должна быть больше нуля!")
-        return False
+    if not is_valid: print(f"❌ {err_msg}"); return False
+    if sender_address == recipient: print("❌ Нельзя отправить самому себе!"); return False
+    if amount_ram <= 0: print("❌ Сумма должна быть больше нуля!"); return False
 
     amount = int(round(amount_ram * COIN))
     fee = FIXED_NETWORK_FEE
 
-    # Получаем баланс с ноды
+    # Получаем баланс через /address/{addr}
     live_balance, tx_nonce = get_balance(sender_address)
 
     if live_balance is not None:
         is_online = True
     else:
-        # Офлайн — используем сохранённые данные
         live_balance = int(wallet_data.get("last_balance", 0)) if wallet_data else 0
         tx_nonce = int(wallet_data.get("last_nonce", 0)) if wallet_data else 0
         is_online = False
@@ -664,91 +531,52 @@ def send_transaction(sender_address, private_key_hex, recipient, amount_ram, wal
     if available < (amount + fee):
         print(f"❌ Недостаточно средств!")
         print(f"   Доступно: {available / COIN:.8f} RAM")
-        print(f"   Требуется: {(amount + fee) / COIN:.8f} RAM (включая комиссию {fee / COIN} RAM)")
+        print(f"   Требуется: {(amount + fee) / COIN:.8f} RAM")
         return False
 
-    # Формируем транзакцию
-    tx_data = {
-        "sender": sender_address,
-        "recipient": recipient,
-        "amount": amount,
-        "fee": fee,
-        "nonce": tx_nonce,
-        "timestamp": int(time.time())
-    }
+    tx_data = {"sender": sender_address, "recipient": recipient, "amount": amount,
+               "fee": fee, "nonce": tx_nonce, "timestamp": int(time.time())}
 
-    # Подписываем
     try:
         priv_int = int(private_key_hex, 16)
         priv_key = ec.derive_private_key(priv_int, ec.SECP256K1())
+        signing_data = {"sender": tx_data["sender"], "recipient": tx_data["recipient"],
+                        "amount": tx_data["amount"], "fee": tx_data["fee"],
+                        "nonce": tx_data["nonce"], "timestamp": tx_data["timestamp"]}
+        tx_data["signature"] = priv_key.sign(json.dumps(signing_data, sort_keys=True).encode(), ec.ECDSA(hashes.SHA256())).hex()
+    except Exception as e: print(f"❌ Ошибка подписи: {e}"); return False
 
-        signing_data = {
-            "sender": tx_data["sender"],
-            "recipient": tx_data["recipient"],
-            "amount": tx_data["amount"],
-            "fee": tx_data["fee"],
-            "nonce": tx_data["nonce"],
-            "timestamp": tx_data["timestamp"]
-        }
-
-        signature = priv_key.sign(
-            json.dumps(signing_data, sort_keys=True).encode(),
-            ec.ECDSA(hashes.SHA256())
-        )
-
-        tx_data["signature"] = signature.hex()
-
-    except Exception as e:
-        print(f"❌ Ошибка подписи: {e}")
-        return False
-
-    # Отправка
     if is_online:
         resp = api_post("/tx", tx_data)
         if resp and resp.get("status") == "ok":
             print(f"\n✅ Транзакция отправлена!")
             print(f"   📤 {amount_ram} RAM → {recipient[:30]}...")
-            print(f"   ⛽ Комиссия: {fee / COIN} RAM")
-            print(f"      • Разработчику: {fee * DEVELOPER_SHARE // 100 / COIN} RAM")
-            print(f"      • Майнеру: {fee * MINER_SHARE // 100 / COIN} RAM")
-            # Обновляем nonce в кошельке
-            if wallet_data:
-                wallet_data["last_nonce"] = tx_nonce + 1
+            if wallet_data: wallet_data["last_nonce"] = tx_nonce + 1
             return True
         else:
-            reason = resp.get("reason", "unknown") if resp else "no response"
-            print(f"❌ Нода отклонила: {reason}")
+            print(f"❌ Нода отклонила: {resp.get('reason', '?') if resp else 'no response'}")
             return False
 
-    # Офлайн — сохраняем
     print("📴 Сохраняем офлайн...")
     push_offline_transaction(tx_data)
-
     if wallet_data and password:
         wallet_data["last_nonce"] = tx_nonce + 1
         wallet_data["last_balance"] = live_balance - (amount + fee)
         encrypted = CryptoWallet.encrypt_data(json.dumps(wallet_data), password)
-        with open(WALLET_FILE, "r", encoding="utf-8") as f:
-            wf = json.load(f)
+        with open(WALLET_FILE, "r", encoding="utf-8") as f: wf = json.load(f)
         wf["crypto_data"] = encrypted
-        with open(WALLET_FILE, "w", encoding="utf-8") as f:
-            json.dump(wf, f, indent=4)
-
-    print(f"✅ Транзакция сохранена (nonce: {tx_nonce})")
+        with open(WALLET_FILE, "w", encoding="utf-8") as f: json.dump(wf, f, indent=4)
+    print(f"✅ TX сохранена (nonce: {tx_nonce})")
     return True
 
 
 def check_balance(address):
     print(f"\n💰 Проверка баланса...")
-
     balance, nonce = get_balance(address)
-
     if balance is not None:
         print(f"📍 Адрес: {address[:30]}...")
         print(f"💰 Баланс: {balance / COIN:.8f} RAM")
         print(f"🔢 Nonce: {nonce}")
-        print(f"⛽ Комиссия: {FIXED_NETWORK_FEE / COIN} RAM за перевод")
-
         pending = get_pending_transactions()
         my_pending = [tx for tx in pending if tx.get("sender") == address]
         if my_pending:
@@ -759,10 +587,9 @@ def check_balance(address):
         print("⚠️ Нода недоступна.")
 
 
-# ═══════════════════ ИНТЕРФЕЙС ═══════════════════
+# ==================== ИНТЕРФЕЙС ====================
 def wallet_menu(wallet_data):
     password = None
-
     while True:
         print("\n" + "=" * 55)
         print(f"{CYAN}💼 КОШЕЛЁК RAMCOIN v{VERSION}{RESET}")
@@ -779,7 +606,6 @@ def wallet_menu(wallet_data):
         print("7. 🔒 Сменить пароль")
         print("8. 🚪 Выйти")
         print("-" * 55)
-
         choice = input("👉 ").strip()
 
         if choice == "1":
@@ -787,157 +613,95 @@ def wallet_menu(wallet_data):
 
         elif choice == "2":
             print(f"\n📤 ОТПРАВКА RAM")
-            print(f"⛽ Комиссия: {FIXED_NETWORK_FEE / COIN} RAM")
-
             book = AddressBook.load()
             if book:
                 print("\n📒 Адресная книга:")
                 items = list(book.items())
-                for i, (name, addr) in enumerate(items, 1):
-                    print(f"  {i}. {name}: {addr[:30]}...")
+                for i, (name, addr) in enumerate(items, 1): print(f"  {i}. {name}: {addr[:30]}...")
                 print(f"  0. Ввести вручную")
                 try:
                     idx = int(input("\n👉 Получатель: ").strip())
-                    if 1 <= idx <= len(items):
-                        recipient = items[idx - 1][1]
-                    else:
-                        recipient = input("📍 Адрес (RAM_...): ").strip()
-                except:
-                    recipient = input("📍 Адрес (RAM_...): ").strip()
+                    recipient = items[idx-1][1] if 1 <= idx <= len(items) else input("📍 Адрес (RAM_...): ").strip()
+                except: recipient = input("📍 Адрес (RAM_...): ").strip()
             else:
                 recipient = input("📍 Адрес (RAM_...): ").strip()
-
-            try:
-                amount = float(input("💎 Сумма RAM: ").strip())
-            except ValueError:
-                print("❌ Введите число!")
-                continue
-
-            if not password:
-                password = input("🔒 Пароль: ").strip()
-
-            # Проверка пароля
-            with open(WALLET_FILE, "r", encoding="utf-8") as f:
-                wf = json.load(f)
-            if CryptoWallet.decrypt_data(wf["crypto_data"], password) is None:
-                print("❌ Неверный пароль!")
-                password = None
-                continue
-
-            send_transaction(
-                wallet_data["address"],
-                wallet_data["private_key_hex"],
-                recipient,
-                amount,
-                wallet_data,
-                password
-            )
+            try: amount = float(input("💎 Сумма RAM: ").strip())
+            except ValueError: print("❌ Введите число!"); continue
+            if not password: password = input("🔒 Пароль: ").strip()
+            with open(WALLET_FILE, "r", encoding="utf-8") as f: wf = json.load(f)
+            if CryptoWallet.decrypt_data(wf["crypto_data"], password) is None: print("❌ Неверный пароль!"); password = None; continue
+            send_transaction(wallet_data["address"], wallet_data["private_key_hex"], recipient, amount, wallet_data, password)
 
         elif choice == "3":
             print("\n📜 ИСТОРИЯ ТРАНЗАКЦИЙ")
-            print("=" * 55)
             history = get_transaction_history(wallet_data["address"])
             if history:
                 for tx in history[:20]:
                     direction = "📥" if tx.get("recipient") == wallet_data["address"] else "📤"
                     amount = int(tx.get("amount", 0)) / COIN
                     print(f"  {direction} Блок #{tx.get('block_index', '?')} | {amount:.4f} RAM")
-                if len(history) > 20:
-                    print(f"  ... и ещё {len(history) - 20}")
-            else:
-                print("  Нет транзакций")
+            else: print("  Нет транзакций")
 
         elif choice == "4":
-            print("\n📒 АДРЕСНАЯ КНИГА")
-            print("1. Показать | 2. Добавить | 3. Удалить | 4. Назад")
+            print("\n📒 АДРЕСНАЯ КНИГА\n1. Показать | 2. Добавить | 3. Удалить | 4. Назад")
             sub = input("👉 ").strip()
-            if sub == "1":
-                AddressBook.list_all()
+            if sub == "1": AddressBook.list_all()
             elif sub == "2":
-                name = input("  Имя: ").strip()
-                addr = input("  Адрес (RAM_...): ").strip()
+                name = input("  Имя: ").strip(); addr = input("  Адрес (RAM_...): ").strip()
                 ok, err = validate_address(addr)
-                if ok:
-                    AddressBook.add(name, addr)
-                else:
-                    print(f"❌ {err}")
-            elif sub == "3":
-                name = input("  Имя: ").strip()
-                AddressBook.remove(name)
+                if ok: AddressBook.add(name, addr)
+                else: print(f"❌ {err}")
+            elif sub == "3": AddressBook.remove(input("  Имя: ").strip())
 
-        elif choice == "5":
-            sync_offline_transactions()
+        elif choice == "5": sync_offline_transactions()
 
         elif choice == "6":
             print(f"\n📋 ИНФОРМАЦИЯ")
             print(f"Версия: {wallet_data.get('version', '?')}")
             print(f"Адрес: {wallet_data['address']}")
             print(f"Создан: {time.ctime(wallet_data.get('created_at', 0))}")
-            print(f"Шифрование: AES-256-GCM + PBKDF2-SHA512 (600K iter)")
-            print(f"Комиссия: {FIXED_NETWORK_FEE / COIN} RAM")
+            print(f"Шифрование: AES-256-GCM + PBKDF2-SHA512")
 
         elif choice == "7":
             print("\n🔒 СМЕНА ПАРОЛЯ")
             old_pw = input("Старый пароль: ").strip()
-            with open(WALLET_FILE, "r") as f:
-                wf = json.load(f)
-            if CryptoWallet.decrypt_data(wf["crypto_data"], old_pw) is None:
-                print("❌ Неверный пароль!")
-                continue
+            with open(WALLET_FILE, "r") as f: wf = json.load(f)
+            if CryptoWallet.decrypt_data(wf["crypto_data"], old_pw) is None: print("❌ Неверный пароль!"); continue
             new_pw = input("Новый пароль (мин. 8): ").strip()
-            if len(new_pw) < 8:
-                print("❌ Короткий!")
-                continue
+            if len(new_pw) < 8: print("❌ Короткий!"); continue
             wf["crypto_data"] = CryptoWallet.encrypt_data(json.dumps(wallet_data), new_pw)
-            with open(WALLET_FILE, "w") as f:
-                json.dump(wf, f, indent=4)
-            password = new_pw
-            print("✅ Пароль изменён!")
+            with open(WALLET_FILE, "w") as f: json.dump(wf, f, indent=4)
+            password = new_pw; print("✅ Пароль изменён!")
 
         elif choice == "8":
             print(f"\n👋 До свидания!")
             wallet_data["private_key_hex"] = "0" * 64
             break
 
-        else:
-            print("❌ Неверный выбор!")
+        else: print("❌ Неверный выбор!")
 
 
 def main():
     print(f"\n{CYAN}🚀 RAMCOIN WALLET v{VERSION}{RESET}")
-    print(f"🔒 Защищённый криптокошелёк")
     print(f"⛽ Комиссия: {FIXED_NETWORK_FEE / COIN} RAM")
-    print("=" * 55)
-
     if os.path.exists(WALLET_FILE):
-        print("1. 📂 Загрузить кошелёк")
-        print("2. 🆕 Создать новый")
-        print("3. 🔄 Восстановить по фразе")
-        print("4. 🚪 Выйти")
+        print("1. 📂 Загрузить кошелёк\n2. 🆕 Создать новый\n3. 🔄 Восстановить по фразе\n4. 🚪 Выйти")
         choice = input("\n👉 ").strip()
-
         if choice == "1":
             wallet = load_wallet()
-            if wallet:
-                wallet_menu(wallet)
+            if wallet: wallet_menu(wallet)
         elif choice == "2":
             wallet = create_new_wallet()
-            if wallet:
-                wallet_menu(wallet)
+            if wallet: wallet_menu(wallet)
         elif choice == "3":
             wallet = restore_wallet_by_mnemonic()
-            if wallet:
-                wallet_menu(wallet)
+            if wallet: wallet_menu(wallet)
     else:
         print("🆕 Создание нового кошелька...")
         wallet = create_new_wallet()
-        if wallet:
-            wallet_menu(wallet)
+        if wallet: wallet_menu(wallet)
 
 
 if __name__ == "__main__":
-    try:
-        main()
-    except KeyboardInterrupt:
-        print(f"\n\n👋 До свидания!")
-        sys.exit(0)
+    try: main()
+    except KeyboardInterrupt: print(f"\n\n👋 До свидания!"); sys.exit(0)
