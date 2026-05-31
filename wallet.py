@@ -1,6 +1,6 @@
 #!/usr/bin/env python3
 """
-RAMCOIN WALLET v5.0.1 — Совместим с нодой v7.0.2
+RAMCOIN WALLET v7.0.3 — Совместим с нодой v7.0.3
 """
 
 import hashlib
@@ -17,7 +17,7 @@ from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives import serialization, hashes
 
 # ==================== КОНСТАНТЫ ====================
-VERSION = "5.0.1"
+VERSION = "7.0.3"
 NODE_URL = "http://localhost:5000"
 WALLET_FILE = "ramcoin_wallet.json"
 OFFLINE_TX_FILE = "ramcoin_offline_txs.json"
@@ -514,7 +514,6 @@ def send_transaction(sender_address, private_key_hex, recipient, amount_ram, wal
     amount = int(round(amount_ram * COIN))
     fee = FIXED_NETWORK_FEE
 
-    # Получаем баланс через /address/{addr}
     live_balance, tx_nonce = get_balance(sender_address)
 
     if live_balance is not None:
