@@ -3,13 +3,12 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAMCOIN (RAM) — Честный P2P блокчейн | Дашборд</title>
-    <link rel="icon" href="https://github.com/ramcoinnode-debug/ramcoin/raw/main/Ramcoin%20(1).png" type="image/png">
+    <title>RAMCOIN (RAM) — P2P Blockchain</title>
     <style>
         :root {
             --bg: #060609; --bg-card: #0d0d14; --border: #1a1a2e;
-            --blue: #38bdf8; --green: #10b981; --gold: #fbbf24; --red: #ef4444;
-            --text: #e4e4e7; --text-secondary: #a1a1aa;
+            --blue: #38bdf8; --green: #10b981; --gold: #fbbf24;
+            --text: #e4e4e7;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
         body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); }
@@ -28,73 +27,75 @@
         .btn-primary { background: #0284c7; color: white; }
         .btn-green { background: #059669; color: white; }
         .btn-gold { background: #b45309; color: white; }
+        .btn-purple { background: #7c3aed; color: white; }
         .balance { font-size: 2em; font-weight: 900; color: var(--green); text-align: center; }
         .social { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 20px 0; }
         .social a { background: var(--bg-card); border: 1px solid var(--border); padding: 10px 18px; border-radius: 10px; color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.9em; }
     </style>
 </head>
 <body>
-    <nav><span class="logo">🚀 RAMCOIN</span></nav>
+    <nav><span class="logo">RAMCOIN</span></nav>
     <div class="container">
-        <center><span class="hero-badge">🌐 P2P СЕТЬ ЗАПУЩЕНА</span></center>
+        <center><span class="hero-badge">P2P NETWORK LIVE</span></center>
         <h1>RAMCOIN</h1>
-        <p style="text-align:center;color:#a1a1aa;">Честный CPU-майнинг. 17.5M монет. Сжигание. P2P.</p>
+        <p style="text-align:center;color:#a1a1aa;">CPU Mining | 17.5M Supply | Burn | P2P</p>
         
         <div class="stats" id="stats">
-            <div class="stat"><div class="num" id="h">--</div><div class="lbl">БЛОКИ</div></div>
-            <div class="stat"><div class="num" id="d">--</div><div class="lbl">СЛОЖНОСТЬ</div></div>
-            <div class="stat"><div class="num" id="s">--</div><div class="lbl">ЭМИССИЯ</div></div>
-            <div class="stat"><div class="num" id="p">--</div><div class="lbl">ПИРЫ</div></div>
+            <div class="stat"><div class="num" id="h">--</div><div class="lbl">BLOCKS</div></div>
+            <div class="stat"><div class="num" id="d">--</div><div class="lbl">DIFFICULTY</div></div>
+            <div class="stat"><div class="num" id="s">--</div><div class="lbl">SUPPLY</div></div>
+            <div class="stat"><div class="num" id="p">--</div><div class="lbl">MINERS</div></div>
         </div>
 
         <div class="card">
-            <h3>🔍 Проверить баланс</h3>
-            <input type="text" id="addr" placeholder="RAM_..." value="RAM_04a9b30816a61686f377f152435f528e542b61eb7f0c9403778fdd19862600eb18a4faffe64d6a88a8077da4bf5bf908b74f2729c7fe044ddf5528521f5dcbd75a">
-            <button class="btn btn-primary" onclick="check()">💰 Проверить</button>
+            <h3>Check Balance</h3>
+            <input type="text" id="addr" placeholder="RAM_...">
+            <button class="btn btn-primary" onclick="check()">Check</button>
             <div id="result"></div>
         </div>
 
         <div class="card" style="text-align:center;">
-            <a href="https://github.com/ramcoinnode-debug/ramcoin" class="btn btn-green">📂 GitHub</a>
-            <a href="https://t.me/ramcoin_pow" class="btn btn-gold">📢 Telegram</a>
+            <h3>Download</h3>
+            <a href="https://github.com/ramcoinnode-debug/ramcoin" class="btn btn-purple">GitHub</a>
+            <a href="https://t.me/ramcoin_pow" class="btn btn-gold">Telegram</a>
         </div>
 
         <div class="social">
-            <a href="https://t.me/ramcoin_pow">📢 Telegram</a>
-            <a href="https://rutube.ru/channel/38441251/">▶️ Rutube</a>
-            <a href="https://www.twitch.tv/ram_coin">🎮 Twitch</a>
-            <a href="https://kick.com/ram_coin">🟢 Kick</a>
-            <a href="https://github.com/ramcoinnode-debug/ramcoin">💻 GitHub</a>
+            <a href="https://t.me/ramcoin_pow">Telegram</a>
+            <a href="https://rutube.ru/channel/38441251/">Rutube</a>
+            <a href="https://www.twitch.tv/ram_coin">Twitch</a>
+            <a href="https://kick.com/ram_coin">Kick</a>
+            <a href="https://github.com/ramcoinnode-debug/ramcoin">GitHub</a>
         </div>
 
-        <p style="text-align:center;color:#71717a;font-size:0.8em;">Seed: 90.188.108.252:5000 | API: 8080</p>
+        <p style="text-align:center;color:#71717a;font-size:0.8em;">Node: 90.188.108.252:5000</p>
     </div>
 
     <script>
-        const API = 'http://90.188.108.252:8080';
+        const API = window.location.origin;
         async function load() {
             try {
-                const r = await fetch(API + '/api/stats');
+                const r = await fetch(API + '/stats');
                 const d = await r.json();
                 document.getElementById('h').textContent = d.height;
                 document.getElementById('d').textContent = d.difficulty;
-                document.getElementById('s').textContent = (d.total_supply/1000).toFixed(0)+'K';
-                document.getElementById('p').textContent = d.peers;
+                document.getElementById('s').textContent = d.total_supply.toFixed(0) + ' RAM';
+                document.getElementById('p').textContent = d.active_miners;
             } catch(e) {}
         }
         async function check() {
             const addr = document.getElementById('addr').value.trim();
             const res = document.getElementById('result');
-            if(!addr.startsWith('RAM_')) { res.innerHTML='<p style="color:red">Неверный адрес</p>'; return; }
-            res.innerHTML='<p>Загрузка...</p>';
+            if(!addr.startsWith('RAM_')) { res.innerHTML='<p style="color:red">Invalid address</p>'; return; }
+            res.innerHTML='<p>Loading...</p>';
             try {
-                const r = await fetch(API+'/api/address/'+addr);
+                const r = await fetch(API + '/address/' + addr);
                 const d = await r.json();
                 if(d.error) res.innerHTML='<p style="color:red">'+d.error+'</p>';
-                else res.innerHTML='<div class="balance">💰 '+d.balance.toFixed(4)+' RAM</div><p style="color:#71717a">Nonce: '+d.nonce+'</p>';
-            } catch(e) { res.innerHTML='<p style="color:red">Нода недоступна</p>'; }
+                else res.innerHTML='<div class="balance">' + d.balance.toFixed(4) + ' RAM</div><p style="color:#71717a">Nonce: '+d.nonce+'</p>';
+            } catch(e) { res.innerHTML='<p style="color:red">Node offline</p>'; }
         }
-        load(); check();
+        load();
         setInterval(load, 30000);
     </script>
 </body>
