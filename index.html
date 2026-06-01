@@ -3,9 +3,8 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAMCOIN (RAM) — Честный блокчейн | CPU-майнинг без ASIC | $1M Potential</title>
-    <meta name="description" content="RAMCOIN — блокчейн с нуля на Python. Честный CPU-майнинг, защита от ASIC и серверов. Соло и пул-майнинг. 17.5M монет. Заявки на CoinMarketCap и CoinGecko поданы.">
-    <meta name="keywords" content="ramcoin, криптовалюта, майнинг, cpu mining, anti-asic, соло-майнинг, пул-майнинг, блокчейн">
+    <title>RAMCOIN (RAM) — Честный P2P блокчейн | Дашборд</title>
+    <meta name="description" content="RAMCOIN — децентрализованный блокчейн. CPU-майнинг, P2P сеть, защита от ASIC. 17.5M монет. Сеть запущена.">
     <link rel="icon" href="https://github.com/ramcoinnode-debug/ramcoin/raw/main/Ramcoin%20(1).png" type="image/png">
     <style>
         :root {
@@ -27,7 +26,6 @@
                         radial-gradient(circle at 90% 80%, rgba(139,92,246,0.06) 0%, transparent 40%);
             pointer-events: none; z-index: 0;
         }
-        
         nav {
             position: sticky; top: 0; z-index: 100;
             background: rgba(6,6,9,0.92); backdrop-filter: blur(16px);
@@ -38,312 +36,224 @@
             display: flex; align-items: center; justify-content: space-between; height: 56px;
             flex-wrap: wrap; gap: 10px;
         }
-        nav .logo { 
+        nav .logo {
             font-size: 1.4em; font-weight: 900; color: var(--blue); text-decoration: none; letter-spacing: -1px;
             display: flex; align-items: center; gap: 10px;
         }
         nav .logo img { height: 32px; width: 32px; border-radius: 6px; }
-        nav .nav-links { display: flex; gap: 20px; list-style: none; flex-wrap: wrap; }
-        nav .nav-links a { color: var(--text-secondary); text-decoration: none; font-size: 0.85em; font-weight: 600; transition: color 0.2s; }
-        nav .nav-links a:hover { color: var(--blue); }
-        .lang-switch { display: flex; gap: 8px; }
-        .lang-switch button {
-            background: var(--bg-card); border: 1px solid var(--border); color: var(--text-secondary);
-            padding: 6px 14px; border-radius: 8px; cursor: pointer; font-size: 0.85em; font-weight: 600; transition: all 0.2s;
-        }
-        .lang-switch button.active { background: var(--blue); color: #fff; border-color: var(--blue); }
-        @media(max-width:800px) { nav .nav-links { display: none; } }
-        
         .container { max-width: 1100px; margin: 0 auto; padding: 20px 20px 60px; position: relative; z-index: 1; }
-        
-        .hero { text-align: center; padding: 50px 20px 40px; }
+
+        .hero { text-align: center; padding: 30px 20px 20px; }
         .hero-badge {
-            display: inline-block; background: rgba(239,68,68,0.15); color: var(--red);
-            border: 1px solid rgba(239,68,68,0.3); padding: 8px 20px; border-radius: 50px;
-            font-weight: 700; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 20px;
+            display: inline-block; background: rgba(16,185,129,0.15); color: var(--green);
+            border: 1px solid rgba(16,185,129,0.3); padding: 8px 20px; border-radius: 50px;
+            font-weight: 700; font-size: 0.85em; text-transform: uppercase; letter-spacing: 1px; margin-bottom: 15px;
             animation: pulse 2s infinite;
         }
-        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.5} }
+        @keyframes pulse { 0%,100%{opacity:1} 50%{opacity:0.7} }
         .hero h1 {
-            font-size: clamp(2.4em, 6vw, 3.8em); font-weight: 900; letter-spacing: -2px;
+            font-size: clamp(2em, 5vw, 3em); font-weight: 900; letter-spacing: -2px;
             background: linear-gradient(135deg, #38bdf8 0%, #818cf8 40%, #c084fc 100%);
             -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-            margin-bottom: 12px; line-height: 1.1;
+            margin-bottom: 10px; line-height: 1.1;
         }
-        .hero p { color: var(--text-secondary); font-size: 1.1em; max-width: 650px; margin: 0 auto; }
-        .hero p strong { color: #fff; }
-        
-        .stats-row { display: flex; justify-content: center; gap: 35px; margin: 30px 0 20px; flex-wrap: wrap; }
-        .stat-item { text-align: center; min-width: 80px; }
-        .stat-item .num { font-size: 2.4em; font-weight: 900; color: #fff; line-height: 1; }
-        .stat-item .lbl { color: var(--text-muted); text-transform: uppercase; font-size: 0.75em; letter-spacing: 1.5px; margin-top: 5px; }
-        
-        .btn-row { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; margin-top: 20px; }
+        .hero p { color: var(--text-secondary); font-size: 1em; max-width: 600px; margin: 0 auto; }
+
+        .stats-row { display: flex; justify-content: center; gap: 30px; margin: 20px 0; flex-wrap: wrap; }
+        .stat-item { text-align: center; min-width: 70px; }
+        .stat-item .num { font-size: 1.8em; font-weight: 900; color: #fff; }
+        .stat-item .lbl { color: var(--text-muted); text-transform: uppercase; font-size: 0.7em; letter-spacing: 1.5px; }
+
+        .btn-row { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 15px 0; }
         .btn {
             display: inline-flex; align-items: center; gap: 8px;
-            padding: 14px 28px; border-radius: 10px; font-weight: 700; font-size: 0.95em;
-            text-decoration: none; transition: all 0.25s; border: 1px solid transparent;
+            padding: 12px 24px; border-radius: 10px; font-weight: 700; font-size: 0.9em;
+            text-decoration: none; transition: all 0.25s; border: 1px solid transparent; cursor: pointer;
         }
         .btn-primary { background: #0284c7; color: #fff; border-color: var(--blue); }
         .btn-primary:hover { background: #0369a1; transform: translateY(-2px); }
-        .btn-secondary { background: #059669; color: #d1fae5; border-color: var(--green); }
-        .btn-secondary:hover { background: #064e3b; transform: translateY(-2px); }
+        .btn-green { background: #059669; color: #d1fae5; border-color: var(--green); }
+        .btn-green:hover { background: #064e3b; transform: translateY(-2px); }
         .btn-outline { background: transparent; color: var(--blue); border-color: var(--border); }
         .btn-outline:hover { border-color: var(--blue); }
         .btn-gold { background: #b45309; color: #fef3c7; border-color: var(--gold); }
         .btn-gold:hover { background: #92400e; transform: translateY(-2px); }
-        
+
         .section-title {
-            font-size: 1.5em; font-weight: 800; color: #f8fafc;
-            margin: 45px 0 18px; padding-left: 14px; border-left: 4px solid var(--blue);
+            font-size: 1.3em; font-weight: 800; color: #f8fafc;
+            margin: 30px 0 15px; padding-left: 14px; border-left: 4px solid var(--blue);
         }
-        
-        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
-        .grid-3 { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 14px; }
-        @media(max-width:750px) { .grid-2, .grid-3 { grid-template-columns: 1fr; } }
-        
+
         .card {
             background: var(--bg-card); border: 1px solid var(--border);
-            border-radius: var(--radius); padding: 24px; transition: all 0.3s;
+            border-radius: var(--radius); padding: 20px; transition: all 0.3s; margin-bottom: 14px;
         }
-        .card:hover { border-color: #38bdf844; transform: translateY(-2px); }
+        .card:hover { border-color: #38bdf844; }
         .card h3 { color: #f8fafc; margin-bottom: 10px; font-size: 1.1em; }
-        .card p, .card li { color: var(--text-secondary); line-height: 1.8; font-size: 0.93em; }
-        
+        .card p { color: var(--text-secondary); line-height: 1.7; font-size: 0.9em; }
+
+        .dashboard-address {
+            width: 100%; max-width: 550px; padding: 14px 18px; border-radius: 10px;
+            border: 1px solid var(--border); background: var(--bg-card); color: var(--text);
+            font-family: 'Courier New', monospace; font-size: 0.9em; margin: 10px 0;
+        }
+        .dashboard-address:focus { outline: none; border-color: var(--blue); }
+
+        .balance-big {
+            font-size: 2.5em; font-weight: 900; color: var(--green);
+            text-align: center; padding: 20px;
+        }
+
+        .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+        @media(max-width:750px) { .grid-2 { grid-template-columns: 1fr; } }
+
         .highlight { color: var(--blue); font-weight: 700; }
         .green { color: var(--green); font-weight: 700; }
         .gold { color: var(--gold); font-weight: 700; }
-        
-        table { width: 100%; border-collapse: collapse; font-size: 0.9em; }
-        th { text-align: left; padding: 12px 14px; color: var(--text-muted); text-transform: uppercase; font-size: 0.72em; letter-spacing: 1px; border-bottom: 2px solid var(--border); }
-        td { padding: 11px 14px; border-bottom: 1px solid #111; color: #cbd5e1; }
-        
-        .roadmap-item {
-            border-left: 3px solid var(--blue); padding: 0 0 20px 20px; position: relative;
-        }
-        .roadmap-item::before {
-            content: ''; position: absolute; left: -6px; top: 4px;
-            width: 10px; height: 10px; background: var(--blue); border-radius: 50%;
-            box-shadow: 0 0 12px var(--blue);
-        }
-        .roadmap-item:last-child { border-left-color: transparent; padding-bottom: 0; }
-        .badge {
-            display: inline-block; padding: 5px 12px; border-radius: 30px;
-            font-size: 0.76em; font-weight: 700; margin-bottom: 6px;
-        }
-        .badge-done { background: #065f46; color: #6ee7b7; }
-        .badge-progress { background: #1e3a5f; color: var(--blue); }
-        .badge-future { background: #1e293b; color: #94a3b8; }
-        
-        .social-grid { display: flex; justify-content: center; gap: 16px; flex-wrap: wrap; }
+
+        table { width: 100%; border-collapse: collapse; font-size: 0.85em; }
+        th { text-align: left; padding: 10px 12px; color: var(--text-muted); text-transform: uppercase; font-size: 0.7em; letter-spacing: 1px; border-bottom: 2px solid var(--border); }
+        td { padding: 9px 12px; border-bottom: 1px solid #111; color: #cbd5e1; }
+
+        .social-grid { display: flex; justify-content: center; gap: 12px; flex-wrap: wrap; }
         .social-btn {
             display: inline-flex; align-items: center; gap: 8px;
-            padding: 12px 24px; border-radius: 10px; font-weight: 700; font-size: 0.9em;
+            padding: 10px 20px; border-radius: 10px; font-weight: 700; font-size: 0.85em;
             text-decoration: none; transition: all 0.25s; border: 1px solid var(--border);
             background: var(--bg-card); color: var(--text);
         }
         .social-btn:hover { border-color: var(--blue); transform: translateY(-2px); }
-        
+
         .footer { text-align: center; padding: 30px; color: var(--text-muted); font-size: 0.8em; border-top: 1px solid var(--border); margin-top: 40px; }
         .footer a { color: var(--blue); text-decoration: none; }
+
+        #balance-result { text-align: center; padding: 15px; }
+        .error { color: var(--red); text-align: center; padding: 10px; }
     </style>
 </head>
 <body>
 
-    <nav>
-        <div class="nav-inner">
-            <a href="#" class="logo">
-                <img src="https://github.com/ramcoinnode-debug/ramcoin/raw/main/Ramcoin%20(1).png" alt="RAMCOIN">
-                RAMCOIN
-            </a>
-            <ul class="nav-links" id="nav-links">
-                <li><a href="#about" data-ru="О проекте" data-en="About">О проекте</a></li>
-                <li><a href="#mining" data-ru="Майнинг" data-en="Mining">Майнинг</a></li>
-                <li><a href="#tokenomics" data-ru="Токеномика" data-en="Tokenomics">Токеномика</a></li>
-                <li><a href="#roadmap" data-ru="Дорожная карта" data-en="Roadmap">Дорожная карта</a></li>
-                <li><a href="#exchange" data-ru="Биржи" data-en="Exchanges">Биржи</a></li>
-                <li><a href="#verify" data-ru="Проверка" data-en="Verify">Проверка</a></li>
-                <li><a href="#social" data-ru="Соцсети" data-en="Social">Соцсети</a></li>
-            </ul>
-            <div class="lang-switch">
-                <button class="active" onclick="setLang('ru')">RU</button>
-                <button onclick="setLang('en')">EN</button>
-            </div>
-        </div>
-    </nav>
+<nav>
+    <div class="nav-inner">
+        <a href="#" class="logo">
+            <img src="https://github.com/ramcoinnode-debug/ramcoin/raw/main/Ramcoin%20(1).png" alt="RAMCOIN">
+            RAMCOIN
+        </a>
+    </div>
+</nav>
 
-    <div class="container">
-        
-        <!-- HERO -->
-        <div class="hero">
-            <div class="hero-badge" data-ru="Нода офлайн — сервер скоро будет запущен" data-en="Node offline — server coming soon">Нода офлайн — сервер скоро будет запущен</div>
-            <h1>RAMCOIN</h1>
-            <p data-ru="<strong>Честный блокчейн.</strong> Написан с нуля на Python.<br>CPU-майнинг без ASIC, соло и пул, сжигание монет."
-               data-en="<strong>Fair blockchain.</strong> Built from scratch in Python.<br>CPU mining, no ASIC, solo & pool, coin burn.">
-               <strong>Честный блокчейн.</strong> Написан с нуля на Python.<br>CPU-майнинг без ASIC, соло и пул, сжигание монет.</p>
-            
-            <div class="stats-row">
-                <div class="stat-item"><div class="num">4 MB</div><div class="lbl" data-ru="RAM на поток" data-en="RAM per thread">RAM на поток</div></div>
-                <div class="stat-item"><div class="num">0.001</div><div class="lbl" data-ru="RAM комиссия" data-en="RAM fee">RAM комиссия</div></div>
-                <div class="stat-item"><div class="num">17.5M</div><div class="lbl" data-ru="Всего монет" data-en="Total supply">Всего монет</div></div>
-                <div class="stat-item"><div class="num">$1M+</div><div class="lbl" data-ru="Потенциал" data-en="Potential">Потенциал</div></div>
-            </div>
-            
-            <div class="btn-row">
-                <a href="https://github.com/ramcoinnode-debug/ramcoin" target="_blank" class="btn btn-primary">GitHub</a>
-                <a href="https://github.com/ramcoinnode-debug/ramcoin/raw/main/RamcoinMiner.exe" target="_blank" class="btn btn-secondary" data-ru="Скачать Майнер" data-en="Download Miner">Скачать Майнер</a>
-                <a href="https://github.com/ramcoinnode-debug/ramcoin/blob/main/ramcoin_whitepaper.pdf" target="_blank" class="btn btn-outline">Whitepaper</a>
-                <a href="https://t.me/ramcoin_pow" target="_blank" class="btn btn-gold">Telegram</a>
-            </div>
-        </div>
-        
-        <!-- О ПРОЕКТЕ -->
-        <h2 class="section-title" id="about" data-ru="О проекте" data-en="About">О проекте</h2>
-        <div class="grid-2">
-            <div class="card">
-                <h3 data-ru="🖥️ CPU-only майнинг" data-en="🖥️ CPU-only mining">🖥️ CPU-only майнинг</h3>
-                <p data-ru="Майнит любой домашний ПК с 4 ГБ ОЗУ. Никаких видеокарт, никаких ASIC."
-                   data-en="Any home PC with 4GB RAM can mine. No GPUs, no ASICs.">Майнит любой домашний ПК с 4 ГБ ОЗУ. Никаких видеокарт, никаких ASIC.</p>
-            </div>
-            <div class="card">
-                <h3 data-ru="🛡️ Защита от серверов" data-en="🛡️ Anti-server protection">🛡️ Защита от серверов</h3>
-                <p data-ru="Штраф 75% для Xeon, EPYC, Threadripper. Домашние ПК в приоритете."
-                   data-en="75% penalty for Xeon, EPYC, Threadripper. Home PCs first.">Штраф 75% для Xeon, EPYC, Threadripper. Домашние ПК в приоритете.</p>
-            </div>
-            <div class="card">
-                <h3 data-ru="⚡ Соло + Пул" data-en="⚡ Solo + Pool">⚡ Соло + Пул</h3>
-                <p data-ru="Соло: нашёл блок — забрал все 10 RAM. Пул: 98% майнерам, 1% сжигается, 1% разработчику. Выбор при запуске."
-                   data-en="Solo: find a block, take all 10 RAM. Pool: 98% miners, 1% burned, 1% developer. Choose at launch.">Соло: нашёл блок — забрал все 10 RAM. Пул: 98% майнерам, 1% сжигается, 1% разработчику.</p>
-            </div>
-            <div class="card">
-                <h3 data-ru="💰 Честный старт" data-en="💰 Fair launch">💰 Честный старт</h3>
-                <p data-ru="0 премайна. 0 ICO. 0 инвесторов. Разработчик майнит как все с блока #1."
-                   data-en="0 premine. 0 ICO. 0 investors. Developer mines from block #1.">0 премайна. 0 ICO. 0 инвесторов. Разработчик майнит как все с блока #1.</p>
-            </div>
-        </div>
-        
-        <!-- МАЙНИНГ -->
-        <h2 class="section-title" id="mining" data-ru="Майнинг" data-en="Mining">Майнинг</h2>
-        <div class="grid-2">
-            <div class="card">
-                <h3 data-ru="⚡ Соло-майнинг" data-en="⚡ Solo Mining">⚡ Соло-майнинг</h3>
-                <p data-ru="Нашёл блок — забрал все 10 RAM. Вся награда твоя. Выбери режим 1 при запуске."
-                   data-en="Find a block — take all 10 RAM. Full reward is yours. Choose mode 1 at launch.">Нашёл блок — забрал все 10 RAM. Вся награда твоя.</p>
-            </div>
-            <div class="card">
-                <h3 data-ru="🤝 Пул-майнинг" data-en="🤝 Pool Mining">🤝 Пул-майнинг</h3>
-                <p data-ru="Стабильный доход. 98% майнерам, 1% сжигается, 1% разработчику. Выбери режим 2 при запуске."
-                   data-en="Stable income. 98% miners, 1% burned, 1% developer. Choose mode 2 at launch.">Стабильный доход. 98% майнерам, 1% сжигается, 1% разработчику.</p>
-            </div>
-            <div class="card">
-                <h3 data-ru="📥 Быстрый старт" data-en="📥 Quick Start">📥 Быстрый старт</h3>
-                <p data-ru="Скачай .exe или запусти Python: pip install -r requirements.txt && python miner.py"
-                   data-en="Download .exe or run Python: pip install -r requirements.txt && python miner.py">Скачай .exe или Python: pip install -r requirements.txt && python miner.py</p>
-                <a href="https://github.com/ramcoinnode-debug/ramcoin" target="_blank" class="btn btn-primary" style="margin-top:10px;display:inline-flex;">GitHub</a>
-            </div>
-            <div class="card">
-                <h3 data-ru="🔥 Сжигание" data-en="🔥 Burn">🔥 Сжигание</h3>
-                <p data-ru="1% награды пула сжигается навсегда. Монеты уходят на BURN-адрес. Дефляционный механизм."
-                   data-en="1% of pool rewards burned forever. Coins sent to BURN address. Deflationary mechanism.">1% награды пула сжигается навсегда. Дефляционный механизм.</p>
-            </div>
-        </div>
-        
-        <!-- ТОКЕНОМИКА -->
-        <h2 class="section-title" id="tokenomics" data-ru="Токеномика" data-en="Tokenomics">Токеномика</h2>
-        <div class="card">
-            <table>
-                <tr><td data-ru="Всего монет" data-en="Total supply">Всего монет</td><td class="highlight">17 520 000 RAM</td></tr>
-                <tr><td data-ru="Награда за блок" data-en="Block reward">Награда за блок</td><td class="gold">10 RAM</td></tr>
-                <tr><td data-ru="Время блока" data-en="Block time">Время блока</td><td>30 секунд</td></tr>
-                <tr><td data-ru="Халвинг" data-en="Halving">Халвинг</td><td>Каждые 876 000 блоков (~10 месяцев)</td></tr>
-                <tr><td data-ru="Комиссия" data-en="Fee">Комиссия</td><td>0.001 RAM (фиксированная)</td></tr>
-                <tr><td data-ru="Алгоритм" data-en="Algorithm">Алгоритм</td><td>Memory-Hard PoW (CPU-only)</td></tr>
-                <tr><td data-ru="Сжигание" data-en="Burn">Сжигание</td><td class="green">1% с каждого блока пула</td></tr>
-                <tr><td data-ru="Потенциал" data-en="Potential">Потенциал</td><td class="gold">$1M+ при цене $0.057</td></tr>
-            </table>
-        </div>
-        
-        <!-- ROADMAP -->
-        <h2 class="section-title" id="roadmap" data-ru="Дорожная карта" data-en="Roadmap">Дорожная карта</h2>
-        <div class="card">
-            <div class="roadmap-item">
-                <span class="badge badge-done" data-ru="Q2 2026 — Выполнено" data-en="Q2 2026 — Done">Q2 2026 — Выполнено</span>
-                <p data-ru="Нода v7.0 • Майнер (соло+пул) • Кошелёк • Сайт • GitHub • Whitepaper • Сжигание • 14 900+ блоков • 200+ часов аптайма • 0 rejected • Стресс-тест 1000 TX"
-                   data-en="Node v7.0 • Miner (solo+pool) • Wallet • Website • GitHub • Whitepaper • Burn • 14,900+ blocks • 200+ hrs uptime • 0 rejected • 1000 TX stress test">
-                   Нода v7.0 • Майнер (соло+пул) • Кошелёк • Сайт • GitHub • Whitepaper • Сжигание • 14 900+ блоков • 200+ часов аптайма • 0 rejected</p>
-            </div>
-            <div class="roadmap-item">
-                <span class="badge badge-progress" data-ru="Q3 2026 — В процессе" data-en="Q3 2026 — In Progress">Q3 2026 — В процессе</span>
-                <p data-ru="Сервер 24/7 • Заявки на CMC и CoinGecko поданы • Первые майнеры • Листинг на бирже • Аудит"
-                   data-en="24/7 server • CMC & CoinGecko applied • First miners • Exchange listing • Audit">
-                   Сервер 24/7 • Заявки на CMC и CoinGecko поданы • Первые майнеры • Листинг на бирже</p>
-            </div>
-            <div class="roadmap-item">
-                <span class="badge badge-future">Q4 2026</span>
-                <p data-ru="P2P • Смарт-контракты • Мобильный кошелёк • Децентрализация"
-                   data-en="P2P • Smart contracts • Mobile wallet • Decentralization">P2P • Смарт-контракты • Мобильный кошелёк • Децентрализация</p>
-            </div>
-            <div class="roadmap-item">
-                <span class="badge badge-future">2027</span>
-                <p data-ru="NFT • DEX • Маркетплейс • Массовое принятие"
-                   data-en="NFT • DEX • Marketplace • Mass adoption">NFT • DEX • Маркетплейс • Массовое принятие</p>
-            </div>
-        </div>
-        
-        <!-- БИРЖИ -->
-        <h2 class="section-title" id="exchange" data-ru="Биржи и листинг" data-en="Exchanges & Listing">Биржи и листинг</h2>
-        <div class="card" style="text-align:center;">
-            <p data-ru="Заявки поданы на CoinMarketCap и CoinGecko. После одобрения — первая биржа."
-               data-en="Applications submitted to CoinMarketCap and CoinGecko. First exchange after approval.">
-               Заявки поданы на CoinMarketCap и CoinGecko. После одобрения — первая биржа.</p>
-            <div class="btn-row" style="margin-top:14px;">
-                <span class="badge badge-progress" style="font-size:0.9em;">CMC: #1368445</span>
-                <span class="badge badge-progress" style="font-size:0.9em;">CoinGecko: CL3005260016</span>
-            </div>
-        </div>
-        
-        <!-- ПРОВЕРКА -->
-        <h2 class="section-title" id="verify" data-ru="Проверка блокчейна" data-en="Blockchain verification">Проверка блокчейна</h2>
-        <div class="card" style="text-align:center;">
-            <p data-ru="Вся история с блока #0 доступна. Скачай базу и открой в DB Browser for SQLite."
-               data-en="Full history from block #0 available. Download and open in DB Browser for SQLite.">
-               Вся история с блока #0 доступна для проверки.</p>
-            <a href="https://github.com/ramcoinnode-debug/ramcoin/blob/main/blockchain_v7.db" target="_blank" class="btn btn-secondary" style="margin-top:14px;display:inline-flex;">
-                <span data-ru="Скачать blockchain_v7.db" data-en="Download blockchain_v7.db">Скачать blockchain_v7.db</span>
-            </a>
-        </div>
-        
-        <!-- СОЦСЕТИ -->
-        <h2 class="section-title" id="social" data-ru="Соцсети" data-en="Social">Соцсети</h2>
-        <div class="social-grid">
-            <a href="https://t.me/ramcoin_pow" target="_blank" class="social-btn">Telegram</a>
-            <a href="https://rutube.ru/channel/38441251/" target="_blank" class="social-btn">Rutube</a>
-            <a href="https://www.twitch.tv/ram_coin" target="_blank" class="social-btn">Twitch</a>
-            <a href="https://kick.com/ram_coin" target="_blank" class="social-btn">Kick</a>
-            <a href="https://github.com/ramcoinnode-debug/ramcoin" target="_blank" class="social-btn">GitHub</a>
-        </div>
-        
-        <div class="footer">
-            © 2026 RAMCOIN Network. All rights reserved.<br>
-            <a href="https://github.com/ramcoinnode-debug/ramcoin" target="_blank">GitHub</a> · 
-            <a href="https://t.me/ramcoin_pow" target="_blank">Telegram</a>
+<div class="container">
+
+    <!-- HERO -->
+    <div class="hero">
+        <div class="hero-badge">🌐 P2P СЕТЬ ЗАПУЩЕНА</div>
+        <h1>RAMCOIN</h1>
+        <p><strong>Честный блокчейн.</strong> CPU-майнинг без ASIC.<br>Соло и пул, сжигание монет. 17.5M RAM.</p>
+        <div class="stats-row" id="network-stats">
+            <div class="stat-item"><div class="num" id="stat-height">--</div><div class="lbl">Блоки</div></div>
+            <div class="stat-item"><div class="num" id="stat-diff">--</div><div class="lbl">Сложность</div></div>
+            <div class="stat-item"><div class="num" id="stat-supply">--</div><div class="lbl">Эмиссия</div></div>
+            <div class="stat-item"><div class="num" id="stat-peers">--</div><div class="lbl">Пиры</div></div>
         </div>
     </div>
 
-    <script>
-        var currentLang = 'ru';
-        function setLang(lang) {
-            currentLang = lang;
-            document.querySelectorAll('.lang-switch button').forEach(function(b) {
-                b.classList.toggle('active', b.textContent.trim().toLowerCase() === lang);
-            });
-            document.querySelectorAll('[data-ru][data-en]').forEach(function(el) {
-                el.innerHTML = el.getAttribute('data-' + lang);
-            });
-            document.querySelectorAll('#nav-links a').forEach(function(a) {
-                a.textContent = a.getAttribute('data-' + lang);
-            });
+    <!-- ДАШБОРД: ПРОВЕРКА БАЛАНСА -->
+    <div class="card" style="text-align:center;">
+        <h3>🔍 Проверить баланс</h3>
+        <input type="text" class="dashboard-address" id="addr-input"
+               placeholder="RAM_04a9b30816a61686f377f152435f528e..."
+               value="RAM_04a9b30816a61686f377f152435f528e542b61eb7f0c9403778fdd19862600eb18a4faffe64d6a88a8077da4bf5bf908b74f2729c7fe044ddf5528521f5dcbd75a">
+        <br>
+        <button class="btn btn-primary" onclick="checkBalance()">💰 Проверить баланс</button>
+        <div id="balance-result"></div>
+    </div>
+
+    <!-- ТОКЕНОМИКА -->
+    <h2 class="section-title">📊 Токеномика</h2>
+    <div class="card">
+        <table>
+            <tr><td>Всего монет</td><td class="highlight">17,520,000 RAM</td></tr>
+            <tr><td>Награда за блок</td><td class="gold">10 RAM</td></tr>
+            <tr><td>Время блока</td><td>30 секунд</td></tr>
+            <tr><td>Халвинг</td><td>Каждые 876,000 блоков (~10 месяцев)</td></tr>
+            <tr><td>Комиссия</td><td>0.001 RAM</td></tr>
+            <tr><td>Соло-майнинг</td><td>100% майнеру</td></tr>
+            <tr><td>Пул-майнинг</td><td class="green">98% майнерам, 1% сжигание, 1% разработчику</td></tr>
+            <tr><td>Алгоритм</td><td>Memory-Hard PoW (CPU-only)</td></tr>
+        </table>
+    </div>
+
+    <!-- КНОПКИ -->
+    <div class="btn-row">
+        <a href="https://github.com/ramcoinnode-debug/ramcoin" target="_blank" class="btn btn-outline">📂 GitHub</a>
+        <a href="https://github.com/ramcoinnode-debug/ramcoin/raw/main/RamcoinMiner.exe" target="_blank" class="btn btn-green">⬇️ Скачать Майнер</a>
+        <a href="https://t.me/ramcoin_pow" target="_blank" class="btn btn-gold">📢 Telegram</a>
+    </div>
+
+    <!-- СОЦСЕТИ -->
+    <h2 class="section-title">🌐 Соцсети</h2>
+    <div class="social-grid">
+        <a href="https://t.me/ramcoin_pow" target="_blank" class="social-btn">📢 Telegram</a>
+        <a href="https://rutube.ru/channel/38441251/" target="_blank" class="social-btn">▶️ Rutube</a>
+        <a href="https://www.twitch.tv/ram_coin" target="_blank" class="social-btn">🎮 Twitch</a>
+        <a href="https://kick.com/ram_coin" target="_blank" class="social-btn">🟢 Kick</a>
+        <a href="https://github.com/ramcoinnode-debug/ramcoin" target="_blank" class="social-btn">💻 GitHub</a>
+    </div>
+
+    <div class="footer">
+        © 2026 RAMCOIN Network | Seed: 90.188.108.252:5000<br>
+        <a href="https://github.com/ramcoinnode-debug/ramcoin" target="_blank">GitHub</a> ·
+        <a href="https://t.me/ramcoin_pow" target="_blank">Telegram</a>
+    </div>
+</div>
+
+<script>
+const API_URL = 'http://90.188.108.252:8080';
+
+async function loadNetworkStats() {
+    try {
+        const resp = await fetch(`${API_URL}/api/stats`);
+        const data = await resp.json();
+        document.getElementById('stat-height').textContent = data.height.toLocaleString();
+        document.getElementById('stat-diff').textContent = data.difficulty;
+        document.getElementById('stat-supply').textContent = (data.total_supply / 1000).toFixed(0) + 'K';
+        document.getElementById('stat-peers').textContent = data.peers;
+    } catch(e) {
+        console.log('Stats unavailable');
+    }
+}
+
+async function checkBalance() {
+    const addr = document.getElementById('addr-input').value.trim();
+    const result = document.getElementById('balance-result');
+
+    if (!addr.startsWith('RAM_')) {
+        result.innerHTML = '<p class="error">❌ Адрес должен начинаться с RAM_</p>';
+        return;
+    }
+
+    result.innerHTML = '<p style="color:#aaa;">⏳ Загрузка...</p>';
+
+    try {
+        const resp = await fetch(`${API_URL}/api/address/${addr}`);
+        const data = await resp.json();
+        if (data.error) {
+            result.innerHTML = `<p class="error">❌ ${data.error}</p>`;
+        } else {
+            result.innerHTML = `
+                <div class="balance-big">💰 ${data.balance.toFixed(4)} RAM</div>
+                <p style="color:var(--text-muted);">Nonce: ${data.nonce} | Адрес: ${data.address.substring(0, 30)}...</p>
+            `;
         }
-    </script>
+    } catch(e) {
+        result.innerHTML = '<p class="error">❌ Нода недоступна. Попробуйте позже.</p>';
+    }
+}
+
+// Загрузка при открытии
+loadNetworkStats();
+checkBalance();
+setInterval(loadNetworkStats, 30000);
+</script>
 </body>
 </html>
