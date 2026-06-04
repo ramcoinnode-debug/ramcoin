@@ -1,62 +1,169 @@
-# RAMCOIN (RAM)
+# ⚡ RAMCOIN (RAM) — P2P Blockchain Cryptocurrency
 
-**Честный блокчейн с CPU-майнингом. Без ASIC, без пулов, только домашний ПК.**
-
-*A fair blockchain with CPU mining. No ASICs, no pools, home PC only.*
+**Версия:** v9.0.15 | **Сеть:** LIVE | **Блоков:** 14359+
 
 ---
 
-## Текущая версия: v7.0.3
+## 📊 Что такое RAMCOIN?
+
+**RAMCOIN** — полностью децентрализованная P2P криптовалюта с защитой от ASIC/FPGA майнинга.
+
+- ⚡ **Алгоритм:** RAM-Hash (Memory-Hard, только CPU)
+- 💎 **Макс. эмиссия:** 17 520 000 RAM
+- ⏱️ **Время блока:** ~30 секунд
+- 🔥 **Сжигание:** 1% от каждой награды
+- 🔒 **Безопасность:** ECDSA + SHA256
+- 🛡️ **ASIC защита:** 512KB-4MB scratchpad
 
 ---
 
-## Возможности
+## 🚀 Быстрый старт
 
-- 🖥️ CPU-only майнинг — любой ПК с 4 ГБ ОЗУ
-- 🔒 Memory-Hard PoW — 4 МБ scratchpad, защита от ASIC и GPU
-- 🛡️ Анти-сервер — штраф 75% для Xeon, EPYC, Threadripper
-- ⚡ Соло-майнинг — нашёл блок, забрал всё (100%)
-- 🤝 Пул-майнинг — стабильный доход (98% майнерам, 1% dev, 1% сжигание)
-- 🔥 Сжигание — 1% с каждого блока пула
-- 💰 Честный старт — 0 премайна, 0 ICO, 0 инвесторов
-- 📊 17.5M монет — эмиссия на 30 лет
-- 💸 Комиссия 0.001 RAM
+### 1. Скачай и запусти Кошелёк
+RAMCOIN_Wallet.exe
+
+text
+Создай RAM адрес для майнинга
+
+### 2. Скачай и запусти Майнер
+RAMCOIN_Miner.exe
+
+text
+Выбери SOLO или POOL режим
+
+### 3. Зарабатывай RAM!
+Майнер автоматически подключается к сети!
 
 ---
 
-## Быстрый старт
+## 📥 Скачать
 
+| Файл | Описание |
+|------|----------|
+| [💼 RAMCOIN_Wallet.exe](https://github.com/ramcoinnode-debug/ramcoin/releases/latest) | Кошелёк для создания адреса |
+| [⛏️ RAMCOIN_Miner.exe](https://github.com/ramcoinnode-debug/ramcoin/releases/latest) | Майнер SOLO/POOL |
+| [🌐 RAMCOIN_Node.exe](https://github.com/ramcoinnode-debug/ramcoin/releases/latest) | Нода (для белых IP) |
+
+Или скачай исходный код:
+- `wallet.py` — Кошелёк
+- `miner.py` — Майнер
+- `ramcoin_full.py` — Нода
+
+---
+
+## 💎 Режимы майнинга
+
+### ⛏️ SOLO
+- Находишь блок → получаешь **10 RAM**
+- Для мощных ПК
+- Полная награда твоя
+
+### 👥 POOL
+- Отправляешь шары → стабильный доход
+- Для любых ПК
+- Награда распределяется по шарам
+
+---
+
+## 📊 Характеристики
+
+| Параметр | Значение |
+|----------|----------|
+| Алгоритм | RAM-Hash (Memory-Hard) |
+| Макс. supply | 17,520,000 RAM |
+| Время блока | ~30 секунд |
+| Награда за блок | 10 RAM |
+| Халвинг | Каждые 876,000 блоков |
+| Сжигание | 1% от награды |
+| Комиссия DEV | 10% от транзакций |
+| Pool fee | 1% |
+| Размер скретчпада | 512KB - 4MB |
+| Итераций | 8,192 |
+| Подпись | ECDSA (secp256k1) |
+| Хеширование | SHA256 |
+
+---
+
+## 🌐 Сеть
+
+### Seed ноды:
+- `90.188.115.169:5000` (API)
+- `90.188.108.252:5000` (API)
+- Порт P2P: `8333`
+
+### Типы участников:
+- **Белые IP** — полные ноды, хранят и раздают блокчейн
+- **Серые IP** — майнеры за NAT, подключаются к белым
+
+---
+
+## 🔧 Запуск из исходного кода
+
+### Требования:
 ```bash
 pip install -r requirements.txt
-python node.py    # Запуск ноды
-python miner.py   # 1 = SOLO, 2 = POOL
-python wallet.py  # Кошелёк
-Файлы
-Файл	Описание
-node.py	Нода v7.0.3
-miner.py	Майнер v7.0.3 (соло + пул)
-wallet.py	Кошелёк v7.0.3
-index.html	Сайт
-blockchain_v7.db	Полная история блокчейна
-RamcoinMiner.exe	Майнер для Windows
-RamcoinWallet.exe	Кошелёк для Windows
-Экономика
-Режим	Майнер	Dev	Сжигание
-СОЛО	100%	0%	0%
-ПУЛ	98%	1%	1%
-Статистика сети
-Блоков добыто: 14 900+
+requirements.txt:
+text
+aiohttp
+cryptography
+pycryptodome
+websocket-client
+psutil
+Запуск:
+bash
+# Нода
+python ramcoin_full.py
 
-Аптайм ноды: 200+ часов
+# Майнер
+python miner.py
 
-Rejected блоков: 0
+# Кошелёк
+python wallet.py
+🏗️ Сборка .exe
+bash
+pip install pyinstaller
 
-Заявки на CoinMarketCap и CoinGecko поданы
+pyinstaller --onefile --name "RAMCOIN_Wallet" wallet.py
+pyinstaller --onefile --name "RAMCOIN_Miner" miner.py
+pyinstaller --onefile --name "RAMCOIN_Node" ramcoin_full.py
+Готовые файлы в папке dist/
 
-Ссылки
-🌐 Сайт | 📱 Telegram | ▶️ Rutube | 🎮 Twitch | 🟢 Kick
+🛡️ Безопасность
+✅ Проверка подписей блоков (ECDSA)
 
-Лицензия
-MIT — делай что хочешь. Это экспериментальное ПО.
+✅ Проверка подписей транзакций
 
-© 2026 RAMCOIN Network
+✅ Защита от двойных трат (nonce)
+
+✅ Защита от форков
+
+✅ Орфанные блоки
+
+✅ Memory-Hard PoW (ASIC/FPGA resistant)
+
+✅ Шифрование кошелька (AES-256-GCM)
+
+🌍 Сообщество
+💬 Telegram: t.me/ramcoin_pow
+
+🌐 Сайт: ramcoin.netlify.app
+
+📦 GitHub: github.com/ramcoinnode-debug/ramcoin
+
+🎬 Rutube: rutube.ru/channel/38441251
+
+🎮 Twitch: twitch.tv/ram_coin
+
+🟢 Kick: kick.com/ram_coin
+
+⚠️ Важно
+Windows Defender может показать предупреждение на .exe файлы — это нормально для самоподписанных приложений.
+
+Нажмите "Подробнее" → "Выполнить в любом случае"
+
+📈 Статистика сети
+Актуальная статистика доступна по адресу:
+
+text
+http://90.188.115.169:5000/stats
+RAMCOIN © 2026 — Крипта для народа! Майнь на своём ПК! ⚡💰
