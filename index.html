@@ -20,37 +20,26 @@
         .status.offline { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
         .container { max-width: 900px; margin: 0 auto; padding: 20px; }
         
-        /* DASHBOARD */
         .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 20px 0; }
         .dash-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; text-align: center; }
         .dash-card .icon { font-size: 1.5em; margin-bottom: 5px; }
         .dash-card .value { font-size: 1.6em; font-weight: 900; margin: 5px 0; }
         .dash-card .label { color: var(--text2); font-size: 0.7em; text-transform: uppercase; letter-spacing: 1px; }
-        .dash-card .change { font-size: 0.75em; margin-top: 5px; }
-        .change.up { color: var(--green); }
-        .change.down { color: var(--red); }
         
         .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin: 14px 0; }
         h2 { color: var(--blue); margin-bottom: 15px; font-size: 1.2em; }
         h3 { margin: 10px 0; font-size: 1em; }
-        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); 
-                       background: var(--bg-card); color: white; font-family: monospace; margin: 8px 0; }
+        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); 
+                background: var(--bg-card); color: white; font-family: monospace; margin: 8px 0; }
         .btn { display: inline-block; padding: 12px 24px; border-radius: 10px; font-weight: 700; text-decoration: none; 
                border: none; cursor: pointer; margin: 5px; transition: all 0.2s; font-size: 0.9em; }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0.9; }
         .btn-primary { background: #0284c7; color: white; }
         .btn-green { background: #059669; color: white; }
-        .btn-gold { background: #b45309; color: white; }
         .btn-purple { background: #7c3aed; color: white; }
-        .btn-outline { background: transparent; border: 2px solid var(--blue); color: var(--blue); }
         
         .balance { font-size: 2.5em; font-weight: 900; color: var(--green); text-align: center; }
         .address-display { color: var(--text2); font-size: 0.8em; text-align: center; word-break: break-all; }
-        
-        .tx-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid var(--border); font-size: 0.85em; }
-        .tx-row:last-child { border-bottom: none; }
-        .tx-in { color: var(--green); }
-        .tx-out { color: var(--red); }
         
         .social { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 20px 0; }
         .social a { background: var(--bg-card); border: 1px solid var(--border); padding: 10px 18px; 
@@ -62,10 +51,6 @@
         
         .footer { text-align: center; color: var(--text2); font-size: 0.75em; padding: 20px; }
         .footer a { color: var(--blue); text-decoration: none; }
-        
-        .tabs { display: flex; gap: 5px; margin-bottom: 15px; }
-        .tab { padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.85em; border: 1px solid var(--border); background: transparent; color: var(--text2); }
-        .tab.active { background: var(--blue); color: white; border-color: var(--blue); }
         
         @media (max-width: 600px) {
             .dashboard { grid-template-columns: repeat(2, 1fr); }
@@ -80,7 +65,7 @@
     </nav>
     
     <div class="container">
-        <!-- 🔥 ДАШБОРД -->
+        <!-- ДАШБОРД -->
         <h2 style="text-align:center;">📊 Network Dashboard</h2>
         <div class="dashboard">
             <div class="dash-card">
@@ -115,7 +100,7 @@
             </div>
         </div>
         
-        <!-- Прогресс бар до халвинга -->
+        <!-- Прогресс халвинга -->
         <div class="card">
             <h3>🔄 Next Halving Progress</h3>
             <div class="progress-bar">
@@ -126,7 +111,7 @@
             </p>
         </div>
 
-        <!-- 🔥 ПРОВЕРКА БАЛАНСА -->
+        <!-- Проверка баланса -->
         <div class="card">
             <h2>💰 Check Balance</h2>
             <input type="text" id="addr" placeholder="Paste RAM_ address...">
@@ -134,7 +119,7 @@
             <div id="result"></div>
         </div>
 
-        <!-- 🔥 СКАЧАТЬ -->
+        <!-- Скачать -->
         <div class="card" style="text-align:center;">
             <h2>📥 Download & Start Mining</h2>
             <p style="color:var(--text2); margin:10px 0;">No installation. Download → Run → Mine!</p>
@@ -148,7 +133,7 @@
             </p>
         </div>
 
-        <!-- 🔥 КАК НАЧАТЬ -->
+        <!-- Как начать -->
         <div class="card">
             <h2>🚀 Quick Start</h2>
             <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
@@ -170,7 +155,7 @@
             </div>
         </div>
 
-        <!-- 🔥 ХАРАКТЕРИСТИКИ -->
+        <!-- Характеристики -->
         <div class="card">
             <h2>📊 Specifications</h2>
             <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.9em;">
@@ -183,7 +168,7 @@
             </div>
         </div>
 
-        <!-- 🔥 КОНТАКТЫ -->
+        <!-- Контакты -->
         <div class="card" style="text-align:center;">
             <h2>🌍 Community</h2>
             <div class="social">
@@ -203,37 +188,61 @@
     </div>
 
     <script>
-        // 🔥 ИСПОЛЬЗУЙ SERVEO HTTPS ССЫЛКУ
-        const API = 'https://bd46a430a26ff7e3-90-188-115-169.serveousercontent.com';
+        // СПИСОК НОД С АВТО-ПЕРЕКЛЮЧЕНИЕМ
+        const NODES = [
+            'https://bd46a430a26ff7e3-90-188-115-169.serveousercontent.com',
+            'http://90.188.115.169:5000',
+            'http://90.188.108.252:5000'
+        ];
         
-        let lastStats = null;
+        let nodeIndex = 0;
+
+        async function tryFetch(url) {
+            try {
+                const controller = new AbortController();
+                const timeout = setTimeout(() => controller.abort(), 3000);
+                const r = await fetch(url, { signal: controller.signal });
+                clearTimeout(timeout);
+                if (r.ok) return r;
+            } catch(e) {}
+            return null;
+        }
 
         async function loadDashboard() {
-            try {
-                const r = await fetch(API + '/stats');
-                const d = await r.json();
+            let success = false;
+            
+            for (let i = 0; i < NODES.length; i++) {
+                const url = NODES[(nodeIndex + i) % NODES.length] + '/stats';
+                const r = await tryFetch(url);
                 
-                // Обновляем дашборд
-                document.getElementById('dashHeight').textContent = (d.height || 0).toLocaleString();
-                document.getElementById('dashDiff').textContent = d.difficulty || '--';
-                document.getElementById('dashSupply').textContent = (d.total_supply || 0).toFixed(0) + ' RAM';
-                document.getElementById('dashMiners').textContent = d.active_miners || d.peers || '0';
-                document.getElementById('dashBurn').textContent = (d.burn || 0).toFixed(2) + ' RAM';
-                document.getElementById('dashMempool').textContent = d.mempool || '0';
-                
-                // Халвинг прогресс
-                const height = d.height || 0;
-                const halvingBlock = 876000;
-                const progress = (height % halvingBlock) / halvingBlock * 100;
-                document.getElementById('halvingProgress').style.width = progress.toFixed(2) + '%';
-                document.getElementById('currentBlock').textContent = (height % halvingBlock).toLocaleString();
-                
-                // Статус сети
-                document.getElementById('netStatus').textContent = '🟢 Network Online';
-                document.getElementById('netStatus').className = 'status online';
-                
-                lastStats = d;
-            } catch(e) {
+                if (r) {
+                    try {
+                        const d = await r.json();
+                        
+                        document.getElementById('dashHeight').textContent = (d.height || 0).toLocaleString();
+                        document.getElementById('dashDiff').textContent = d.difficulty || '--';
+                        document.getElementById('dashSupply').textContent = (d.total_supply || 0).toFixed(0) + ' RAM';
+                        document.getElementById('dashMiners').textContent = d.active_miners || d.peers || '0';
+                        document.getElementById('dashBurn').textContent = (d.burn || 0).toFixed(2) + ' RAM';
+                        document.getElementById('dashMempool').textContent = d.mempool || '0';
+                        
+                        const height = d.height || 0;
+                        const halvingBlock = 876000;
+                        const progress = (height % halvingBlock) / halvingBlock * 100;
+                        document.getElementById('halvingProgress').style.width = progress.toFixed(2) + '%';
+                        document.getElementById('currentBlock').textContent = (height % halvingBlock).toLocaleString();
+                        
+                        document.getElementById('netStatus').textContent = '🟢 Network Online';
+                        document.getElementById('netStatus').className = 'status online';
+                        
+                        nodeIndex = (nodeIndex + i) % NODES.length;
+                        success = true;
+                        break;
+                    } catch(e) {}
+                }
+            }
+            
+            if (!success) {
                 document.getElementById('netStatus').textContent = '🔴 Node Offline';
                 document.getElementById('netStatus').className = 'status offline';
             }
@@ -250,27 +259,33 @@
             
             res.innerHTML = '<p style="text-align:center;">⏳ Loading...</p>';
             
-            try {
-                const r = await fetch(API + '/address/' + addr);
-                const d = await r.json();
+            for (let i = 0; i < NODES.length; i++) {
+                const url = NODES[(nodeIndex + i) % NODES.length] + '/address/' + addr;
+                const r = await tryFetch(url);
                 
-                if(d.error) {
-                    res.innerHTML = '<p style="color:#ef4444;text-align:center;">❌ ' + d.error + '</p>';
-                } else {
-                    res.innerHTML = `
-                        <div class="balance">💰 ${d.balance.toFixed(4)} RAM</div>
-                        <div class="address-display">📍 ${addr}</div>
-                        <p style="color:var(--text2);text-align:center;">🔢 Nonce: ${d.nonce}</p>
-                    `;
+                if (r) {
+                    try {
+                        const d = await r.json();
+                        if(d.error) {
+                            res.innerHTML = '<p style="color:#ef4444;text-align:center;">❌ ' + d.error + '</p>';
+                        } else {
+                            res.innerHTML = `
+                                <div class="balance">💰 ${d.balance.toFixed(4)} RAM</div>
+                                <div class="address-display">📍 ${addr}</div>
+                                <p style="color:var(--text2);text-align:center;">🔢 Nonce: ${d.nonce}</p>
+                            `;
+                        }
+                        return;
+                    } catch(e) {}
                 }
-            } catch(e) {
-                res.innerHTML = '<p style="color:#fbbf24;text-align:center;">⚠️ Node offline. Try again later.</p>';
             }
+            
+            res.innerHTML = '<p style="color:#fbbf24;text-align:center;">⚠️ All nodes offline. Try again later.</p>';
         }
 
         // Запуск
         loadDashboard();
-        setInterval(loadDashboard, 5000); // Обновление каждые 5 секунд
+        setInterval(loadDashboard, 5000);
     </script>
 </body>
 </html>
