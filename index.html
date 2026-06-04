@@ -6,100 +6,181 @@
     <title>RAMCOIN (RAM) — CPU Mining Cryptocurrency</title>
     <style>
         :root {
-            --bg: #060609; --bg-card: #0d0d14; --border: #1a1a2e;
-            --blue: #38bdf8; --green: #10b981; --gold: #fbbf24;
-            --text: #e4e4e7;
+            --bg: #0a0a0f; --bg-card: #12121a; --border: #1e1e2e;
+            --blue: #38bdf8; --green: #10b981; --gold: #fbbf24; --red: #ef4444;
+            --text: #e4e4e7; --text2: #a1a1aa; --purple: #a78bfa;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); }
-        nav { background: rgba(6,6,9,0.92); border-bottom: 1px solid var(--border); padding: 15px 20px; text-align: center; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; }
+        nav { background: rgba(10,10,15,0.95); border-bottom: 1px solid var(--border); padding: 15px 20px; 
+              display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         nav .logo { font-size: 1.5em; font-weight: 900; color: var(--blue); }
-        .container { max-width: 800px; margin: 0 auto; padding: 20px; }
-        .hero-badge { display: inline-block; background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); padding: 8px 20px; border-radius: 50px; font-weight: 700; font-size: 0.85em; margin: 20px 0; }
-        h1 { font-size: 2.5em; text-align: center; background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 10px 0; }
-        h2 { color: var(--blue); margin: 20px 0 10px; }
-        h3 { margin: 10px 0; }
-        .stats { display: flex; justify-content: center; gap: 30px; margin: 20px 0; flex-wrap: wrap; }
-        .stat { text-align: center; }
-        .stat .num { font-size: 1.5em; font-weight: 900; }
-        .stat .lbl { color: #71717a; font-size: 0.7em; }
+        nav .status { font-size: 0.8em; padding: 5px 12px; border-radius: 50px; }
+        .status.online { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
+        .status.offline { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
+        .container { max-width: 900px; margin: 0 auto; padding: 20px; }
+        
+        /* DASHBOARD */
+        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 20px 0; }
+        .dash-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; text-align: center; }
+        .dash-card .icon { font-size: 1.5em; margin-bottom: 5px; }
+        .dash-card .value { font-size: 1.6em; font-weight: 900; margin: 5px 0; }
+        .dash-card .label { color: var(--text2); font-size: 0.7em; text-transform: uppercase; letter-spacing: 1px; }
+        .dash-card .change { font-size: 0.75em; margin-top: 5px; }
+        .change.up { color: var(--green); }
+        .change.down { color: var(--red); }
+        
         .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin: 14px 0; }
-        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-card); color: white; font-family: monospace; margin: 10px 0; }
-        .btn { display: inline-block; padding: 12px 24px; border-radius: 10px; font-weight: 700; text-decoration: none; border: none; cursor: pointer; margin: 5px; transition: all 0.2s; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
+        h2 { color: var(--blue); margin-bottom: 15px; font-size: 1.2em; }
+        h3 { margin: 10px 0; font-size: 1em; }
+        input, select { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); 
+                       background: var(--bg-card); color: white; font-family: monospace; margin: 8px 0; }
+        .btn { display: inline-block; padding: 12px 24px; border-radius: 10px; font-weight: 700; text-decoration: none; 
+               border: none; cursor: pointer; margin: 5px; transition: all 0.2s; font-size: 0.9em; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0.9; }
         .btn-primary { background: #0284c7; color: white; }
         .btn-green { background: #059669; color: white; }
         .btn-gold { background: #b45309; color: white; }
         .btn-purple { background: #7c3aed; color: white; }
-        .balance { font-size: 2em; font-weight: 900; color: var(--green); text-align: center; }
+        .btn-outline { background: transparent; border: 2px solid var(--blue); color: var(--blue); }
+        
+        .balance { font-size: 2.5em; font-weight: 900; color: var(--green); text-align: center; }
+        .address-display { color: var(--text2); font-size: 0.8em; text-align: center; word-break: break-all; }
+        
+        .tx-row { display: flex; justify-content: space-between; padding: 10px; border-bottom: 1px solid var(--border); font-size: 0.85em; }
+        .tx-row:last-child { border-bottom: none; }
+        .tx-in { color: var(--green); }
+        .tx-out { color: var(--red); }
+        
         .social { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 20px 0; }
-        .social a { background: var(--bg-card); border: 1px solid var(--border); padding: 10px 18px; border-radius: 10px; color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.9em; transition: all 0.2s; }
+        .social a { background: var(--bg-card); border: 1px solid var(--border); padding: 10px 18px; 
+                   border-radius: 10px; color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.85em; }
         .social a:hover { border-color: var(--blue); color: var(--blue); }
-        .steps { list-style: none; padding: 0; }
-        .steps li { padding: 10px; margin: 5px 0; background: rgba(56,189,248,0.05); border-radius: 8px; border-left: 3px solid var(--blue); }
-        .code { background: #000; color: var(--green); padding: 15px; border-radius: 8px; font-family: monospace; overflow-x: auto; margin: 10px 0; }
-        .warning { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3); padding: 10px; border-radius: 8px; margin: 10px 0; }
+        
+        .progress-bar { background: var(--border); border-radius: 10px; height: 8px; margin: 10px 0; overflow: hidden; }
+        .progress-fill { background: linear-gradient(90deg, var(--blue), var(--purple)); height: 100%; border-radius: 10px; transition: width 0.5s; }
+        
+        .footer { text-align: center; color: var(--text2); font-size: 0.75em; padding: 20px; }
+        .footer a { color: var(--blue); text-decoration: none; }
+        
+        .tabs { display: flex; gap: 5px; margin-bottom: 15px; }
+        .tab { padding: 8px 16px; border-radius: 8px; cursor: pointer; font-size: 0.85em; border: 1px solid var(--border); background: transparent; color: var(--text2); }
+        .tab.active { background: var(--blue); color: white; border-color: var(--blue); }
+        
+        @media (max-width: 600px) {
+            .dashboard { grid-template-columns: repeat(2, 1fr); }
+            .btn { width: 100%; margin: 3px 0; }
+        }
     </style>
 </head>
 <body>
-    <nav><span class="logo">⚡ RAMCOIN</span></nav>
+    <nav>
+        <span class="logo">⚡ RAMCOIN</span>
+        <span class="status online" id="netStatus">🟢 Network Online</span>
+    </nav>
+    
     <div class="container">
-        <center><span class="hero-badge">🟢 NETWORK LIVE</span></center>
-        <h1>RAMCOIN</h1>
-        <p style="text-align:center;color:#a1a1aa;">CPU Mining • Memory-Hard PoW • P2P Network</p>
+        <!-- 🔥 ДАШБОРД -->
+        <h2 style="text-align:center;">📊 Network Dashboard</h2>
+        <div class="dashboard">
+            <div class="dash-card">
+                <div class="icon">📦</div>
+                <div class="value" id="dashHeight">--</div>
+                <div class="label">Blocks</div>
+            </div>
+            <div class="dash-card">
+                <div class="icon">⚡</div>
+                <div class="value" id="dashDiff">--</div>
+                <div class="label">Difficulty</div>
+            </div>
+            <div class="dash-card">
+                <div class="icon">💰</div>
+                <div class="value" id="dashSupply">--</div>
+                <div class="label">Supply (RAM)</div>
+            </div>
+            <div class="dash-card">
+                <div class="icon">⛏️</div>
+                <div class="value" id="dashMiners">--</div>
+                <div class="label">Miners</div>
+            </div>
+            <div class="dash-card">
+                <div class="icon">🔥</div>
+                <div class="value" id="dashBurn">--</div>
+                <div class="label">Burned (RAM)</div>
+            </div>
+            <div class="dash-card">
+                <div class="icon">📝</div>
+                <div class="value" id="dashMempool">--</div>
+                <div class="label">Mempool TX</div>
+            </div>
+        </div>
         
-        <div class="stats" id="stats">
-            <div class="stat"><div class="num" id="h">--</div><div class="lbl">BLOCKS</div></div>
-            <div class="stat"><div class="num" id="d">--</div><div class="lbl">DIFFICULTY</div></div>
-            <div class="stat"><div class="num" id="s">--</div><div class="lbl">SUPPLY (RAM)</div></div>
-            <div class="stat"><div class="num" id="p">--</div><div class="lbl">MINERS</div></div>
-            <div class="stat"><div class="num" id="b">--</div><div class="lbl">BURNED (RAM)</div></div>
+        <!-- Прогресс бар до халвинга -->
+        <div class="card">
+            <h3>🔄 Next Halving Progress</h3>
+            <div class="progress-bar">
+                <div class="progress-fill" id="halvingProgress" style="width: 0%"></div>
+            </div>
+            <p style="color:var(--text2);font-size:0.8em;text-align:center;">
+                Block <span id="currentBlock">--</span> / 876,000
+            </p>
+        </div>
+
+        <!-- 🔥 ПРОВЕРКА БАЛАНСА -->
+        <div class="card">
+            <h2>💰 Check Balance</h2>
+            <input type="text" id="addr" placeholder="Paste RAM_ address...">
+            <button class="btn btn-primary" onclick="check()">🔍 Check</button>
+            <div id="result"></div>
         </div>
 
         <!-- 🔥 СКАЧАТЬ -->
         <div class="card" style="text-align:center;">
             <h2>📥 Download & Start Mining</h2>
-            <p style="color:#a1a1aa; margin:10px 0;">No installation needed. Just download and run!</p>
+            <p style="color:var(--text2); margin:10px 0;">No installation. Download → Run → Mine!</p>
             
-            <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/download/v1.0/RAMCOIN_Wallet.exe" class="btn btn-primary">💼 Wallet</a>
-            <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/download/v1.0/RAMCOIN_Miner.exe" class="btn btn-green">⛏️ Miner</a>
-            <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/download/v1.0/RAMCOIN_Node.exe" class="btn btn-purple">🌐 Node</a>
+            <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/latest" class="btn btn-primary">💼 Wallet</a>
+            <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/latest" class="btn btn-green">⛏️ Miner</a>
+            <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/latest" class="btn btn-purple">🌐 Node</a>
             
-            <p style="color:#71717a; font-size:0.8em; margin-top:10px;">Or download from <a href="https://github.com/ramcoinnode-debug/ramcoin" style="color:var(--blue);">GitHub Releases</a></p>
+            <p style="color:var(--text2); font-size:0.8em; margin-top:10px;">
+                ⚠️ Windows Defender warning is normal → "More info" → "Run anyway"
+            </p>
         </div>
 
         <!-- 🔥 КАК НАЧАТЬ -->
         <div class="card">
-            <h2>🚀 How to Start Mining</h2>
-            <ol class="steps">
-                <li><strong>Download Wallet</strong> — create your RAM address</li>
-                <li><strong>Download Miner</strong> — start mining SOLO or POOL</li>
-                <li><strong>Run Miner</strong> — it auto-connects to the network</li>
-                <li><strong>Earn RAM!</strong> — blocks found every ~30 seconds</li>
-            </ol>
-            <div class="warning">
-                ⚠️ <strong>Windows Defender may show warning</strong> — this is normal for .exe files. Click "More info" → "Run anyway"
+            <h2>🚀 Quick Start</h2>
+            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
+                <div style="text-align:center;padding:10px;">
+                    <div style="font-size:2em;">1️⃣</div>
+                    <p><strong>Download Wallet</strong></p>
+                    <p style="color:var(--text2);font-size:0.8em;">Create your RAM address</p>
+                </div>
+                <div style="text-align:center;padding:10px;">
+                    <div style="font-size:2em;">2️⃣</div>
+                    <p><strong>Download Miner</strong></p>
+                    <p style="color:var(--text2);font-size:0.8em;">Choose SOLO or POOL</p>
+                </div>
+                <div style="text-align:center;padding:10px;">
+                    <div style="font-size:2em;">3️⃣</div>
+                    <p><strong>Run & Earn!</strong></p>
+                    <p style="color:var(--text2);font-size:0.8em;">Auto-connects to network</p>
+                </div>
             </div>
-        </div>
-
-        <!-- 🔥 ПРОВЕРИТЬ БАЛАНС -->
-        <div class="card">
-            <h3>💰 Check Balance</h3>
-            <input type="text" id="addr" placeholder="Paste your RAM_ address...">
-            <button class="btn btn-primary" onclick="check()">Check Balance</button>
-            <div id="result"></div>
         </div>
 
         <!-- 🔥 ХАРАКТЕРИСТИКИ -->
         <div class="card">
             <h2>📊 Specifications</h2>
-            <p>⚡ <strong>Algorithm:</strong> RAM-Hash (Memory-Hard, CPU only)</p>
-            <p>💎 <strong>Max Supply:</strong> 17,520,000 RAM</p>
-            <p>⏱️ <strong>Block Time:</strong> 30 seconds</p>
-            <p>🔥 <strong>Burn:</strong> 1% of each block reward</p>
-            <p>🔒 <strong>Security:</strong> ECDSA + SHA256</p>
-            <p>🌐 <strong>Network:</strong> P2P, white/grey IP support</p>
-            <p>🛡️ <strong>ASIC/FPGA Resistant:</strong> 512KB-4MB scratchpad</p>
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.9em;">
+                <p>⚡ <strong>Algorithm:</strong></p><p>RAM-Hash (CPU Only)</p>
+                <p>💎 <strong>Max Supply:</strong></p><p>17,520,000 RAM</p>
+                <p>⏱️ <strong>Block Time:</strong></p><p>~30 seconds</p>
+                <p>🔥 <strong>Burn:</strong></p><p>1% per block</p>
+                <p>🔒 <strong>Security:</strong></p><p>ECDSA + SHA256</p>
+                <p>🛡️ <strong>ASIC Resistant:</strong></p><p>512KB-4MB scratchpad</p>
+            </div>
         </div>
 
         <!-- 🔥 КОНТАКТЫ -->
@@ -114,50 +195,47 @@
             </div>
         </div>
 
-        <p style="text-align:center;color:#71717a;font-size:0.8em;">
-            🌐 Seed Node: 90.188.115.169:5000 | 90.188.108.252:5000<br>
-            RAMCOIN v9.0.15 — P2P Blockchain
-        </p>
+        <div class="footer">
+            🌐 Seed Nodes: 90.188.115.169:5000 | 90.188.108.252:5000<br>
+            RAMCOIN v9.0.15 — P2P Blockchain Network<br>
+            © 2026 <a href="https://t.me/ramcoin_pow">RAMCOIN Community</a>
+        </div>
     </div>
 
     <script>
-        // 🔥 Авто-выбор ноды
-        const NODES = [
-            'http://90.188.115.169:5000',
-            'http://90.188.108.252:5000'
-        ];
-        let API = NODES[0];
-        let currentNode = 0;
+        // 🔥 ИСПОЛЬЗУЙ SERVEO HTTPS ССЫЛКУ
+        const API = 'https://af12cced69bbebb4-90-188-115-169.serveousercontent.com';
+        
+        let lastStats = null;
 
-        async function tryNode(url) {
-            try {
-                const r = await fetch(url + '/health');
-                if (r.ok) return url;
-            } catch(e) {}
-            return null;
-        }
-
-        async function findBestNode() {
-            for (let url of NODES) {
-                const node = await tryNode(url);
-                if (node) return node;
-            }
-            return NODES[0];
-        }
-
-        async function load() {
+        async function loadDashboard() {
             try {
                 const r = await fetch(API + '/stats');
                 const d = await r.json();
-                document.getElementById('h').textContent = d.height || '--';
-                document.getElementById('d').textContent = d.difficulty || '--';
-                document.getElementById('s').textContent = (d.total_supply || 0).toFixed(0) + ' RAM';
-                document.getElementById('p').textContent = d.active_miners || d.peers || '0';
-                document.getElementById('b').textContent = (d.burn || 0).toFixed(2) + ' RAM';
+                
+                // Обновляем дашборд
+                document.getElementById('dashHeight').textContent = (d.height || 0).toLocaleString();
+                document.getElementById('dashDiff').textContent = d.difficulty || '--';
+                document.getElementById('dashSupply').textContent = (d.total_supply || 0).toFixed(0) + ' RAM';
+                document.getElementById('dashMiners').textContent = d.active_miners || d.peers || '0';
+                document.getElementById('dashBurn').textContent = (d.burn || 0).toFixed(2) + ' RAM';
+                document.getElementById('dashMempool').textContent = d.mempool || '0';
+                
+                // Халвинг прогресс
+                const height = d.height || 0;
+                const halvingBlock = 876000;
+                const progress = (height % halvingBlock) / halvingBlock * 100;
+                document.getElementById('halvingProgress').style.width = progress.toFixed(2) + '%';
+                document.getElementById('currentBlock').textContent = (height % halvingBlock).toLocaleString();
+                
+                // Статус сети
+                document.getElementById('netStatus').textContent = '🟢 Network Online';
+                document.getElementById('netStatus').className = 'status online';
+                
+                lastStats = d;
             } catch(e) {
-                // Пробуем другую ноду
-                currentNode = (currentNode + 1) % NODES.length;
-                API = NODES[currentNode];
+                document.getElementById('netStatus').textContent = '🔴 Node Offline';
+                document.getElementById('netStatus').className = 'status offline';
             }
         }
 
@@ -166,36 +244,33 @@
             const res = document.getElementById('result');
             
             if(!addr.startsWith('RAM_')) {
-                res.innerHTML = '<p style="color:#f87171;">❌ Address must start with RAM_</p>';
+                res.innerHTML = '<p style="color:#ef4444;text-align:center;">❌ Address must start with RAM_</p>';
                 return;
             }
             
-            res.innerHTML = '<p>⏳ Loading...</p>';
+            res.innerHTML = '<p style="text-align:center;">⏳ Loading...</p>';
             
             try {
                 const r = await fetch(API + '/address/' + addr);
                 const d = await r.json();
                 
                 if(d.error) {
-                    res.innerHTML = '<p style="color:#f87171;">❌ ' + d.error + '</p>';
+                    res.innerHTML = '<p style="color:#ef4444;text-align:center;">❌ ' + d.error + '</p>';
                 } else {
                     res.innerHTML = `
                         <div class="balance">💰 ${d.balance.toFixed(4)} RAM</div>
-                        <p style="color:#71717a;">📍 ${addr.substring(0, 30)}...</p>
-                        <p style="color:#71717a;">🔢 Nonce: ${d.nonce}</p>
+                        <div class="address-display">📍 ${addr}</div>
+                        <p style="color:var(--text2);text-align:center;">🔢 Nonce: ${d.nonce}</p>
                     `;
                 }
             } catch(e) {
-                res.innerHTML = '<p style="color:#fbbf24;">⚠️ Node offline. Try again later.</p>';
+                res.innerHTML = '<p style="color:#fbbf24;text-align:center;">⚠️ Node offline. Try again later.</p>';
             }
         }
 
         // Запуск
-        (async () => {
-            API = await findBestNode();
-            load();
-            setInterval(load, 10000);
-        })();
+        loadDashboard();
+        setInterval(loadDashboard, 5000); // Обновление каждые 5 секунд
     </script>
 </body>
 </html>
