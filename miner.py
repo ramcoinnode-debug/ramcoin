@@ -1,21 +1,16 @@
 #!/usr/bin/env python3
 """
-RAMCOIN MINER v7.0.3 — SOLO + POOL
-Исправлено: добавлен pool_block=False для соло-блоков.
+RAMCOIN MINER v7.0.10 - SECURE VERSION
+Таймауты потоков, авто-переподключение, проверка ответов ноды
 """
 
-import hashlib, json, os, secrets, sys, threading, time, array, signal, traceback, ctypes, ctypes.util, platform, re
-from datetime import datetime
-from collections import deque
+import hashlib, json, os, sys, time, array, signal, traceback, secrets, threading
+from collections import OrderedDict
+import urllib.request
+import urllib.error
 
 try:
-    import websocket
-except ImportError:
-    print("pip install websocket-client");
-    sys.exit(1)
-
-try:
-    import psutil;
+    import psutil
 
     HAS_PSUTIL = True
 except ImportError:
@@ -26,224 +21,79 @@ from Crypto.Cipher import AES
 from cryptography.hazmat.primitives.asymmetric import ec
 from cryptography.hazmat.primitives import hashes
 
-VERSION = "7.0.3"
+VERSION = "7.0.10"
 COIN = 100_000_000
 MAX_TARGET = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
-SCRATCHPAD_ITER = 4096
-BASE_BUFFER_SIZE = 524288
-MAX_BUFFER_SIZE = 4194304
-MAX_HOME_CORES = 16
-MAX_HOME_L3_MB = 64
-MAX_HOME_THREADS = 8
-MAX_SERVER_THREADS = 8
-SERVER_PENALTY = 0.25
+SCRATCHPAD_ITER = 8192
+BASE_SCRATCHPAD = 524288
+PROTOCOL = 2
 
-NODES = [{"http": "http://localhost:5000", "ws": "ws://localhost:5000/ws"}]
-NODE_TIMEOUT = 15
+# 🔥 АВТО-ПОИСК НОДЫ
+NODES = [
+    "http://127.0.0.1:5000",
+    "http://90.188.115.169:5000",
+]
+
+NODE_TIMEOUT = 5
 SUBMIT_TIMEOUT = 60
 MAX_RETRIES = 3
 RETRY_BASE_DELAY = 2
-WS_RECONNECT_DELAY = 3
-HEARTBEAT_INTERVAL = 15
-BLOCK_TIMEOUT = 300
 SPEED_SMOOTHING = 0.85
 SPEED_UPDATE_INTERVAL = 0.3
 LOG_INTERVAL = 10
-
-
-class HardwareDetector:
-    def __init__(self):
-        self.is_server = False;
-        self.server_reasons = []
-        self.total_cores = os.cpu_count() or 2
-        self.physical_cores = self._get_physical_cores()
-        self.l3_cache_mb = 0;
-        self.cpu_model = "";
-        self.cpu_vendor = ""
-        self.recommended_threads = 2;
-        self.scratchpad_size = BASE_BUFFER_SIZE;
-        self.server_penalty = 1.0
-        self._detect()
-
-    def _get_physical_cores(self):
-        try:
-            if platform.system() == "Linux":
-                with open('/proc/cpuinfo') as f:
-                    content = f.read()
-                phys_ids = set(re.findall(r'physical id\s*:\s*(\d+)', content))
-                if phys_ids:
-                    cores_per_socket = set(re.findall(r'cpu cores\s*:\s*(\d+)', content))
-                    if cores_per_socket: return len(phys_ids) * int(cores_per_socket.pop())
-            if HAS_PSUTIL: return psutil.cpu_count(logical=False)
-        except:
-            pass
-        return max(1, self.total_cores // 2)
-
-    def _detect(self):
-        try:
-            with open('/proc/cpuinfo') as f:
-                for line in f:
-                    if 'model name' in line: self.cpu_model = line.split(':')[1].strip(); break
-        except:
-            self.cpu_model = platform.processor() or "Unknown"
-        cpu_lower = self.cpu_model.lower()
-        if any(k in cpu_lower for k in ['amd', 'ryzen', 'athlon', 'epyc']):
-            self.cpu_vendor = "amd"
-        elif any(k in cpu_lower for k in ['intel', 'xeon', 'core', 'pentium', 'celeron']):
-            self.cpu_vendor = "intel"
-        elif any(k in cpu_lower for k in ['apple', 'm1', 'm2', 'm3', 'm4']):
-            self.cpu_vendor = "apple"
-        else:
-            self.cpu_vendor = "unknown"
-        self.l3_cache_mb = self._get_l3_cache();
-        self._check_server();
-        self._configure()
-
-    def _get_l3_cache(self):
-        try:
-            if platform.system() == "Linux":
-                l3 = 0
-                for cpu_dir in os.listdir('/sys/devices/system/cpu'):
-                    if cpu_dir.startswith('cpu') and cpu_dir[3:].isdigit():
-                        cache_path = f'/sys/devices/system/cpu/{cpu_dir}/cache'
-                        if os.path.exists(cache_path):
-                            for idx in os.listdir(cache_path):
-                                level_path = f'{cache_path}/{idx}/level';
-                                size_path = f'{cache_path}/{idx}/size'
-                                if os.path.exists(level_path):
-                                    with open(level_path) as f:
-                                        if f.read().strip() == '3':
-                                            if os.path.exists(size_path):
-                                                with open(size_path) as f: l3 = max(l3,
-                                                                                    self._parse_size(f.read().strip()))
-                if l3 > 0: return l3
-        except:
-            pass
-        cpu_l = self.cpu_model.lower()
-        if 'ryzen 9 79' in cpu_l or 'ryzen 9 59' in cpu_l:
-            return 64
-        elif 'ryzen 9' in cpu_l:
-            return 32
-        elif 'ryzen 7 78' in cpu_l or 'ryzen 7 58' in cpu_l:
-            return 32
-        elif 'ryzen 7' in cpu_l:
-            return 16
-        elif 'ryzen 5 56' in cpu_l or 'ryzen 5 76' in cpu_l:
-            return 32
-        elif 'ryzen 5' in cpu_l:
-            return 16
-        elif 'ryzen 3' in cpu_l:
-            return 8
-        elif 'i9-' in cpu_l:
-            return 30
-        elif 'i7-' in cpu_l:
-            return 24
-        elif 'i5-' in cpu_l:
-            return 18
-        elif 'i3-' in cpu_l:
-            return 12
-        return 8
-
-    def _parse_size(self, size_str):
-        size_str = size_str.strip().upper()
-        if size_str.endswith('K'):
-            return int(size_str[:-1]) // 1024
-        elif size_str.endswith('M'):
-            return int(size_str[:-1])
-        elif size_str.endswith('G'):
-            return int(size_str[:-1]) * 1024
-        else:
-            try:
-                return int(size_str) // (1024 * 1024)
-            except:
-                return 0
-
-    def _check_server(self):
-        cpu_lower = self.cpu_model.lower()
-        server_kw = ['xeon', 'epyc', 'opteron', 'platinum', 'gold ', 'silver ', 'threadripper pro']
-        detected = False
-        for kw in server_kw:
-            if kw in cpu_lower: detected = True; self.server_reasons.append(f"Server CPU: {kw.upper()}"); break
-        if 'threadripper' in cpu_lower and 'pro' in cpu_lower: detected = True
-        if 'threadripper' in cpu_lower and 'pro' not in cpu_lower: detected = True
-        if self.physical_cores > MAX_HOME_CORES: detected = True
-        if self.l3_cache_mb > MAX_HOME_L3_MB: detected = True
-        home_whitelist = ['ryzen 9 7950x', 'ryzen 9 5950x', 'ryzen 9 3950x', 'i9-14900k', 'i9-13900k', 'i9-12900k',
-                          'ryzen 7 7800x3d', 'ryzen 7 5800x3d', 'core ultra 9']
-        if detected:
-            for hw in home_whitelist:
-                if hw in cpu_lower and self.physical_cores <= 16: detected = False; break
-        self.is_server = detected
-
-    def _configure(self):
-        if self.is_server:
-            self.recommended_threads = MAX_SERVER_THREADS; self.server_penalty = SERVER_PENALTY; self.scratchpad_size = BASE_BUFFER_SIZE * 2
-        else:
-            optimal = max(2, min(MAX_HOME_THREADS, self.l3_cache_mb // 4))
-            optimal = min(optimal, self.physical_cores);
-            optimal = min(optimal, self.total_cores)
-            self.recommended_threads = optimal;
-            self.server_penalty = 1.0;
-            self.scratchpad_size = BASE_BUFFER_SIZE
-
-    def get_effective_threads(self):
-        return self.recommended_threads
-
-    def get_thread_memory_mb(self):
-        return self.scratchpad_size * 8 / (1024 * 1024)
-
-
-hw = HardwareDetector()
+POLL_INTERVAL = 2
+THREAD_TIMEOUT = 300  # 🔥 Таймаут для подвисших потоков (5 минут)
+MAX_NODE_FAILS = 10  # 🔥 Максимум ошибок перед сменой ноды
 
 
 class MinerState:
     def __init__(self):
         self.lock = threading.RLock()
-        self.height = -1;
-        self.prev_hash = "";
-        self.target = 0;
+        self.height = -1
+        self.prev_hash = ""
+        self.target = 0
         self.reward = 10.0
-        self.txs = [];
-        self.active = False;
+        self.txs = []
+        self.active = False
         self.block_found = False
-        self.node_ok = False;
-        self.ws_ok = False;
-        self.primary_node = 0
-        self.mined = 0;
-        self.total_ram = 0.0;
+        self.node_ok = False
+        self.node_url = None
+        self.node_fails = 0  # 🔥 Счётчик ошибок ноды
+        self.mined = 0
+        self.total_ram = 0.0
         self.rejected = 0
-        self.start_time = time.time();
+        self.start_time = time.time()
         self.speed = 0.0
-        self.thread_speeds = {};
+        self.thread_speeds = {}
         self.thread_updates = {}
-        self.template_version = 0;
+        self.thread_last_active = {}  # 🔥 Время последней активности потока
+        self.template_version = 0
         self.template_lock = threading.RLock()
-        self.submitted_blocks = set()
-        self.current_buffer_size = hw.scratchpad_size
-        self.pool_mode = False;
+        self.current_buffer_size = BASE_SCRATCHPAD
+        self.pool_mode = False
         self.pool_shares = 0
 
     def update_speed(self, tid, sols):
         with self.lock:
-            now = time.time();
+            now = time.time()
             last = self.thread_updates.get(tid, now - 1)
-            elapsed = max(0.01, now - last);
+            elapsed = max(0.01, now - last)
             instant = sols / elapsed
             self.speed = instant if self.speed == 0 else self.speed * SPEED_SMOOTHING + instant * (1 - SPEED_SMOOTHING)
-            self.thread_speeds[tid] = instant;
+            self.thread_speeds[tid] = instant
             self.thread_updates[tid] = now
+            self.thread_last_active[tid] = now  # 🔥 Обновляем время активности
 
     def get_template(self):
         with self.template_lock:
-            return (self.height, self.prev_hash, self.target, self.reward, self.txs, self.template_version,
-                    self.current_buffer_size)
+            return (self.height, self.prev_hash, self.target, self.reward, self.txs,
+                    self.template_version, self.current_buffer_size)
 
-    def get_node_url(self): return NODES[self.primary_node]["http"]
-
-    def get_ws_url(self): return NODES[self.primary_node]["ws"]
-
-    def switch_node(self):
-        with self.lock: self.primary_node = (self.primary_node + 1) % len(NODES)
+    def check_node_health(self):
+        """Проверяет здоровье ноды"""
+        if self.node_fails >= MAX_NODE_FAILS:
+            return False
+        return True
 
 
 state = MinerState()
@@ -263,7 +113,7 @@ def fmt_time(s):
 
 
 def safe_request(url, data=None, timeout=NODE_TIMEOUT, max_retries=MAX_RETRIES):
-    import urllib.request, urllib.error
+    """Безопасный запрос с проверкой ответа"""
     for attempt in range(max_retries):
         try:
             if data is None:
@@ -273,62 +123,145 @@ def safe_request(url, data=None, timeout=NODE_TIMEOUT, max_retries=MAX_RETRIES):
                                              headers={"Content-Type": "application/json", "Connection": "close"},
                                              method="POST")
             with urllib.request.urlopen(req, timeout=timeout) as r:
-                state.node_ok = True; return json.loads(r.read().decode())
-        except:
-            time.sleep(RETRY_BASE_DELAY * (2 ** attempt))
-    state.node_ok = False;
+                resp = json.loads(r.read().decode())
+                # 🔥 Проверка валидности ответа
+                if resp is None:
+                    raise ValueError("Empty response")
+                state.node_fails = 0  # Сбрасываем счётчик ошибок
+                return resp
+        except Exception as e:
+            if attempt < max_retries - 1:
+                time.sleep(RETRY_BASE_DELAY * (2 ** attempt))
+            else:
+                state.node_fails += 1
     return None
+
+
+def find_best_node():
+    """Автоматически находит рабочую ноду"""
+    print("🔍 Поиск ноды...")
+    for url in NODES:
+        try:
+            print(f"   Проверяю {url}...")
+            resp = safe_request(f"{url}/health", timeout=3, max_retries=1)
+            if resp and resp.get("ok"):
+                height = resp.get("height", 0)
+                version = resp.get("version", "")
+                if height > 0:  # 🔥 Проверяем что нода не пустая
+                    print(f"✅ Нода найдена: {url} (H=#{height}, v{version})")
+                    state.node_fails = 0
+                    return url
+        except:
+            pass
+    print("❌ Ноды не найдены. Повтор через 5 сек...")
+    time.sleep(5)
+    return find_best_node()
+
+
+def http_poller():
+    """Проверяет новые блоки через HTTP с авто-переподключением"""
+    last_height = -1
+    while True:
+        try:
+            time.sleep(POLL_INTERVAL)
+
+            # 🔥 Проверяем здоровье ноды
+            if not state.node_url or not state.check_node_health():
+                print("⚠️ Потеря связи с нодой, ищу новую...")
+                state.node_url = find_best_node()
+                continue
+
+            chain = safe_request(f"{state.node_url}/chain", timeout=5)
+
+            # 🔥 Проверка валидности ответа
+            if not chain or not isinstance(chain, dict):
+                state.node_fails += 1
+                continue
+
+            current_height = chain.get("length", chain.get("height", 0))
+
+            # 🔥 Проверка что высота валидная
+            if current_height <= 0:
+                state.node_fails += 1
+                continue
+
+            if current_height != last_height and current_height > 0:
+                last_height = current_height
+                with state.template_lock:
+                    state.height = current_height
+                    chain_data = chain.get("chain", [])
+                    if chain_data:
+                        state.prev_hash = chain_data[-1].get("hash", "")
+                    state.target = chain.get("current_target", chain.get("target", 0))
+                    if state.target > 0:  # 🔥 Проверка target
+                        state.reward = 10.0 / (2 ** (state.height // 876000))
+                        state.txs = safe_request(f"{state.node_url}/pending") or []
+                        state.template_version += 1
+                        state.block_found = True
+        except Exception as e:
+            state.node_fails += 1
+            time.sleep(1)
 
 
 def sign_block(block, priv_hex):
     try:
         priv = ec.derive_private_key(int(priv_hex, 16), ec.SECP256K1())
-        data = {"index": block["index"], "previous_hash": block["previous_hash"], "timestamp": block["timestamp"],
-                "nonce": block["nonce"], "nonce_seed": block.get("nonce_seed", 0),
-                "memory_proof": block["memory_proof"],
-                "miner_payout_address": block["miner_payout_address"],
-                "scratchpad_mods": block.get("scratchpad_mods", 0)}
-        return priv.sign(json.dumps(data, sort_keys=True).encode(), ec.ECDSA(hashes.SHA256())).hex()
+        data = OrderedDict([
+            ("v", PROTOCOL), ("i", block["index"]), ("ph", block["previous_hash"]),
+            ("t", block["timestamp"]), ("n", block["nonce"]),
+            ("ns", block.get("nonce_seed", 0)), ("mp", block["memory_proof"]),
+            ("ma", block.get("miner_payout_address", "")),
+            ("sm", block.get("scratchpad_mods", 0)),
+            ("ss", block.get("scratchpad_size", BASE_SCRATCHPAD)),
+            ("en", block.get("extra_nonce", 0))
+        ])
+        hash_bytes = hashlib.sha256(json.dumps(data, sort_keys=True).encode()).digest()
+        return priv.sign(hash_bytes, ec.ECDSA(hashes.SHA256())).hex()
     except:
         return None
 
 
 def create_scratchpad(prev_hash, tid, nseed, buffer_size=None):
-    size = buffer_size or state.current_buffer_size
+    size = buffer_size or BASE_SCRATCHPAD
     sp = array.array('Q', [0]) * size
     seed = int(hashlib.sha256(f"{prev_hash}|{tid}|{nseed}|RAMCOIN_v7|{size}".encode()).hexdigest(), 16)
     s0, s1 = seed, seed ^ 0xDEADBEEF
     for i in range(size):
         s1, s0 = s0 & 0xFFFFFFFFFFFFFFFF, s1
-        s1 ^= (s1 << 23) & 0xFFFFFFFFFFFFFFFF;
-        s1 ^= (s1 >> 17);
-        s1 ^= s0;
+        s1 ^= (s1 << 23) & 0xFFFFFFFFFFFFFFFF
+        s1 ^= (s1 >> 17)
+        s1 ^= s0
         s1 ^= (s0 >> 26)
         sp[i] = (s0 + s1) & 0xFFFFFFFFFFFFFFFF
     return sp, seed, size
 
 
 def memhard_loop(sp, seed, nonce, nseed, buffer_size=None):
-    size = buffer_size or state.current_buffer_size
-    mix = seed;
+    size = buffer_size or BASE_SCRATCHPAD
+    sp_copy = array.array('Q', sp)
+    mix = seed
     mods = 0
+    nseed_current = nseed
     for k in range(SCRATCHPAD_ITER):
         if k & 63 == 0:
-            if not state.active or state.block_found: return None, None, None
-        mix = (mix * 0x9E3779B97F4A7C15 + nonce + nseed) & 0xFFFFFFFFFFFFFFFF
-        mix ^= (mix >> 33);
+            if not state.active or state.block_found:
+                return None, None, None
+        mix = (mix * 0x9E3779B97F4A7C15 + nonce + nseed_current) & 0xFFFFFFFFFFFFFFFF
+        mix ^= (mix >> 33)
         mix ^= (mix << 13)
-        idx = mix % size;
-        rv = sp[idx]
-        sp[idx] = (rv ^ mix ^ nonce) & 0xFFFFFFFFFFFFFFFF;
+        idx = mix % size
+        rv = sp_copy[idx]
+        sp_copy[idx] = (rv ^ mix ^ nonce) & 0xFFFFFFFFFFFFFFFF
         mods += 1
         mix = (mix + rv) & 0xFFFFFFFFFFFFFFFF
         if k % 256 == 0:
             idx2 = ((idx * 1103515245 + 12345) ^ rv) % size
-            sp[idx2] = (sp[idx2] ^ (mix >> 16) ^ nonce) & 0xFFFFFFFFFFFFFFFF;
+            sp_copy[idx2] = (sp_copy[idx2] ^ (mix >> 16) ^ nonce) & 0xFFFFFFFFFFFFFFFF
             mods += 1
-        if k > 0 and k % 50000 == 0: nseed = (nseed + 1) & 0xFFFFFFFF; mix = (mix ^ nseed) & 0xFFFFFFFFFFFFFFFF
-    return mix, nseed, mods
+        if k > 0 and k % 50000 == 0:
+            nseed_current = (nseed_current + 1) & 0xFFFFFFFF
+            mix = (mix ^ nseed_current) & 0xFFFFFFFFFFFFFFFF
+    return mix, nseed_current, mods
 
 
 def verify_solution(prev_hash, nonce, nseed, mix, mods, target):
@@ -339,52 +272,76 @@ def verify_solution(prev_hash, nonce, nseed, mix, mods, target):
         return False, ""
 
 
-class MinerThread:
-    """Соло-майнер"""
+def check_thread_timeout(tid):
+    """Проверяет не завис ли поток"""
+    last_active = state.thread_last_active.get(tid, time.time())
+    if time.time() - last_active > THREAD_TIMEOUT:
+        print(f"⚠️ Поток {tid} завис! Перезапуск...")
+        return True
+    return False
 
+
+class MinerThread:
     def __init__(self, tid, address, priv_key):
-        self.tid = tid;
-        self.address = address;
+        self.tid = tid
+        self.address = address
         self.priv_key = priv_key
-        self.nonce = secrets.randbits(32);
+        self.nonce = secrets.randbits(32)
         self.nseed = secrets.randbits(16)
-        self.iterations = 0;
-        self.last_restart = time.time();
+        self.iterations = 0
+        self.last_restart = time.time()
         self.thread = None
-        self.skip_counter = 0
-        self.skip_rate = int(1.0 / hw.server_penalty) if hw.is_server and hw.server_penalty > 0 else 0
 
     def run(self):
         if HAS_PSUTIL:
             try:
-                p = psutil.Process();
-                cpu_count = psutil.cpu_count(logical=True)
-                phys = psutil.cpu_count(logical=False)
-                os.sched_setaffinity(0, {self.tid % phys if phys else self.tid % cpu_count})
+                p = psutil.Process()
+                phys = psutil.cpu_count(logical=False) or 1
+                os.sched_setaffinity(0, {self.tid % phys})
             except:
                 pass
+
+        state.thread_last_active[self.tid] = time.time()
         self.last_restart = time.time()
+
         while state.active:
             try:
                 self._mine_loop()
             except Exception as e:
                 time.sleep(1)
-            self.nonce = secrets.randbits(32);
+
+            self.nonce = secrets.randbits(32)
             self.nseed = secrets.randbits(16)
+
+            # 🔥 Проверка таймаута
+            if check_thread_timeout(self.tid):
+                self.last_restart = time.time()
 
     def _mine_loop(self):
         height, prev_hash, target, reward, txs, tpl_ver, buf_size = state.get_template()
+        if height < 0:
+            time.sleep(1)
+            return
+
         try:
             sp, seed, actual_size = create_scratchpad(prev_hash, self.tid, self.nseed, buf_size)
         except:
-            time.sleep(0.5); return
+            time.sleep(0.5)
+            return
 
-        local_sol = 0;
+        local_sol = 0
         last_report = time.time()
+
         while state.active and not state.block_found:
-            if hw.is_server and self.skip_rate > 1:
-                self.skip_counter += 1
-                if self.skip_counter % self.skip_rate != 0: self.nonce = (self.nonce + 1) & 0xFFFFFFFF; continue
+            # 🔥 Проверка таймаута
+            if time.time() - self.last_restart > THREAD_TIMEOUT:
+                self.nonce = secrets.randbits(32)
+                self.nseed = secrets.randbits(16)
+                self.last_restart = time.time()
+                try:
+                    sp, seed, actual_size = create_scratchpad(prev_hash, self.tid, self.nseed, buf_size)
+                except:
+                    return
 
             cur = state.get_template()
             if cur[5] != tpl_ver:
@@ -393,210 +350,214 @@ class MinerThread:
                     sp, seed, actual_size = create_scratchpad(prev_hash, self.tid, self.nseed, buf_size)
                 except:
                     return
-                self.nonce = secrets.randbits(32);
-                self.nseed = secrets.randbits(16);
-                self.iterations = 0
-
-            if time.time() - self.last_restart > BLOCK_TIMEOUT:
-                self.nonce = secrets.randbits(32);
-                self.nseed = secrets.randbits(16);
-                self.last_restart = time.time()
-                try:
-                    sp, seed, actual_size = create_scratchpad(prev_hash, self.tid, self.nseed, buf_size)
-                except:
-                    return
+                self.nonce = secrets.randbits(32)
+                self.nseed = secrets.randbits(16)
+                tpl_ver = cur[5]
 
             try:
-                sp_copy = array.array('Q', sp)
-                mix, new_nseed, mods = memhard_loop(sp_copy, seed, self.nonce, self.nseed, actual_size)
-                if mix is None: return
+                mix, new_nseed, mods = memhard_loop(sp, seed, self.nonce, self.nseed, actual_size)
+                if mix is None:
+                    return
 
-                local_sol += 1;
+                local_sol += 1
                 self.iterations += 1
                 now = time.time()
-                if now - last_report >= SPEED_UPDATE_INTERVAL: state.update_speed(self.tid,
-                                                                                  local_sol); local_sol = 0; last_report = now
+                if now - last_report >= SPEED_UPDATE_INTERVAL:
+                    state.update_speed(self.tid, local_sol)
+                    local_sol = 0
+                    last_report = now
 
-                is_valid, proof = verify_solution(prev_hash, self.nonce, self.nseed, mix, mods, target)
+                is_valid, proof = verify_solution(prev_hash, self.nonce, new_nseed, mix, mods, target)
                 if is_valid:
-                    is_valid2, _ = verify_solution(prev_hash, self.nonce, self.nseed, mix, mods, target)
-                    if not is_valid2: self.nonce = (self.nonce + 1) & 0xFFFFFFFF; continue
-
                     with state.lock:
-                        if state.block_found or state.height != height: return
+                        if state.block_found or state.height != height:
+                            return
                         state.block_found = True
 
-                    # ===== ИСПРАВЛЕНО: добавлен pool_block: False =====
-                    block = {"index": height, "previous_hash": prev_hash, "transactions": txs,
-                             "timestamp": int(time.time()),
-                             "nonce": int(self.nonce), "nonce_seed": int(self.nseed), "memory_proof": proof,
-                             "target": target,
-                             "extra_nonce": self.tid, "miner_payout_address": self.address, "scratchpad_mods": mods,
-                             "scratchpad_size": actual_size, "pool_block": False}
+                    block = {
+                        "index": height, "previous_hash": prev_hash, "transactions": txs,
+                        "timestamp": int(time.time()), "nonce": int(self.nonce),
+                        "nonce_seed": int(new_nseed), "memory_proof": proof, "target": target,
+                        "extra_nonce": self.tid, "miner_payout_address": self.address,
+                        "scratchpad_mods": mods, "scratchpad_size": actual_size, "pool_block": False
+                    }
 
                     sig = sign_block(block, self.priv_key)
-                    if not sig: state.block_found = False; self.nonce = secrets.randbits(32); continue
+                    if not sig:
+                        state.block_found = False
+                        self.nonce = secrets.randbits(32)
+                        continue
+
                     block["miner_signature"] = sig
 
-                    block_hash = hashlib.sha256(json.dumps(block, sort_keys=True).encode()).hexdigest()
-                    with state.lock:
-                        if block_hash in state.submitted_blocks: state.block_found = False; return
-                        state.submitted_blocks.add(block_hash)
+                    # 🔥 Проверяем что нода жива перед отправкой
+                    if not state.check_node_health():
+                        state.node_url = find_best_node()
 
-                    chain_check = safe_request(f"{state.get_node_url()}/chain", timeout=5)
-                    if not chain_check or chain_check.get("length", -1) != height:
-                        state.block_found = False;
-                        state.rejected += 1;
-                        return
+                    resp = safe_request(f"{state.node_url}/mine", block, timeout=SUBMIT_TIMEOUT)
 
-                    resp = safe_request(f"{state.get_node_url()}/mine", block, timeout=SUBMIT_TIMEOUT, max_retries=3)
-                    if resp and resp.get("status") == "ok":
-                        state.mined += 1;
+                    # 🔥 Проверка ответа ноды
+                    if resp and isinstance(resp, dict) and resp.get("status") == "ok":
+                        state.mined += 1
                         state.total_ram += reward
                         print(
-                            f"[{fmt_time(time.time() - state.start_time)}] BLOCK #{height} ACCEPTED +{reward:.2f} RAM")
+                            f"[{fmt_time(time.time() - state.start_time)}] 🎉 BLOCK #{height} ACCEPTED +{reward:.2f} RAM")
                     else:
-                        state.rejected += 1;
+                        state.rejected += 1
                         state.block_found = False
-                        reason = resp.get("reason", "unknown") if resp else "no response"
-                        print(f"[{fmt_time(time.time() - state.start_time)}] BLOCK #{height} REJECTED: {reason}")
+                        reason = resp.get("reason", "unknown") if resp and isinstance(resp,
+                                                                                      dict) else "invalid response"
+                        print(f"[{fmt_time(time.time() - state.start_time)}] ❌ BLOCK #{height} REJECTED: {reason}")
                     return
 
                 self.nonce = (self.nonce + 1) & 0xFFFFFFFF
-                if self.nonce > 2 ** 48: self.nonce = secrets.randbits(32); self.nseed = secrets.randbits(
-                    16); self.iterations = 0
+                if self.nonce > 2 ** 48:
+                    self.nonce = secrets.randbits(32)
+                    self.nseed = secrets.randbits(16)
             except:
-                self.nonce = secrets.randbits(32); time.sleep(0.1)
+                self.nonce = secrets.randbits(32)
+                time.sleep(0.1)
 
 
 class PoolThread:
-    """Пул-майнер"""
-
     def __init__(self, tid, address):
-        self.tid = tid;
+        self.tid = tid
         self.address = address
-        self.nonce = secrets.randbits(32);
+        self.nonce = secrets.randbits(32)
         self.nseed = secrets.randbits(16)
-        self.last_restart = time.time();
+        self.last_restart = time.time()
         self.thread = None
 
     def run(self):
         if HAS_PSUTIL:
             try:
-                p = psutil.Process();
-                cpu_count = psutil.cpu_count(logical=True)
-                phys = psutil.cpu_count(logical=False)
-                os.sched_setaffinity(0, {self.tid % phys if phys else self.tid % cpu_count})
+                p = psutil.Process()
+                phys = psutil.cpu_count(logical=False) or 1
+                os.sched_setaffinity(0, {self.tid % phys})
             except:
                 pass
+
+        state.thread_last_active[self.tid] = time.time()
+
         while state.active:
             try:
                 self._pool_loop()
             except:
                 time.sleep(1)
-            self.nonce = secrets.randbits(32);
+
+            self.nonce = secrets.randbits(32)
             self.nseed = secrets.randbits(16)
+
+            if check_thread_timeout(self.tid):
+                self.last_restart = time.time()
 
     def _pool_loop(self):
         while state.active and not state.block_found:
-            tmpl = safe_request(f"{state.get_node_url()}/pool/template", timeout=5)
-            if not tmpl: time.sleep(2); continue
-            prev_hash = tmpl["previous_hash"];
-            pool_target = tmpl.get("pool_target", state.target * 100)
-            buf_size = state.current_buffer_size
+            # 🔥 Проверяем ноду
+            if not state.node_url or not state.check_node_health():
+                state.node_url = find_best_node()
+                time.sleep(1)
+                continue
+
+            tmpl = safe_request(f"{state.node_url}/pool/template", timeout=5)
+
+            # 🔥 Проверка валидности шаблона
+            if not tmpl or not isinstance(tmpl, dict) or "previous_hash" not in tmpl:
+                time.sleep(2)
+                continue
+
+            prev_hash = tmpl["previous_hash"]
+            pool_target = tmpl.get("pool_target", MAX_TARGET)
+
             try:
-                sp, seed, actual_size = create_scratchpad(prev_hash, self.tid, self.nseed, buf_size)
+                sp, seed, actual_size = create_scratchpad(prev_hash, self.tid, self.nseed)
             except:
-                time.sleep(0.5); continue
-            local_sol = 0;
+                time.sleep(0.5)
+                continue
+
+            local_sol = 0
             last_report = time.time()
+
             while state.active and not state.block_found:
-                if time.time() - self.last_restart > 60: self.last_restart = time.time(); break
+                # 🔥 Проверка таймаута
+                if time.time() - self.last_restart > THREAD_TIMEOUT:
+                    break
+
                 try:
-                    sp_copy = array.array('Q', sp)
-                    mix, new_nseed, mods = memhard_loop(sp_copy, seed, self.nonce, self.nseed, actual_size)
-                    if mix is None: return
+                    mix, new_nseed, mods = memhard_loop(sp, seed, self.nonce, self.nseed, actual_size)
+                    if mix is None:
+                        return
+
                     local_sol += 1
                     now = time.time()
-                    if now - last_report >= SPEED_UPDATE_INTERVAL: state.update_speed(self.tid,
-                                                                                      local_sol); local_sol = 0; last_report = now
-                    is_share, _ = verify_solution(prev_hash, self.nonce, self.nseed, mix, mods, pool_target)
+                    if now - last_report >= SPEED_UPDATE_INTERVAL:
+                        state.update_speed(self.tid, local_sol)
+                        local_sol = 0
+                        last_report = now
+
+                    is_share, _ = verify_solution(prev_hash, self.nonce, new_nseed, mix, mods, pool_target)
                     if is_share:
-                        share_data = {"miner_address": self.address, "nonce": int(self.nonce),
-                                      "nonce_seed": int(self.nseed),
-                                      "mix": str(mix), "mods": mods, "extra_nonce": self.tid}
-                        resp = safe_request(f"{state.get_node_url()}/pool/share", share_data, timeout=5)
-                        if resp and resp.get("status") == "ok": state.pool_shares += 1
+                        share_data = {
+                            "miner_address": self.address,
+                            "nonce": int(self.nonce),
+                            "nonce_seed": int(new_nseed),
+                            "mix": str(mix),
+                            "mods": mods,
+                            "extra_nonce": self.tid
+                        }
+
+                        # 🔥 Проверяем ответ ноды на шару
+                        resp = safe_request(f"{state.node_url}/pool/share", share_data, timeout=5)
+                        if resp and isinstance(resp, dict) and resp.get("status") == "ok":
+                            state.pool_shares += 1
+
                     self.nonce = (self.nonce + 1) & 0xFFFFFFFF
-                    if self.nonce > 2 ** 48: self.nonce = secrets.randbits(32); self.nseed = secrets.randbits(16)
+                    if self.nonce > 2 ** 48:
+                        self.nonce = secrets.randbits(32)
+                        self.nseed = secrets.randbits(16)
                 except:
-                    self.nonce = secrets.randbits(32); time.sleep(0.1)
+                    self.nonce = secrets.randbits(32)
+                    time.sleep(0.1)
 
 
-def logger(threads, address):
+def logger():
     last_log = 0
     while True:
         time.sleep(1)
         now = time.time()
         if now - last_log >= LOG_INTERVAL:
-            s = state;
+            s = state
             mode = "POOL" if s.pool_mode else "SOLO"
-            print(
-                f"[{fmt_time(time.time() - s.start_time)}] {mode} | {fmt_speed(s.speed)} | Blocks: {s.mined} | Rejected: {s.rejected} | Height: #{s.height} | Reward: {s.reward:.2f} RAM",
-                flush=True)
+            shares_info = f"Shares: {s.pool_shares}" if s.pool_mode else ""
+            node_info = f"Node: {s.node_url}" if s.node_url else "Node: searching..."
+            print(f"[{fmt_time(time.time() - s.start_time)}] {mode} | {fmt_speed(s.speed)} | "
+                  f"Blocks: {s.mined} | Rejected: {s.rejected} | {shares_info} | "
+                  f"H:#{s.height} | R:{s.reward:.2f}", flush=True)
             last_log = now
 
 
-def ws_client():
-    while True:
-        try:
-            ws = websocket.create_connection(state.get_ws_url(), timeout=10, ping_interval=HEARTBEAT_INTERVAL,
-                                             ping_timeout=5)
-            state.ws_ok = True;
-            state.node_ok = True
-            ws.send(json.dumps({"type": "miner", "version": VERSION,
-                                "hardware": {"cpu": hw.cpu_model, "vendor": hw.cpu_vendor,
-                                             "cores_physical": hw.physical_cores, "cores_logical": hw.total_cores,
-                                             "l3_mb": hw.l3_cache_mb, "is_server": hw.is_server}}))
-            while True:
-                try:
-                    data = json.loads(ws.recv())
-                    if data.get("event") == "new_block":
-                        state.block_found = True
-                        chain = safe_request(f"{state.get_node_url()}/chain")
-                        if chain:
-                            with state.template_lock: state.height = chain["length"]; state.prev_hash = \
-                            chain["chain"][-1]["hash"]; state.target = chain.get("current_target",
-                                                                                 0); state.reward = 10.0 / (
-                                        2 ** (state.height // 876000)); state.txs = safe_request(
-                                f"{state.get_node_url()}/pending") or []; state.template_version += 1
-                except websocket.WebSocketTimeoutException:
-                    continue
-                except:
-                    break
-        except:
-            state.ws_ok = False; time.sleep(WS_RECONNECT_DELAY)
-
-
 def load_wallet():
-    for wf in ["ramcoin_wallet.json", "wallet.json", os.path.expanduser("~/.ramcoin/wallet.json")]:
-        if not os.path.exists(wf): continue
+    for wf in ["ramcoin_wallet.json", "wallet.json"]:
+        if not os.path.exists(wf):
+            continue
         try:
             with open(wf) as f:
                 data = json.load(f)
             if "private_key_hex" in data and len(data["private_key_hex"]) == 64 and data.get("address", "").startswith(
-                "RAM_"): return data["private_key_hex"], data["address"]
+                    "RAM_"):
+                return data["private_key_hex"], data["address"]
             if "crypto_data" in data:
                 for i in range(3):
                     pw = input(f"Password ({i + 1}/3): ").strip()
-                    if not pw: continue
+                    if not pw:
+                        continue
                     try:
-                        raw = bytes.fromhex(data["crypto_data"]);
+                        raw = bytes.fromhex(data["crypto_data"])
                         key = pbkdf2_hmac('sha512', pw.encode(), raw[:32], 600000, dklen=32)
                         cipher = AES.new(key, AES.MODE_GCM, nonce=raw[32:48])
                         dec = json.loads(cipher.decrypt_and_verify(raw[64:], raw[48:64]))
-                        if len(dec["private_key_hex"]) == 64 and dec["address"].startswith("RAM_"): return dec[
-                            "private_key_hex"], dec["address"]
+                        if len(dec["private_key_hex"]) == 64 and dec["address"].startswith("RAM_"):
+                            return dec["private_key_hex"], dec["address"]
                     except:
                         pass
         except:
@@ -605,115 +566,144 @@ def load_wallet():
 
 
 def main():
-    print(f"RAMCOIN MINER v{VERSION}")
-    print(f"CPU: {hw.cpu_model[:55]}")
-    print(f"{hw.cpu_vendor.upper()} | {hw.physical_cores}P/{hw.total_cores}L | L3: {hw.l3_cache_mb}MB")
-    if hw.is_server:
-        print(f"SERVER — Penalty: {int((1 - hw.server_penalty) * 100)}%")
-    else:
-        print(f"HOME PC — Full hashrate")
-    threads = hw.get_effective_threads()
-    print(f"Threads: {threads} | {hw.get_thread_memory_mb():.0f}MB/thread")
+    print(f"╔══════════════════════════════════════╗")
+    print(f"║   RAMCOIN MINER v{VERSION} - SECURE    ║")
+    print(f"║   Таймауты, защита, авто-нода       ║")
+    print(f"╚══════════════════════════════════════╝")
 
-    print(f"\nSelect mode: 1. SOLO  2. POOL")
+    threads = max(1, (os.cpu_count() or 2) // 2)
+    print(f"Threads: {threads}")
+
+    print(f"\nSelect mode:")
+    print(f"  1. SOLO mining")
+    print(f"  2. POOL mining")
     while True:
         c = input(f"Choose [1/2]: ").strip()
-        if c in ("1", "2"): break
-    state.pool_mode = (c == "2")
-    mode_str = "POOL" if state.pool_mode else "SOLO"
-    print(f"Mode: {mode_str}")
+        if c in ("1", "2"):
+            break
+    pool_mode = (c == "2")
+    print(f"Mode: {'POOL' if pool_mode else 'SOLO'}\n")
 
-    try:
-        libc = ctypes.CDLL(ctypes.util.find_library("c"), use_errno=True);
-        libc.mlockall(1 | 2)
-    except:
-        pass
+    priv_hex, address = load_wallet()
+    if not priv_hex:
+        print("❌ Wallet not found!")
+        sys.exit(1)
+    print(f"✅ Wallet loaded: {address[:42]}...\n")
+
+    # 🔥 Авто-поиск ноды
+    state.node_url = find_best_node()
+    print(f"📍 Используется нода: {state.node_url}\n")
+
+    # 🔥 Синхронизация с проверкой
+    print("🔄 Синхронизация...")
+    chain = safe_request(f"{state.node_url}/chain")
+    if not chain or not isinstance(chain, dict):
+        print("❌ Не могу получить блокчейн!")
+        sys.exit(1)
+
+    with state.template_lock:
+        state.height = chain.get("length", chain.get("height", 0))
+        chain_data = chain.get("chain", [])
+        if chain_data:
+            state.prev_hash = chain_data[-1].get("hash", "")
+        state.target = chain.get("current_target", chain.get("target", 0))
+        if state.target <= 0:
+            print("❌ Невалидный target!")
+            sys.exit(1)
+        state.reward = 10.0 / (2 ** (state.height // 876000))
+        state.txs = safe_request(f"{state.node_url}/pending") or []
+        state.template_version = 1
+
+    state.active = True
+    state.pool_mode = pool_mode
+
+    print(f"✅ Connected! H:#{state.height} | Reward: {state.reward} RAM")
+    print(f"🚀 {'POOL' if pool_mode else 'SOLO'} MINING STARTED!\n")
+
+    threading.Thread(target=logger, daemon=True).start()
+    threading.Thread(target=http_poller, daemon=True).start()
 
     def sig_handler(sig, frame):
+        print(f"\n⏹️  Stopping...")
         print(
-            f"\nBlocks: {state.mined} | RAM: {state.total_ram:.4f} | Rejected: {state.rejected} | Shares: {state.pool_shares}")
-        state.active = False;
-        state.block_found = True;
-        time.sleep(0.5);
+            f"Blocks: {state.mined} | RAM: {state.total_ram:.4f} | Rejected: {state.rejected} | Shares: {state.pool_shares}")
+        state.active = False
+        state.block_found = True
+        time.sleep(0.5)
         sys.exit(0)
 
     signal.signal(signal.SIGINT, sig_handler)
 
-    priv_hex, address = load_wallet()
-    if not priv_hex: print("Wallet not found\n"); sys.exit(1)
-    print(f"Address: {address[:42]}...\n")
-
-    threading.Thread(target=logger, args=(threads, address), daemon=True).start()
-    threading.Thread(target=ws_client, daemon=True).start()
-
-    print("Connecting...")
-    chain = None
-    for _ in range(30):
-        chain = safe_request(f"{state.get_node_url()}/chain")
-        if chain: break
-        time.sleep(1)
-    if not chain: print("Cannot connect\n"); sys.exit(1)
-
-    with state.template_lock:
-        state.height = chain["length"];
-        state.prev_hash = chain["chain"][-1]["hash"]
-        state.target = chain.get("current_target", 0);
-        state.reward = 10.0 / (2 ** (state.height // 876000))
-        state.txs = safe_request(f"{state.get_node_url()}/pending") or [];
-        state.template_version = 1
-
-    state.active = True
-    print(
-        f"Height: #{state.height} | Diff: {fmt_speed(MAX_TARGET / max(1, state.target))} | Reward: {state.reward} RAM\n")
-
     miner_threads = []
-    if state.pool_mode:
+    if pool_mode:
         for tid in range(threads):
-            pt = PoolThread(tid, address);
+            pt = PoolThread(tid, address)
             t = threading.Thread(target=pt.run, daemon=True, name=f"p-{tid}")
-            t.start();
-            pt.thread = t;
+            t.start()
+            pt.thread = t
             miner_threads.append(pt)
     else:
         for tid in range(threads):
-            mt = MinerThread(tid, address, priv_hex);
+            mt = MinerThread(tid, address, priv_hex)
             t = threading.Thread(target=mt.run, daemon=True, name=f"m-{tid}")
-            t.start();
-            mt.thread = t;
+            t.start()
+            mt.thread = t
             miner_threads.append(mt)
+
+    # 🔥 Мониторинг зависших потоков
+    def watchdog():
+        while state.active:
+            time.sleep(30)
+            for mt in miner_threads:
+                if mt.tid in state.thread_last_active:
+                    if time.time() - state.thread_last_active[mt.tid] > THREAD_TIMEOUT:
+                        print(f"⚠️ Поток {mt.tid} завис! Потоки будут перезапущены при следующем блоке")
+
+    threading.Thread(target=watchdog, daemon=True).start()
 
     while True:
         time.sleep(1)
         if state.block_found:
-            state.block_found = False;
-            state.active = False;
+            state.block_found = False
+            state.active = False
             time.sleep(0.3)
+
             for mt in miner_threads:
-                if mt.thread and mt.thread.is_alive(): mt.thread.join(timeout=2)
+                if mt.thread and mt.thread.is_alive():
+                    mt.thread.join(timeout=2)
             miner_threads.clear()
-            chain = safe_request(f"{state.get_node_url()}/chain")
-            if chain:
+
+            # 🔥 Переподключение если нода отвалилась
+            if not state.check_node_health():
+                state.node_url = find_best_node()
+
+            chain = safe_request(f"{state.node_url}/chain")
+            if chain and isinstance(chain, dict):
                 with state.template_lock:
-                    state.height = chain["length"];
-                    state.prev_hash = chain["chain"][-1]["hash"]
-                    state.target = chain.get("current_target", 0);
+                    state.height = chain.get("length", chain.get("height", 0))
+                    chain_data = chain.get("chain", [])
+                    if chain_data:
+                        state.prev_hash = chain_data[-1].get("hash", "")
+                    state.target = chain.get("current_target", chain.get("target", 0))
                     state.reward = 10.0 / (2 ** (state.height // 876000))
-                    state.txs = safe_request(f"{state.get_node_url()}/pending") or [];
+                    state.txs = safe_request(f"{state.node_url}/pending") or []
                     state.template_version += 1
+
             state.active = True
-            if state.pool_mode:
+
+            if pool_mode:
                 for tid in range(threads):
-                    pt = PoolThread(tid, address);
+                    pt = PoolThread(tid, address)
                     t = threading.Thread(target=pt.run, daemon=True, name=f"p-{tid}")
-                    t.start();
-                    pt.thread = t;
+                    t.start()
+                    pt.thread = t
                     miner_threads.append(pt)
             else:
                 for tid in range(threads):
-                    mt = MinerThread(tid, address, priv_hex);
+                    mt = MinerThread(tid, address, priv_hex)
                     t = threading.Thread(target=mt.run, daemon=True, name=f"m-{tid}")
-                    t.start();
-                    mt.thread = t;
+                    t.start()
+                    mt.thread = t
                     miner_threads.append(mt)
 
 
@@ -723,4 +713,6 @@ if __name__ == "__main__":
     except KeyboardInterrupt:
         pass
     except Exception as e:
-        print(f"Fatal: {e}"); traceback.print_exc(); sys.exit(1)
+        print(f"❌ Fatal: {e}")
+        traceback.print_exc()
+        sys.exit(1)
