@@ -2,7 +2,7 @@
 """
 RAMCOIN WALLET v7.0.3 — Совместим с нодой v7.0.3
 """
-
+import urllib.request
 import hashlib
 import json
 import os
@@ -18,7 +18,22 @@ from cryptography.hazmat.primitives import serialization, hashes
 
 # ==================== КОНСТАНТЫ ====================
 VERSION = "7.0.3"
-NODE_URL = "http://localhost:5000"
+
+NODES = [
+    "http://127.0.0.1:5000",
+    "http://90.188.115.169:5000",
+]
+
+def find_node():
+    for url in NODES:
+        try:
+            urllib.request.urlopen(f"{url}/health", timeout=1)
+            return url
+        except:
+            pass
+    return "http://90.188.115.169:5000"
+
+NODE_URL = find_node()
 WALLET_FILE = "ramcoin_wallet.json"
 OFFLINE_TX_FILE = "ramcoin_offline_txs.json"
 ADDRESS_BOOK_FILE = "ramcoin_address_book.json"
