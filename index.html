@@ -4,6 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RAMCOIN (RAM) — CPU Mining Cryptocurrency</title>
+    <meta name="description" content="RAMCOIN - децентрализованная P2P криптовалюта с CPU майнингом. Защита от ASIC, сжигание монет, авто-подключение.">
     <style>
         :root {
             --bg: #0a0a0f; --bg-card: #12121a; --border: #1e1e2e;
@@ -15,162 +16,195 @@
         nav { background: rgba(10,10,15,0.95); border-bottom: 1px solid var(--border); padding: 15px 20px; 
               display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 10px; }
         nav .logo { font-size: 1.5em; font-weight: 900; color: var(--blue); }
-        nav .status { font-size: 0.8em; padding: 5px 12px; border-radius: 50px; }
-        .status.online { background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); }
-        .status.offline { background: rgba(239,68,68,0.15); color: var(--red); border: 1px solid rgba(239,68,68,0.3); }
         .container { max-width: 900px; margin: 0 auto; padding: 20px; }
         
-        .dashboard { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 12px; margin: 20px 0; }
-        .dash-card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 16px; text-align: center; }
-        .dash-card .icon { font-size: 1.5em; margin-bottom: 5px; }
-        .dash-card .value { font-size: 1.6em; font-weight: 900; margin: 5px 0; }
-        .dash-card .label { color: var(--text2); font-size: 0.7em; text-transform: uppercase; letter-spacing: 1px; }
+        .hero { text-align: center; padding: 40px 20px; }
+        .hero-badge { display: inline-block; background: rgba(16,185,129,0.15); color: var(--green); 
+                     border: 1px solid rgba(16,185,129,0.3); padding: 8px 20px; border-radius: 50px; 
+                     font-weight: 700; font-size: 0.85em; margin: 20px 0; }
+        .hero h1 { font-size: 3em; font-weight: 900; 
+                  background: linear-gradient(135deg, #38bdf8, #a78bfa); 
+                  -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .hero .subtitle { color: var(--text2); font-size: 1.1em; margin: 10px 0; }
+        
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 12px; margin: 20px 0; }
+        .stat-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; text-align: center; }
+        .stat-item .icon { font-size: 1.8em; margin-bottom: 8px; }
+        .stat-item .value { font-size: 1.2em; font-weight: 700; color: var(--blue); }
+        .stat-item .label { color: var(--text2); font-size: 0.75em; margin-top: 5px; }
         
         .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin: 14px 0; }
         h2 { color: var(--blue); margin-bottom: 15px; font-size: 1.2em; }
         h3 { margin: 10px 0; font-size: 1em; }
-        input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); 
-                background: var(--bg-card); color: white; font-family: monospace; margin: 8px 0; }
+        
         .btn { display: inline-block; padding: 12px 24px; border-radius: 10px; font-weight: 700; text-decoration: none; 
-               border: none; cursor: pointer; margin: 5px; transition: all 0.2s; font-size: 0.9em; }
+               border: none; cursor: pointer; margin: 5px; transition: all 0.2s; font-size: 0.9em; text-align: center; }
         .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); opacity: 0.9; }
         .btn-primary { background: #0284c7; color: white; }
         .btn-green { background: #059669; color: white; }
         .btn-purple { background: #7c3aed; color: white; }
+        .btn-gold { background: #b45309; color: white; }
         
-        .balance { font-size: 2.5em; font-weight: 900; color: var(--green); text-align: center; }
-        .address-display { color: var(--text2); font-size: 0.8em; text-align: center; word-break: break-all; }
+        .steps { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 15px; }
+        .step { text-align: center; padding: 20px; background: rgba(56,189,248,0.03); border-radius: 14px; border: 1px solid var(--border); }
+        .step .num { font-size: 2.5em; font-weight: 900; color: var(--blue); }
+        .step p { margin: 5px 0; font-size: 0.9em; }
+        .step .desc { color: var(--text2); font-size: 0.8em; }
+        
+        .specs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9em; }
+        .specs .spec-label { color: var(--text2); }
+        .specs .spec-value { font-weight: 600; }
         
         .social { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 20px 0; }
         .social a { background: var(--bg-card); border: 1px solid var(--border); padding: 10px 18px; 
                    border-radius: 10px; color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.85em; }
         .social a:hover { border-color: var(--blue); color: var(--blue); }
         
-        .progress-bar { background: var(--border); border-radius: 10px; height: 8px; margin: 10px 0; overflow: hidden; }
-        .progress-fill { background: linear-gradient(90deg, var(--blue), var(--purple)); height: 100%; border-radius: 10px; transition: width 0.5s; }
-        
         .footer { text-align: center; color: var(--text2); font-size: 0.75em; padding: 20px; }
         .footer a { color: var(--blue); text-decoration: none; }
         
+        .warning-box { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3); 
+                      padding: 12px; border-radius: 10px; margin: 10px 0; font-size: 0.85em; }
+        
         @media (max-width: 600px) {
-            .dashboard { grid-template-columns: repeat(2, 1fr); }
+            .hero h1 { font-size: 2em; }
             .btn { width: 100%; margin: 3px 0; }
+            .specs { grid-template-columns: 1fr; }
         }
     </style>
 </head>
 <body>
     <nav>
         <span class="logo">⚡ RAMCOIN</span>
-        <span class="status online" id="netStatus">🟢 Network Online</span>
+        <a href="https://t.me/ramcoin_pow" class="btn btn-primary" style="padding:8px 16px;font-size:0.8em;">💬 Telegram</a>
     </nav>
     
     <div class="container">
-        <!-- ДАШБОРД -->
-        <h2 style="text-align:center;">📊 Network Dashboard</h2>
-        <div class="dashboard">
-            <div class="dash-card">
-                <div class="icon">📦</div>
-                <div class="value" id="dashHeight">--</div>
-                <div class="label">Blocks</div>
+        <!-- HERO -->
+        <div class="hero">
+            <span class="hero-badge">🟢 NETWORK LIVE</span>
+            <h1>RAMCOIN</h1>
+            <p class="subtitle">Децентрализованная P2P криптовалюта</p>
+            <p style="color:var(--text2);">CPU Mining • Memory-Hard PoW • Burn • Auto-Connect</p>
+        </div>
+
+        <!-- КЛЮЧЕВЫЕ ЦИФРЫ -->
+        <div class="stats-grid">
+            <div class="stat-item">
+                <div class="icon">⏱️</div>
+                <div class="value">30 сек</div>
+                <div class="label">Время блока</div>
             </div>
-            <div class="dash-card">
-                <div class="icon">⚡</div>
-                <div class="value" id="dashDiff">--</div>
-                <div class="label">Difficulty</div>
+            <div class="stat-item">
+                <div class="icon">💎</div>
+                <div class="value">17.5M</div>
+                <div class="label">Макс. Supply</div>
             </div>
-            <div class="dash-card">
-                <div class="icon">💰</div>
-                <div class="value" id="dashSupply">--</div>
-                <div class="label">Supply (RAM)</div>
-            </div>
-            <div class="dash-card">
-                <div class="icon">⛏️</div>
-                <div class="value" id="dashMiners">--</div>
-                <div class="label">Miners</div>
-            </div>
-            <div class="dash-card">
+            <div class="stat-item">
                 <div class="icon">🔥</div>
-                <div class="value" id="dashBurn">--</div>
-                <div class="label">Burned (RAM)</div>
+                <div class="value">1%</div>
+                <div class="label">Сжигание</div>
             </div>
-            <div class="dash-card">
-                <div class="icon">📝</div>
-                <div class="value" id="dashMempool">--</div>
-                <div class="label">Mempool TX</div>
+            <div class="stat-item">
+                <div class="icon">🛡️</div>
+                <div class="value">CPU</div>
+                <div class="label">ASIC Защита</div>
             </div>
-        </div>
-        
-        <!-- Прогресс халвинга -->
-        <div class="card">
-            <h3>🔄 Next Halving Progress</h3>
-            <div class="progress-bar">
-                <div class="progress-fill" id="halvingProgress" style="width: 0%"></div>
+            <div class="stat-item">
+                <div class="icon">🌐</div>
+                <div class="value">P2P</div>
+                <div class="label">Сеть</div>
             </div>
-            <p style="color:var(--text2);font-size:0.8em;text-align:center;">
-                Block <span id="currentBlock">--</span> / 876,000
-            </p>
-        </div>
-
-        <!-- Проверка баланса -->
-        <div class="card">
-            <h2>💰 Check Balance</h2>
-            <input type="text" id="addr" placeholder="Paste RAM_ address...">
-            <button class="btn btn-primary" onclick="check()">🔍 Check</button>
-            <div id="result"></div>
+            <div class="stat-item">
+                <div class="icon">💰</div>
+                <div class="value">10 RAM</div>
+                <div class="label">Награда</div>
+            </div>
         </div>
 
-        <!-- Скачать -->
+        <!-- СКАЧАТЬ -->
         <div class="card" style="text-align:center;">
-            <h2>📥 Download & Start Mining</h2>
-            <p style="color:var(--text2); margin:10px 0;">No installation. Download → Run → Mine!</p>
+            <h2>📥 Скачать и начать майнить</h2>
+            <p style="color:var(--text2); margin:10px 0;">Скачал → Запустил → Майнишь!</p>
             
-            <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/latest" class="btn btn-primary">💼 Wallet</a>
-            <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/latest" class="btn btn-green">⛏️ Miner</a>
-            <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/latest" class="btn btn-purple">🌐 Node</a>
+            <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/latest" class="btn btn-purple">💼 Кошелёк</a>
+            <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/latest" class="btn btn-green">⛏️ Майнер</a>
+            <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/latest" class="btn btn-primary">🌐 Нода</a>
             
-            <p style="color:var(--text2); font-size:0.8em; margin-top:10px;">
-                ⚠️ Windows Defender warning is normal → "More info" → "Run anyway"
-            </p>
+            <div class="warning-box">
+                ⚠️ Windows Defender может показать предупреждение — это нормально для .exe файлов.<br>
+                Нажмите <strong>"Подробнее"</strong> → <strong>"Выполнить в любом случае"</strong>
+            </div>
         </div>
 
-        <!-- Как начать -->
+        <!-- КАК НАЧАТЬ -->
         <div class="card">
-            <h2>🚀 Quick Start</h2>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(180px,1fr));gap:10px;">
-                <div style="text-align:center;padding:10px;">
-                    <div style="font-size:2em;">1️⃣</div>
-                    <p><strong>Download Wallet</strong></p>
-                    <p style="color:var(--text2);font-size:0.8em;">Create your RAM address</p>
+            <h2>🚀 Как начать за 3 шага</h2>
+            <div class="steps">
+                <div class="step">
+                    <div class="num">1</div>
+                    <p><strong>Скачай Кошелёк</strong></p>
+                    <p class="desc">Создай RAM адрес для получения награды</p>
                 </div>
-                <div style="text-align:center;padding:10px;">
-                    <div style="font-size:2em;">2️⃣</div>
-                    <p><strong>Download Miner</strong></p>
-                    <p style="color:var(--text2);font-size:0.8em;">Choose SOLO or POOL</p>
+                <div class="step">
+                    <div class="num">2</div>
+                    <p><strong>Скачай Майнер</strong></p>
+                    <p class="desc">Выбери SOLO или POOL режим</p>
                 </div>
-                <div style="text-align:center;padding:10px;">
-                    <div style="font-size:2em;">3️⃣</div>
-                    <p><strong>Run & Earn!</strong></p>
-                    <p style="color:var(--text2);font-size:0.8em;">Auto-connects to network</p>
+                <div class="step">
+                    <div class="num">3</div>
+                    <p><strong>Запусти и зарабатывай!</strong></p>
+                    <p class="desc">Майнер сам подключится к сети</p>
                 </div>
             </div>
         </div>
 
-        <!-- Характеристики -->
+        <!-- ХАРАКТЕРИСТИКИ -->
         <div class="card">
-            <h2>📊 Specifications</h2>
-            <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;font-size:0.9em;">
-                <p>⚡ <strong>Algorithm:</strong></p><p>RAM-Hash (CPU Only)</p>
-                <p>💎 <strong>Max Supply:</strong></p><p>17,520,000 RAM</p>
-                <p>⏱️ <strong>Block Time:</strong></p><p>~30 seconds</p>
-                <p>🔥 <strong>Burn:</strong></p><p>1% per block</p>
-                <p>🔒 <strong>Security:</strong></p><p>ECDSA + SHA256</p>
-                <p>🛡️ <strong>ASIC Resistant:</strong></p><p>512KB-4MB scratchpad</p>
+            <h2>📊 Характеристики</h2>
+            <div class="specs">
+                <p class="spec-label">⚡ Алгоритм:</p>
+                <p class="spec-value">RAM-Hash (Memory-Hard, только CPU)</p>
+                
+                <p class="spec-label">💎 Макс. эмиссия:</p>
+                <p class="spec-value">17 520 000 RAM</p>
+                
+                <p class="spec-label">⏱️ Время блока:</p>
+                <p class="spec-value">~30 секунд</p>
+                
+                <p class="spec-label">🔥 Сжигание:</p>
+                <p class="spec-value">1% от каждой награды</p>
+                
+                <p class="spec-label">🔒 Безопасность:</p>
+                <p class="spec-value">ECDSA + SHA256</p>
+                
+                <p class="spec-label">🛡️ ASIC защита:</p>
+                <p class="spec-value">512KB - 4MB scratchpad</p>
+                
+                <p class="spec-label">🌐 Сеть:</p>
+                <p class="spec-value">P2P, белые/серые IP</p>
+                
+                <p class="spec-label">💰 Награда:</p>
+                <p class="spec-value">10 RAM (уменьшается вдвое каждые 876k блоков)</p>
             </div>
         </div>
 
-        <!-- Контакты -->
+        <!-- ПОЧЕМУ RAMCOIN -->
+        <div class="card">
+            <h2>💡 Почему RAMCOIN?</h2>
+            <div style="display:grid;gap:10px;">
+                <p>✅ <strong>Только CPU майнинг</strong> — твой процессор зарабатывает, фермы и ASIC не пролезут</p>
+                <p>✅ <strong>Автоматическая сеть</strong> — запустил майнер и он сам нашёл ноду</p>
+                <p>✅ <strong>Сжигание монет</strong> — дефляционная модель, монеты становятся дороже</p>
+                <p>✅ <strong>Плавная сложность</strong> — адаптируется каждый блок</p>
+                <p>✅ <strong>Пул встроен</strong> — не нужен отдельный софт для пула</p>
+                <p>✅ <strong>Открытый код</strong> — всё прозрачно на GitHub</p>
+            </div>
+        </div>
+
+        <!-- КОНТАКТЫ -->
         <div class="card" style="text-align:center;">
-            <h2>🌍 Community</h2>
+            <h2>🌍 Сообщество</h2>
             <div class="social">
                 <a href="https://t.me/ramcoin_pow">💬 Telegram</a>
                 <a href="https://github.com/ramcoinnode-debug/ramcoin">📦 GitHub</a>
@@ -186,106 +220,5 @@
             © 2026 <a href="https://t.me/ramcoin_pow">RAMCOIN Community</a>
         </div>
     </div>
-
-    <script>
-        // СПИСОК НОД С АВТО-ПЕРЕКЛЮЧЕНИЕМ
-        const NODES = [
-            'https://bd46a430a26ff7e3-90-188-115-169.serveousercontent.com',
-            'http://90.188.115.169:5000',
-            'http://90.188.108.252:5000'
-        ];
-        
-        let nodeIndex = 0;
-
-        async function tryFetch(url) {
-            try {
-                const controller = new AbortController();
-                const timeout = setTimeout(() => controller.abort(), 3000);
-                const r = await fetch(url, { signal: controller.signal });
-                clearTimeout(timeout);
-                if (r.ok) return r;
-            } catch(e) {}
-            return null;
-        }
-
-        async function loadDashboard() {
-            let success = false;
-            
-            for (let i = 0; i < NODES.length; i++) {
-                const url = NODES[(nodeIndex + i) % NODES.length] + '/stats';
-                const r = await tryFetch(url);
-                
-                if (r) {
-                    try {
-                        const d = await r.json();
-                        
-                        document.getElementById('dashHeight').textContent = (d.height || 0).toLocaleString();
-                        document.getElementById('dashDiff').textContent = d.difficulty || '--';
-                        document.getElementById('dashSupply').textContent = (d.total_supply || 0).toFixed(0) + ' RAM';
-                        document.getElementById('dashMiners').textContent = d.active_miners || d.peers || '0';
-                        document.getElementById('dashBurn').textContent = (d.burn || 0).toFixed(2) + ' RAM';
-                        document.getElementById('dashMempool').textContent = d.mempool || '0';
-                        
-                        const height = d.height || 0;
-                        const halvingBlock = 876000;
-                        const progress = (height % halvingBlock) / halvingBlock * 100;
-                        document.getElementById('halvingProgress').style.width = progress.toFixed(2) + '%';
-                        document.getElementById('currentBlock').textContent = (height % halvingBlock).toLocaleString();
-                        
-                        document.getElementById('netStatus').textContent = '🟢 Network Online';
-                        document.getElementById('netStatus').className = 'status online';
-                        
-                        nodeIndex = (nodeIndex + i) % NODES.length;
-                        success = true;
-                        break;
-                    } catch(e) {}
-                }
-            }
-            
-            if (!success) {
-                document.getElementById('netStatus').textContent = '🔴 Node Offline';
-                document.getElementById('netStatus').className = 'status offline';
-            }
-        }
-
-        async function check() {
-            const addr = document.getElementById('addr').value.trim();
-            const res = document.getElementById('result');
-            
-            if(!addr.startsWith('RAM_')) {
-                res.innerHTML = '<p style="color:#ef4444;text-align:center;">❌ Address must start with RAM_</p>';
-                return;
-            }
-            
-            res.innerHTML = '<p style="text-align:center;">⏳ Loading...</p>';
-            
-            for (let i = 0; i < NODES.length; i++) {
-                const url = NODES[(nodeIndex + i) % NODES.length] + '/address/' + addr;
-                const r = await tryFetch(url);
-                
-                if (r) {
-                    try {
-                        const d = await r.json();
-                        if(d.error) {
-                            res.innerHTML = '<p style="color:#ef4444;text-align:center;">❌ ' + d.error + '</p>';
-                        } else {
-                            res.innerHTML = `
-                                <div class="balance">💰 ${d.balance.toFixed(4)} RAM</div>
-                                <div class="address-display">📍 ${addr}</div>
-                                <p style="color:var(--text2);text-align:center;">🔢 Nonce: ${d.nonce}</p>
-                            `;
-                        }
-                        return;
-                    } catch(e) {}
-                }
-            }
-            
-            res.innerHTML = '<p style="color:#fbbf24;text-align:center;">⚠️ All nodes offline. Try again later.</p>';
-        }
-
-        // Запуск
-        loadDashboard();
-        setInterval(loadDashboard, 5000);
-    </script>
 </body>
 </html>
