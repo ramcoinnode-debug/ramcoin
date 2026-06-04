@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAMCOIN (RAM) — P2P Blockchain</title>
+    <title>RAMCOIN (RAM) — CPU Mining Cryptocurrency</title>
     <style>
         :root {
             --bg: #060609; --bg-card: #0d0d14; --border: #1a1a2e;
@@ -17,86 +17,185 @@
         .container { max-width: 800px; margin: 0 auto; padding: 20px; }
         .hero-badge { display: inline-block; background: rgba(16,185,129,0.15); color: var(--green); border: 1px solid rgba(16,185,129,0.3); padding: 8px 20px; border-radius: 50px; font-weight: 700; font-size: 0.85em; margin: 20px 0; }
         h1 { font-size: 2.5em; text-align: center; background: linear-gradient(135deg, #38bdf8, #818cf8); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin: 10px 0; }
+        h2 { color: var(--blue); margin: 20px 0 10px; }
+        h3 { margin: 10px 0; }
         .stats { display: flex; justify-content: center; gap: 30px; margin: 20px 0; flex-wrap: wrap; }
         .stat { text-align: center; }
         .stat .num { font-size: 1.5em; font-weight: 900; }
         .stat .lbl { color: #71717a; font-size: 0.7em; }
         .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px; margin: 14px 0; }
         input { width: 100%; padding: 12px; border-radius: 10px; border: 1px solid var(--border); background: var(--bg-card); color: white; font-family: monospace; margin: 10px 0; }
-        .btn { display: inline-block; padding: 12px 24px; border-radius: 10px; font-weight: 700; text-decoration: none; border: none; cursor: pointer; margin: 5px; }
+        .btn { display: inline-block; padding: 12px 24px; border-radius: 10px; font-weight: 700; text-decoration: none; border: none; cursor: pointer; margin: 5px; transition: all 0.2s; }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 4px 12px rgba(0,0,0,0.3); }
         .btn-primary { background: #0284c7; color: white; }
         .btn-green { background: #059669; color: white; }
         .btn-gold { background: #b45309; color: white; }
         .btn-purple { background: #7c3aed; color: white; }
         .balance { font-size: 2em; font-weight: 900; color: var(--green); text-align: center; }
         .social { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 20px 0; }
-        .social a { background: var(--bg-card); border: 1px solid var(--border); padding: 10px 18px; border-radius: 10px; color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.9em; }
+        .social a { background: var(--bg-card); border: 1px solid var(--border); padding: 10px 18px; border-radius: 10px; color: var(--text); text-decoration: none; font-weight: 600; font-size: 0.9em; transition: all 0.2s; }
+        .social a:hover { border-color: var(--blue); color: var(--blue); }
+        .steps { list-style: none; padding: 0; }
+        .steps li { padding: 10px; margin: 5px 0; background: rgba(56,189,248,0.05); border-radius: 8px; border-left: 3px solid var(--blue); }
+        .code { background: #000; color: var(--green); padding: 15px; border-radius: 8px; font-family: monospace; overflow-x: auto; margin: 10px 0; }
+        .warning { background: rgba(251,191,36,0.1); border: 1px solid rgba(251,191,36,0.3); padding: 10px; border-radius: 8px; margin: 10px 0; }
     </style>
 </head>
 <body>
-    <nav><span class="logo">RAMCOIN</span></nav>
+    <nav><span class="logo">⚡ RAMCOIN</span></nav>
     <div class="container">
-        <center><span class="hero-badge">P2P NETWORK LIVE</span></center>
+        <center><span class="hero-badge">🟢 NETWORK LIVE</span></center>
         <h1>RAMCOIN</h1>
-        <p style="text-align:center;color:#a1a1aa;">CPU Mining | 17.5M Supply | Burn | P2P</p>
+        <p style="text-align:center;color:#a1a1aa;">CPU Mining • Memory-Hard PoW • P2P Network</p>
         
         <div class="stats" id="stats">
             <div class="stat"><div class="num" id="h">--</div><div class="lbl">BLOCKS</div></div>
             <div class="stat"><div class="num" id="d">--</div><div class="lbl">DIFFICULTY</div></div>
-            <div class="stat"><div class="num" id="s">--</div><div class="lbl">SUPPLY</div></div>
+            <div class="stat"><div class="num" id="s">--</div><div class="lbl">SUPPLY (RAM)</div></div>
             <div class="stat"><div class="num" id="p">--</div><div class="lbl">MINERS</div></div>
+            <div class="stat"><div class="num" id="b">--</div><div class="lbl">BURNED (RAM)</div></div>
         </div>
 
+        <!-- 🔥 СКАЧАТЬ -->
+        <div class="card" style="text-align:center;">
+            <h2>📥 Download & Start Mining</h2>
+            <p style="color:#a1a1aa; margin:10px 0;">No installation needed. Just download and run!</p>
+            
+            <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/download/v1.0/RAMCOIN_Wallet.exe" class="btn btn-primary">💼 Wallet</a>
+            <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/download/v1.0/RAMCOIN_Miner.exe" class="btn btn-green">⛏️ Miner</a>
+            <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/download/v1.0/RAMCOIN_Node.exe" class="btn btn-purple">🌐 Node</a>
+            
+            <p style="color:#71717a; font-size:0.8em; margin-top:10px;">Or download from <a href="https://github.com/ramcoinnode-debug/ramcoin" style="color:var(--blue);">GitHub Releases</a></p>
+        </div>
+
+        <!-- 🔥 КАК НАЧАТЬ -->
         <div class="card">
-            <h3>Check Balance</h3>
-            <input type="text" id="addr" placeholder="RAM_...">
-            <button class="btn btn-primary" onclick="check()">Check</button>
+            <h2>🚀 How to Start Mining</h2>
+            <ol class="steps">
+                <li><strong>Download Wallet</strong> — create your RAM address</li>
+                <li><strong>Download Miner</strong> — start mining SOLO or POOL</li>
+                <li><strong>Run Miner</strong> — it auto-connects to the network</li>
+                <li><strong>Earn RAM!</strong> — blocks found every ~30 seconds</li>
+            </ol>
+            <div class="warning">
+                ⚠️ <strong>Windows Defender may show warning</strong> — this is normal for .exe files. Click "More info" → "Run anyway"
+            </div>
+        </div>
+
+        <!-- 🔥 ПРОВЕРИТЬ БАЛАНС -->
+        <div class="card">
+            <h3>💰 Check Balance</h3>
+            <input type="text" id="addr" placeholder="Paste your RAM_ address...">
+            <button class="btn btn-primary" onclick="check()">Check Balance</button>
             <div id="result"></div>
         </div>
 
+        <!-- 🔥 ХАРАКТЕРИСТИКИ -->
+        <div class="card">
+            <h2>📊 Specifications</h2>
+            <p>⚡ <strong>Algorithm:</strong> RAM-Hash (Memory-Hard, CPU only)</p>
+            <p>💎 <strong>Max Supply:</strong> 17,520,000 RAM</p>
+            <p>⏱️ <strong>Block Time:</strong> 30 seconds</p>
+            <p>🔥 <strong>Burn:</strong> 1% of each block reward</p>
+            <p>🔒 <strong>Security:</strong> ECDSA + SHA256</p>
+            <p>🌐 <strong>Network:</strong> P2P, white/grey IP support</p>
+            <p>🛡️ <strong>ASIC/FPGA Resistant:</strong> 512KB-4MB scratchpad</p>
+        </div>
+
+        <!-- 🔥 КОНТАКТЫ -->
         <div class="card" style="text-align:center;">
-            <h3>Download</h3>
-            <a href="https://github.com/ramcoinnode-debug/ramcoin" class="btn btn-purple">GitHub</a>
-            <a href="https://t.me/ramcoin_pow" class="btn btn-gold">Telegram</a>
+            <h2>🌍 Community</h2>
+            <div class="social">
+                <a href="https://t.me/ramcoin_pow">💬 Telegram</a>
+                <a href="https://github.com/ramcoinnode-debug/ramcoin">📦 GitHub</a>
+                <a href="https://rutube.ru/channel/38441251/">🎬 Rutube</a>
+                <a href="https://www.twitch.tv/ram_coin">🎮 Twitch</a>
+                <a href="https://kick.com/ram_coin">🟢 Kick</a>
+            </div>
         </div>
 
-        <div class="social">
-            <a href="https://t.me/ramcoin_pow">Telegram</a>
-            <a href="https://rutube.ru/channel/38441251/">Rutube</a>
-            <a href="https://www.twitch.tv/ram_coin">Twitch</a>
-            <a href="https://kick.com/ram_coin">Kick</a>
-            <a href="https://github.com/ramcoinnode-debug/ramcoin">GitHub</a>
-        </div>
-
-        <p style="text-align:center;color:#71717a;font-size:0.8em;">Node: 90.188.108.252:5000</p>
+        <p style="text-align:center;color:#71717a;font-size:0.8em;">
+            🌐 Seed Node: 90.188.115.169:5000 | 90.188.108.252:5000<br>
+            RAMCOIN v9.0.15 — P2P Blockchain
+        </p>
     </div>
 
     <script>
-        const API = 'http://90.188.108.252:5000';
+        // 🔥 Авто-выбор ноды
+        const NODES = [
+            'http://90.188.115.169:5000',
+            'http://90.188.108.252:5000'
+        ];
+        let API = NODES[0];
+        let currentNode = 0;
+
+        async function tryNode(url) {
+            try {
+                const r = await fetch(url + '/health');
+                if (r.ok) return url;
+            } catch(e) {}
+            return null;
+        }
+
+        async function findBestNode() {
+            for (let url of NODES) {
+                const node = await tryNode(url);
+                if (node) return node;
+            }
+            return NODES[0];
+        }
+
         async function load() {
             try {
                 const r = await fetch(API + '/stats');
                 const d = await r.json();
-                document.getElementById('h').textContent = d.height;
-                document.getElementById('d').textContent = d.difficulty;
-                document.getElementById('s').textContent = d.total_supply.toFixed(0) + ' RAM';
-                document.getElementById('p').textContent = d.active_miners;
-            } catch(e) {}
+                document.getElementById('h').textContent = d.height || '--';
+                document.getElementById('d').textContent = d.difficulty || '--';
+                document.getElementById('s').textContent = (d.total_supply || 0).toFixed(0) + ' RAM';
+                document.getElementById('p').textContent = d.active_miners || d.peers || '0';
+                document.getElementById('b').textContent = (d.burn || 0).toFixed(2) + ' RAM';
+            } catch(e) {
+                // Пробуем другую ноду
+                currentNode = (currentNode + 1) % NODES.length;
+                API = NODES[currentNode];
+            }
         }
+
         async function check() {
             const addr = document.getElementById('addr').value.trim();
             const res = document.getElementById('result');
-            if(!addr.startsWith('RAM_')) { res.innerHTML='<p style="color:red">Invalid address</p>'; return; }
-            res.innerHTML='<p>Loading...</p>';
+            
+            if(!addr.startsWith('RAM_')) {
+                res.innerHTML = '<p style="color:#f87171;">❌ Address must start with RAM_</p>';
+                return;
+            }
+            
+            res.innerHTML = '<p>⏳ Loading...</p>';
+            
             try {
                 const r = await fetch(API + '/address/' + addr);
                 const d = await r.json();
-                if(d.error) res.innerHTML='<p style="color:red">'+d.error+'</p>';
-                else res.innerHTML='<div class="balance">' + d.balance.toFixed(4) + ' RAM</div><p style="color:#71717a">Nonce: '+d.nonce+'</p>';
-            } catch(e) { res.innerHTML='<p style="color:red">Node offline</p>'; }
+                
+                if(d.error) {
+                    res.innerHTML = '<p style="color:#f87171;">❌ ' + d.error + '</p>';
+                } else {
+                    res.innerHTML = `
+                        <div class="balance">💰 ${d.balance.toFixed(4)} RAM</div>
+                        <p style="color:#71717a;">📍 ${addr.substring(0, 30)}...</p>
+                        <p style="color:#71717a;">🔢 Nonce: ${d.nonce}</p>
+                    `;
+                }
+            } catch(e) {
+                res.innerHTML = '<p style="color:#fbbf24;">⚠️ Node offline. Try again later.</p>';
+            }
         }
-        load();
-        setInterval(load, 30000);
+
+        // Запуск
+        (async () => {
+            API = await findBestNode();
+            load();
+            setInterval(load, 10000);
+        })();
     </script>
 </body>
 </html>
