@@ -1,169 +1,69 @@
-# ⚡ RAMCOIN (RAM) — P2P Blockchain Cryptocurrency
+markdown
+# RAMCOIN v10.2.1
 
-**Версия:** v9.0.15 | **Сеть:** LIVE | **Блоков:** 14359+
+![Version](https://img.shields.io/badge/version-10.2.1-blue)
+![Protocol](https://img.shields.io/badge/protocol-2-green)
+![License](https://img.shields.io/badge/license-MIT-yellow)
 
----
+Децентрализованная криптовалюта с защищённой P2P-сетью и алгоритмом Ramhash v7 (Memory-hard PoW).
 
-## 📊 Что такое RAMCOIN?
+## 🚀 Особенности
 
-**RAMCOIN** — полностью децентрализованная P2P криптовалюта с защитой от ASIC/FPGA майнинга.
+- **Алгоритм:** Ramhash v7 (Memory-hard, ASIC-resistant)
+- **Шифрование P2P:** ChaCha20-Poly1305 + ECDH
+- **Защита от атак:** Eclipse, Sybil, DDoS
+- **Градуированная репутационная система** для seed-нод
+- **Квантово-устойчивое резервирование**
 
-- ⚡ **Алгоритм:** RAM-Hash (Memory-Hard, только CPU)
-- 💎 **Макс. эмиссия:** 17 520 000 RAM
-- ⏱️ **Время блока:** ~30 секунд
-- 🔥 **Сжигание:** 1% от каждой награды
-- 🔒 **Безопасность:** ECDSA + SHA256
-- 🛡️ **ASIC защита:** 512KB-4MB scratchpad
-
----
-
-## 🚀 Быстрый старт
-
-### 1. Скачай и запусти Кошелёк
-RAMCOIN_Wallet.exe
-
-text
-Создай RAM адрес для майнинга
-
-### 2. Скачай и запусти Майнер
-RAMCOIN_Miner.exe
-
-text
-Выбери SOLO или POOL режим
-
-### 3. Зарабатывай RAM!
-Майнер автоматически подключается к сети!
-
----
-
-## 📥 Скачать
-
-| Файл | Описание |
-|------|----------|
-| [💼 RAMCOIN_Wallet.exe](https://github.com/ramcoinnode-debug/ramcoin/releases/latest) | Кошелёк для создания адреса |
-| [⛏️ RAMCOIN_Miner.exe](https://github.com/ramcoinnode-debug/ramcoin/releases/latest) | Майнер SOLO/POOL |
-| [🌐 RAMCOIN_Node.exe](https://github.com/ramcoinnode-debug/ramcoin/releases/latest) | Нода (для белых IP) |
-
-Или скачай исходный код:
-- `wallet.py` — Кошелёк
-- `miner.py` — Майнер
-- `ramcoin_full.py` — Нода
-
----
-
-## 💎 Режимы майнинга
-
-### ⛏️ SOLO
-- Находишь блок → получаешь **10 RAM**
-- Для мощных ПК
-- Полная награда твоя
-
-### 👥 POOL
-- Отправляешь шары → стабильный доход
-- Для любых ПК
-- Награда распределяется по шарам
-
----
-
-## 📊 Характеристики
+## 📊 Параметры
 
 | Параметр | Значение |
 |----------|----------|
-| Алгоритм | RAM-Hash (Memory-Hard) |
-| Макс. supply | 17,520,000 RAM |
-| Время блока | ~30 секунд |
-| Награда за блок | 10 RAM |
-| Халвинг | Каждые 876,000 блоков |
-| Сжигание | 1% от награды |
-| Комиссия DEV | 10% от транзакций |
-| Pool fee | 1% |
-| Размер скретчпада | 512KB - 4MB |
-| Итераций | 8,192 |
-| Подпись | ECDSA (secp256k1) |
-| Хеширование | SHA256 |
+| Ticker | RAM |
+| Блок | 30 секунд |
+| Награда | 10 RAM |
+| Халвинг | 876 000 блоков |
+| Max supply | 21 000 000 RAM |
+| Комиссия | 0.001 RAM |
+| Порт P2P | 8333 |
+| Порт API | 5000 |
 
----
+## 📦 Компоненты
 
-## 🌐 Сеть
+- `ramcoin_full2.py` — Нода (блокчейн + P2P + API)
+- `miner2.py` — Майнер (SOLO + POOL)
+- `wallet.py` — Кошелёк (AES-256-GCM)
 
-### Seed ноды:
-- `90.188.115.169:5000` (API)
-- `90.188.108.252:5000` (API)
-- Порт P2P: `8333`
+## 🔧 Установка
 
-### Типы участников:
-- **Белые IP** — полные ноды, хранят и раздают блокчейн
-- **Серые IP** — майнеры за NAT, подключаются к белым
-
----
-
-## 🔧 Запуск из исходного кода
-
-### Требования:
 ```bash
-pip install -r requirements.txt
-requirements.txt:
-text
-aiohttp
-cryptography
-pycryptodome
-websocket-client
-psutil
-Запуск:
+pip install aiohttp lz4 cryptography psutil pycryptodome prometheus_client
+🖥️ Запуск
+Нода:
+
 bash
-# Нода
-python ramcoin_full.py
+python ramcoin_full2.py
+Майнер:
 
-# Майнер
-python miner.py
+bash
+python miner2.py
+Кошелёк:
 
-# Кошелёк
+bash
 python wallet.py
-🏗️ Сборка .exe
-bash
-pip install pyinstaller
+🌐 API
+Endpoint	Описание
+/chain	Блокчейн
+/stats	Статистика
+/health	Здоровье
+/coininfo	Информация о монете
+/pool/template	Шаблон для пула
+/pool/share	Отправка шары
+/tx	Отправка транзакции
+/address/{addr}	Баланс адреса
+🔗 Ссылки
+Website: https://ramcoin.network
 
-pyinstaller --onefile --name "RAMCOIN_Wallet" wallet.py
-pyinstaller --onefile --name "RAMCOIN_Miner" miner.py
-pyinstaller --onefile --name "RAMCOIN_Node" ramcoin_full.py
-Готовые файлы в папке dist/
+Discord: https://discord.gg/ramcoin
 
-🛡️ Безопасность
-✅ Проверка подписей блоков (ECDSA)
-
-✅ Проверка подписей транзакций
-
-✅ Защита от двойных трат (nonce)
-
-✅ Защита от форков
-
-✅ Орфанные блоки
-
-✅ Memory-Hard PoW (ASIC/FPGA resistant)
-
-✅ Шифрование кошелька (AES-256-GCM)
-
-🌍 Сообщество
-💬 Telegram: t.me/ramcoin_pow
-
-🌐 Сайт: ramcoin.netlify.app
-
-📦 GitHub: github.com/ramcoinnode-debug/ramcoin
-
-🎬 Rutube: rutube.ru/channel/38441251
-
-🎮 Twitch: twitch.tv/ram_coin
-
-🟢 Kick: kick.com/ram_coin
-
-⚠️ Важно
-Windows Defender может показать предупреждение на .exe файлы — это нормально для самоподписанных приложений.
-
-Нажмите "Подробнее" → "Выполнить в любом случае"
-
-📈 Статистика сети
-Актуальная статистика доступна по адресу:
-
-text
-http://90.188.115.169:5000/stats
-RAMCOIN © 2026 — Крипта для народа! Майнь на своём ПК! ⚡💰
+Twitter: https://twitter.com/ramcoin
