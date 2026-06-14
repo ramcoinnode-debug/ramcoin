@@ -1,0 +1,37 @@
+RAMCOIN WHITEPAPER v1.0
+
+1. INTRODUCTION
+RAMCOIN is a decentralized peer-to-peer cryptocurrency with 
+memory-hard PoW algorithm (Ramhash v7). No ICO, no premine 
+(except developer address with 100 RAM for bootstrap).
+
+2. SPECIFICATIONS
+- Algorithm: Ramhash v7 (Memory-hard SHA-256)
+- Block time: 30 seconds
+- Block reward: 10 RAM
+- Halving: every 876,000 blocks
+- Max supply: 17,500,000 RAM
+- Scratchpad: 8 MB × 8,224 iterations
+- Encryption: ChaCha20-Poly1305 + ECDH
+
+3. FAIR MINING
+- CPU-only, ASIC-resistant
+- Maximum 4 threads per miner
+- 8 MB RAM requirement prevents GPU optimization
+
+4. NETWORK
+- P2P protocol v2
+- Seed nodes with reputation system
+- Anti-Eclipse, Anti-Sybil protection
+- Graduated penalty system
+
+5. ROADMAP
+- Q2 2026: Mainnet launch ✅
+- Q3 2026: Block explorer, mining pool
+- Q4 2026: Exchange listings
+- 2027: Smart contracts, DApps
+
+6. LINKS
+Website: https://ramcoin.network
+GitHub: https://github.com/ramcoinnode-debug/ramcoin
+Community: https://t.me/ramcoin_chat
