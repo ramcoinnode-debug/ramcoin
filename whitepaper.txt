@@ -1,37 +1,341 @@
-RAMCOIN WHITEPAPER v1.0
+# RAMCOIN WHITEPAPER v1.1
 
-1. INTRODUCTION
+---
+
+## 1. INTRODUCTION
+
 RAMCOIN is a decentralized peer-to-peer cryptocurrency with 
-memory-hard PoW algorithm (Ramhash v7). No ICO, no premine 
-(except developer address with 100 RAM for bootstrap).
+memory-hard Proof-of-Work algorithm (Ramhash v7). 
 
-2. SPECIFICATIONS
-- Algorithm: Ramhash v7 (Memory-hard SHA-256)
-- Block time: 30 seconds
-- Block reward: 10 RAM
-- Halving: every 876,000 blocks
-- Max supply: 17,500,000 RAM
-- Scratchpad: 8 MB × 8,224 iterations
-- Encryption: ChaCha20-Poly1305 + ECDH
+**Fair launch principles:**
+- ❌ No ICO
+- ❌ No premine (except developer bootstrap address with 100 RAM)
+- ❌ No VC funding
+- ✅ 100% community-mined
+- ✅ CPU-only mining
+- ✅ ASIC/FPGA-resistant
 
-3. FAIR MINING
-- CPU-only, ASIC-resistant
-- Maximum 4 threads per miner
-- 8 MB RAM requirement prevents GPU optimization
+---
 
-4. NETWORK
-- P2P protocol v2
-- Seed nodes with reputation system
-- Anti-Eclipse, Anti-Sybil protection
-- Graduated penalty system
+## 2. SPECIFICATIONS
 
-5. ROADMAP
-- Q2 2026: Mainnet launch ✅
-- Q3 2026: Block explorer, mining pool
-- Q4 2026: Exchange listings
-- 2027: Smart contracts, DApps
+### Core Parameters
 
-6. LINKS
-Website: https://ramcoin.network
-GitHub: https://github.com/ramcoinnode-debug/ramcoin
-Community: https://t.me/ramcoin_chat
+| Parameter | Value |
+|-----------|-------|
+| **Algorithm** | Ramhash v7 (Memory-hard SHA-256) |
+| **Block time** | 30 seconds |
+| **Block reward** | 10 RAM |
+| **Halving** | Every 876,000 blocks (~304 days) |
+| **Number of halvings** | 64 |
+| **Max supply** | ~17,520,000 RAM |
+| **Current supply** | ~202,530 RAM (as of block 20,487) |
+| **Scratchpad size** | 524 KB — 8 MB |
+| **Scratchpad iterations** | 8,192 |
+| **Scratchpad modifications** | 8,224 per hash |
+| **Network fee** | 0.001 RAM |
+| **P2P port** | 8333 |
+| **API port** | 5000 |
+
+### Supply Schedule
+Epoch 1: 876,000 × 10.00000000 = 8,760,000 RAM
+Epoch 2: 876,000 × 5.00000000 = 4,380,000 RAM
+Epoch 3: 876,000 × 2.50000000 = 2,190,000 RAM
+Epoch 4: 876,000 × 1.25000000 = 1,095,000 RAM
+Epoch 5: 876,000 × 0.62500000 = 547,500 RAM
+...
+Epoch 64: 876,000 × ~0.00000000 = ~0 RAM
+─────────────────────────────────────────────────
+Total (64 epochs): ≈ 17,520,000 RAM
+
+text
+
+### Reward Distribution
+Solo Mining:
+├── 100% → Miner
+
+Pool Mining:
+├── 1% → Developer (dev fee)
+├── 1% → Burn address (deflationary)
+└── 98% → Pool miners (proportional to shares)
+
+Transaction Fees:
+├── 10% → Developer
+└── 90% → Block miner
+
+text
+
+---
+
+## 3. FAIR MINING
+
+### Anti-Cheat System
+
+The node enforces strict mining rules:
+
+| Rule | Limit | Reason |
+|------|-------|--------|
+| **Threads per miner** | ≤ 4 | Prevents server farm advantage |
+| **Scratchpad size** | ≤ 8 MB | Prevents RAM optimization abuse |
+| **Scratchpad mods** | = 8,224 exactly | Prevents algorithm manipulation |
+| **Block timestamp** | ≤ now + 2 hours | Prevents time-drift attacks |
+
+### Why Memory-Hard?
+Traditional SHA-256 (Bitcoin):
+CPU: 100 MH/s | GPU: 1,000 MH/s | ASIC: 100,000 MH/s
+→ ASIC advantage: 1000x
+
+Ramhash v7 (RAMCOIN):
+CPU: 5 MH/s | GPU: 5 MH/s | ASIC: 5 MH/s
+→ ASIC advantage: NONE
+
+Memory-hard algorithms require:
+
+Large memory (524 KB — 8 MB per thread)
+
+High memory bandwidth
+
+Sequential memory access pattern
+→ GPUs and ASICs cannot parallelize effectively
+
+text
+
+### Mining Modes
+
+| Mode | Description | Reward |
+|------|-------------|--------|
+| **SOLO** | Find full blocks independently | 100% of block reward |
+| **POOL** | Submit shares, stable income | Proportional to shares |
+
+---
+
+## 4. TECHNICAL ARCHITECTURE
+
+### Blockchain
+Genesis Block (Block 0):
+├── Timestamp: Network start time
+├── Reward: 0 RAM
+├── Developer: 100 RAM bootstrap
+└── Max scratchpad: 8 MB
+
+Block Structure:
+├── Index
+├── Previous hash (SHA-256)
+├── Timestamp
+├── Transactions (up to 200)
+├── Nonce (48-bit)
+├── Nonce seed (32-bit)
+├── Memory proof (SHA-256)
+├── Scratchpad mods (must be 8,224)
+├── Scratchpad size (524 KB — 8 MB)
+├── Miner signature (ECDSA secp256k1)
+└── Block hash (SHA-256)
+
+text
+
+### Proof-of-Work (Ramhash v7)
+Create Scratchpad:
+seed = SHA256(prev_hash + thread_id + nonce_seed + "RAMCOIN_v7" + buffer_size)
+Initialize 524KB—8MB array with pseudo-random 64-bit values
+
+Memory-Hard Loop (8,192 iterations):
+For each iteration:
+mix = (mix * GOLDEN_RATIO + nonce + current_seed) mod 2^64
+mix = rotate(mix)
+idx = mix % buffer_size
+scratchpad[idx] = scratchpad[idx] XOR mix XOR nonce
+mix = mix + scratchpad[idx]
+
+Every 256 iterations:
+idx2 = hash(idx, scratchpad[idx]) % buffer_size
+scratchpad[idx2] = scratchpad[idx2] XOR (mix >> 16) XOR nonce
+
+Every 50,000 iterations:
+current_seed = current_seed + 1
+mix = mix XOR current_seed
+
+Final Proof:
+proof = SHA256(mix + prev_hash + final_seed + total_mods)
+Valid if: proof < target AND mods == 8,224
+
+text
+
+### Difficulty Adjustment
+Target adjusted every block:
+Block time < 10s → Difficulty × 1.54 (target × 0.65)
+Block time 10-20s → Difficulty × 1.25 (target × 0.80)
+Block time 20-25s → Difficulty × 1.11 (target × 0.90)
+Block time 25-35s → No change
+Block time 35-50s → Difficulty × 0.91 (target × 1.10)
+Block time 50-90s → Difficulty × 0.80 (target × 1.25)
+Block time > 90s → Difficulty × 0.71 (target × 1.40)
+
+text
+
+---
+
+## 5. NETWORK
+
+### P2P Protocol v2
+Encryption: ChaCha20-Poly1305 + ECDH key exchange
+Compression: LZ4 (messages > 1 KB)
+Serialization: JSON
+Heartbeat: Every 10 minutes (seed announce)
+
+Message Types:
+├── new_block: Broadcast new block
+├── new_tx: Broadcast transaction
+├── get_blocks: Request block range
+└── get_peers: Request peer list
+
+text
+
+### Seed Nodes
+Reputation System:
+├── Initial reputation: 1.0
+├── +0.1 per successful connection
+├── -0.5 per failed connection
+├── Max reputation: 100.0
+└── Min reputation for active: 0.0
+
+Seed Requirements:
+├── Public IP address
+├── Minimum 3 confirmations from other seeds
+├── Active within last 24 hours
+└── Height within 10 blocks of network
+
+text
+
+### Attack Protections
+
+| Attack | Protection |
+|--------|------------|
+| **Eclipse** | Diverse seed connections, reputation system |
+| **Sybil** | IP-based reputation, subnet analysis |
+| **DDoS** | Rate limiting (30 req/min), auto-ban (1 hour) |
+| **Double-spend** | Nonce-based transaction ordering |
+| **Time-drift** | Max 2-hour future timestamp |
+| **Selfish mining** | Orphan block handling |
+
+---
+
+## 6. WALLET
+
+### Security
+Encryption: AES-256-GCM
+Key derivation: PBKDF2-SHA512 (600,000 iterations)
+Seed phrase: BIP39-style 12-word mnemonic
+Key type: ECDSA secp256k1
+
+Address format: RAM_ + 130 hex characters (public key)
+Example: RAM_04a9b30816a61686f377f152435f528e...
+
+text
+
+### Features
+
+- ✅ Create/restore wallet from mnemonic
+- ✅ Offline transaction signing
+- ✅ Address book
+- ✅ Balance and transaction history
+- ✅ Password change
+
+---
+
+## 7. API
+
+### Public Endpoints
+GET /health — Node health status
+GET /chain — Blockchain info + last 10 blocks
+GET /stats — Network statistics
+GET /coininfo — Coin specifications
+GET /block/{idx} — Block by index
+GET /address/{addr} — Address balance and nonce
+GET /pending — Mempool transactions
+GET /top — Top addresses by balance
+GET /pool/template — Pool mining template
+GET /pool/stats — Pool statistics
+GET /seeds — Active seed nodes
+GET /network — Network status
+WS /ws — WebSocket (real-time blocks)
+
+text
+
+### Authenticated Endpoints
+POST /mine — Submit mined block (requires API-Key)
+POST /tx — Submit transaction
+POST /pool/share — Submit pool share
+
+text
+
+---
+
+## 8. MONITORING
+
+### Prometheus Metrics
+ramcoin_height — Current blockchain height
+ramcoin_peers_total — Total known peers
+ramcoin_connections_active — Active connections
+ramcoin_seeds_total — Seed nodes count
+ramcoin_average_reputation — Average seed reputation
+ramcoin_mempool_size — Mempool transaction count
+ramcoin_block_time_seconds — Time between blocks (histogram)
+ramcoin_blocks_total{status} — Blocks accepted/rejected
+ramcoin_transactions_total — Total transactions
+ramcoin_api_requests_total — API requests by endpoint
+ramcoin_errors_total{type} — Errors by type
+
+text
+
+---
+
+## 9. ROADMAP
+✅ Q1 2026: Core development
+✅ Q2 2026: Mainnet launch
+✅ Q2 2026: Miner v30.0.3 (anti-cheat compatible)
+✅ Q2 2026: Wallet v8.0.0 (BIP39 mnemonic)
+
+🔄 Q3 2026: Block explorer (web)
+🔄 Q3 2026: Mining pool dashboard
+🔄 Q3 2026: Light node (SPV)
+🔄 Q4 2026: Mobile wallet (React Native)
+
+📅 2027 Q1: Exchange listings
+📅 2027 Q2: Smart contracts (WASM)
+📅 2027 Q3: DApps platform
+📅 2027 Q4: Cross-chain bridge
+📅 2028: Governance DAO
+
+text
+
+---
+
+## 10. LINKS
+
+| Resource | URL |
+|----------|-----|
+| **Website** | [https://ramcoin.network](https://ramcoin.network) |
+| **GitHub** | [https://github.com/ramcoinnode-debug/ramcoin](https://github.com/ramcoinnode-debug/ramcoin) |
+| **Block Explorer** | Coming Q3 2026 |
+| **Community** | [https://t.me/ramcoin_chat](https://t.me/ramcoin_chat) |
+| **Twitter/X** | [https://twitter.com/ramcoin](https://twitter.com/ramcoin) |
+| **Discord** | [https://discord.gg/ramcoin](https://discord.gg/ramcoin) |
+
+---
+
+## 11. DISCLAIMER
+
+RAMCOIN is an experimental cryptocurrency. No guarantees are made about 
+its value, security, or future development. Mining rewards are subject 
+to change based on network conditions. Always backup your wallet 
+mnemonic phrase. Never share your private keys.
+
+---
+
+<div align="center">
+
+**RAMCOIN — Fair mining for everyone.**
+
+*No ICO. No premine. No VCs. Just code.*
+
+</div>
