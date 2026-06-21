@@ -8,8 +8,6 @@
     <meta property="og:title" content="RAMCOIN — Блокчейн нового поколения">
     <meta property="og:description" content="Свой блокчейн. Честный майнинг. Ограниченная эмиссия. Присоединяйся!">
     <meta property="og:type" content="website">
-    <meta property="og:url" content="https://ramcoin.network">
-    <meta name="twitter:card" content="summary_large_image">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐏</text></svg>">
     <style>
         :root {
@@ -34,21 +32,27 @@
               padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; 
               flex-wrap: wrap; gap: 10px; position: sticky; top: 0; z-index: 100; }
         nav .logo { font-size: 1.6em; font-weight: 900; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        nav .badge { background: rgba(16,185,129,0.2); color: var(--green); padding: 6px 14px; border-radius: 50px; 
-                    font-weight: 700; font-size: 0.75em; border: 1px solid rgba(16,185,129,0.3); animation: pulse 2s infinite; white-space: nowrap; }
+        
+        .lang-selector { display: flex; gap: 5px; }
+        .lang-btn { background: var(--bg-card); border: 1px solid var(--border); color: var(--text2); padding: 8px 12px; border-radius: 8px; cursor: pointer; font-size: 0.8em; font-weight: 600; transition: all 0.3s; }
+        .lang-btn:hover { border-color: var(--blue); color: var(--blue); }
+        .lang-btn.active { background: rgba(56,189,248,0.15); border-color: var(--blue); color: var(--blue); }
+        
+        .network-status { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(16,185,129,0.1); border-radius: 50px; border: 1px solid rgba(16,185,129,0.3); font-size: 0.75em; font-weight: 700; }
+        .status-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
         @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
         
         .container { max-width: 1000px; margin: 0 auto; padding: 15px 20px; }
         
         .hero { text-align: center; padding: 50px 15px 40px; }
-        .hero-badge { display: inline-block; background: rgba(239,68,68,0.12); color: var(--red); 
-                     border: 2px solid rgba(239,68,68,0.4); padding: 10px 24px; border-radius: 50px; 
+        .hero-badge { display: inline-block; background: rgba(16,185,129,0.12); color: var(--green); 
+                     border: 2px solid rgba(16,185,129,0.4); padding: 10px 24px; border-radius: 50px; 
                      font-weight: 900; font-size: 0.9em; margin: 15px 0; text-transform: uppercase; 
                      letter-spacing: 1px; animation: glow 2s infinite; }
-        @keyframes glow { 0%,100% { box-shadow: 0 0 10px rgba(239,68,68,0.3); } 50% { box-shadow: 0 0 25px rgba(239,68,68,0.6); } }
+        @keyframes glow { 0%,100% { box-shadow: 0 0 10px rgba(16,185,129,0.3); } 50% { box-shadow: 0 0 25px rgba(16,185,129,0.6); } }
         .hero h1 { font-size: clamp(2.5em, 8vw, 4em); font-weight: 900; line-height: 1.1; 
                   background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
-                  text-shadow: 0 0 60px rgba(56,189,248,0.3); margin: 10px 0; }
+                  margin: 10px 0; }
         .hero .subtitle { color: var(--text); font-size: clamp(1em, 3vw, 1.4em); margin: 12px 0; font-weight: 600; }
         .hero .desc { color: var(--text2); font-size: 1em; max-width: 600px; margin: 0 auto; }
         
@@ -66,21 +70,16 @@
         .card:hover::before { opacity: 1; }
         h2 { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
             margin-bottom: 16px; font-size: clamp(1.1em, 3vw, 1.4em); font-weight: 900; }
-        h3 { margin: 12px 0; font-size: 1em; color: var(--blue); font-weight: 700; }
         
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 12px 0; }
         .btn { display: inline-block; padding: 14px 28px; border-radius: 12px; font-weight: 800; text-decoration: none; 
                border: none; cursor: pointer; font-size: 0.95em; text-align: center; transition: all 0.3s; 
-               text-transform: uppercase; letter-spacing: 1px; position: relative; overflow: hidden; }
-        .btn::after { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255,255,255,0.2); border-radius: 50%; transform: translate(-50%, -50%); transition: width 0.6s, height 0.6s; }
-        .btn:active::after { width: 300px; height: 300px; }
+               text-transform: uppercase; letter-spacing: 1px; }
         .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
         .btn-primary { background: #0284c7; color: white; font-size: 1.1em; }
         .btn-green { background: #059669; color: white; font-size: 1.1em; }
         .btn-purple { background: #7c3aed; color: white; }
         .btn-gold { background: #b45309; color: white; }
-        .btn-outline { background: transparent; border: 2px solid var(--blue); color: var(--blue); }
-        .btn-outline:hover { background: rgba(56,189,248,0.1); }
         
         .specs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.9em; }
         .specs .spec-label { color: var(--text2); }
@@ -89,12 +88,11 @@
         .social { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 18px 0; }
         .social a { background: var(--bg-card); border: 2px solid var(--border); padding: 12px 20px; 
                    border-radius: 12px; color: var(--text); text-decoration: none; font-weight: 700; 
-                   font-size: 0.85em; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
-        .social a:hover { border-color: var(--blue); color: var(--blue); transform: translateY(-2px); box-shadow: 0 5px 20px rgba(56,189,248,0.2); }
+                   font-size: 0.85em; transition: all 0.3s; }
+        .social a:hover { border-color: var(--blue); color: var(--blue); transform: translateY(-2px); }
         
         .footer { text-align: center; color: var(--text2); font-size: 0.8em; padding: 30px 20px; border-top: 1px solid var(--border); margin-top: 20px; }
         .footer a { color: var(--blue); text-decoration: none; font-weight: 600; }
-        .footer a:hover { text-decoration: underline; }
         
         .success-box { background: rgba(16,185,129,0.08); border: 2px solid rgba(16,185,129,0.3); 
                       padding: 16px; border-radius: 12px; margin: 14px 0; font-size: 0.9em; text-align: center; }
@@ -103,27 +101,26 @@
         .info-box { background: rgba(56,189,248,0.08); border: 2px solid rgba(56,189,248,0.3); 
                    padding: 16px; border-radius: 12px; margin: 14px 0; font-size: 0.9em; }
         
-        .sheep-section { text-align: center; padding: 20px 0; }
-        .sheep-section .sheep-icon { font-size: 5em; animation: bounce 1s infinite; display: inline-block; }
-        @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
+        .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; text-align: center; }
+        .step-card { padding: 22px; background: rgba(56,189,248,0.04); border-radius: 14px; border: 1px solid var(--border); transition: all 0.3s; }
+        .step-card:hover { border-color: var(--blue); background: rgba(56,189,248,0.08); }
+        .step-number { font-size: 3em; font-weight: 900; color: var(--blue); }
+        
+        .copy-btn { cursor: pointer; background: var(--bg-card); border: 1px solid var(--border); color: var(--blue); padding: 6px 12px; border-radius: 6px; font-size: 0.8em; transition: all 0.2s; margin-left: 8px; }
+        .copy-btn:hover { background: rgba(56,189,248,0.1); border-color: var(--blue); }
+        
+        .download-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-top: 16px; }
+        .download-card { background: rgba(0,0,0,0.3); border: 2px solid var(--border); border-radius: 16px; padding: 24px; text-align: center; transition: all 0.3s; }
+        .download-card:hover { border-color: var(--green); transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.4); }
+        .download-card .dl-icon { font-size: 3em; margin-bottom: 10px; }
+        .download-card h3 { color: var(--text); margin-bottom: 8px; }
+        .download-card p { color: var(--text2); font-size: 0.85em; margin-bottom: 14px; }
         
         .nft-preview { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
         .nft-card { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 14px; text-align: center; border: 1px solid var(--border); transition: all 0.3s; cursor: pointer; }
         .nft-card:hover { border-color: var(--gold); transform: translateY(-5px); }
         .nft-card .nft-icon { font-size: 3em; }
         .nft-card .nft-name { color: var(--gold); font-weight: 700; font-size: 0.85em; margin-top: 6px; }
-        
-        .copy-btn { cursor: pointer; background: var(--bg-card); border: 1px solid var(--border); color: var(--blue); padding: 6px 12px; border-radius: 6px; font-size: 0.8em; transition: all 0.2s; }
-        .copy-btn:hover { background: rgba(56,189,248,0.1); border-color: var(--blue); }
-        .copied { color: var(--green) !important; }
-        
-        .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; text-align: center; }
-        .step-card { padding: 22px; background: rgba(56,189,248,0.04); border-radius: 14px; border: 1px solid var(--border); transition: all 0.3s; }
-        .step-card:hover { border-color: var(--blue); background: rgba(56,189,248,0.08); }
-        .step-number { font-size: 3em; font-weight: 900; color: var(--blue); }
-        
-        .network-status { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(16,185,129,0.1); border-radius: 50px; border: 1px solid rgba(16,185,129,0.3); }
-        .status-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
         
         @media (max-width: 768px) {
             .hero h1 { font-size: 2.2em; }
@@ -138,25 +135,96 @@
 <body>
     <nav>
         <span class="logo">⚡ RAMCOIN</span>
-        <div class="network-status">
-            <span class="status-dot"></span>
-            <span class="badge">● LIVE — СЕТЬ РАБОТАЕТ</span>
-        </div>
-        <div style="display:flex;gap:8px;flex-wrap:wrap">
-            <a href="https://t.me/ramcoin_pow" class="btn btn-primary" style="padding:8px 16px;font-size:0.8em;">📢 Канал</a>
-            <a href="https://t.me/ramcoin_chat" class="btn btn-green" style="padding:8px 16px;font-size:0.8em;">👥 Чат</a>
+        <div style="display:flex;align-items:center;gap:10px;flex-wrap:wrap;">
+            <div class="network-status">
+                <span class="status-dot"></span>
+                <span data-lang="node_status">● НОДА РАБОТАЕТ</span>
+            </div>
+            <div class="lang-selector">
+                <button class="lang-btn active" onclick="setLang('ru')">🇷🇺 RU</button>
+                <button class="lang-btn" onclick="setLang('en')">🇬🇧 EN</button>
+                <button class="lang-btn" onclick="setLang('zh')">🇨🇳 中文</button>
+            </div>
         </div>
     </nav>
     
     <div class="container">
         <!-- HERO -->
         <div class="hero">
-            <span class="hero-badge">⚡ ЗАПУЩЕН • РАБОТАЕТ 24/7</span>
+            <span class="hero-badge" data-lang="hero_badge">⚡ ЗАПУЩЕН • РАБОТАЕТ 24/7</span>
             <h1>RAMCOIN</h1>
-            <p class="subtitle">Свой блокчейн. Честный майнинг. Ограниченная эмиссия.</p>
-            <p class="desc">Не токен. Не игра. Настоящая криптовалюта с собственной нодой.<br>Один разработчик. Открытый код. Живая сеть.</p>
+            <p class="subtitle" data-lang="hero_subtitle">Свой блокчейн. Честный майнинг. Ограниченная эмиссия.</p>
+            <p class="desc" data-lang="hero_desc">Не токен. Не игра. Настоящая криптовалюта с собственной нодой.<br>Один разработчик. Открытый код. Живая сеть.</p>
             <div style="margin-top:25px;">
-                <a href="#start" class="btn btn-primary" style="font-size:1.2em;padding:18px 40px;">🚀 КАК ЗАПУСТИТЬ НОДУ</a>
+                <a href="#start" class="btn btn-primary" style="font-size:1.2em;padding:18px 40px;" data-lang="start_btn">🚀 НАЧАТЬ МАЙНИТЬ</a>
+            </div>
+        </div>
+
+        <!-- ВАЖНОЕ ОБЪЯВЛЕНИЕ -->
+        <div class="card" style="text-align:center;">
+            <h2 data-lang="announcement_title">⚡ НОДА УЖЕ РАБОТАЕТ!</h2>
+            <p style="font-size:1.1em;margin:10px 0;" data-lang="announcement_text">
+                Вам не нужно запускать свою ноду. Достаточно скачать майнер и кошелек, подключиться к нашей ноде и начать майнить!
+            </p>
+            <div class="info-box">
+                <p data-lang="announcement_detail">
+                    🌐 <strong>Публичная нода:</strong> <code>90.188.115.169:5000</code> (API) | <code>90.188.115.169:8333</code> (P2P)<br>
+                    ✅ Нода работает 24/7. Просто скачайте майнер и кошелек ниже.
+                </p>
+            </div>
+        </div>
+
+        <!-- СКАЧАТЬ -->
+        <div class="card" id="downloads">
+            <h2 data-lang="download_title">📥 СКАЧАТЬ</h2>
+            <p style="text-align:center;color:var(--text2);margin-bottom:16px;" data-lang="download_subtitle">Всё необходимое для майнинга. Нода уже работает.</p>
+            <div class="download-section">
+                <div class="download-card">
+                    <div class="dl-icon">⛏️</div>
+                    <h3 data-lang="miner_title">Майнер</h3>
+                    <p data-lang="miner_desc">CPU-майнер. 4 потока. Windows/Linux.</p>
+                    <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/download/v1.0/RamcoinMiner.exe" class="btn btn-primary" data-lang="download_btn">⬇️ СКАЧАТЬ</a>
+                </div>
+                <div class="download-card">
+                    <div class="dl-icon">👛</div>
+                    <h3 data-lang="wallet_title">Кошелек</h3>
+                    <p data-lang="wallet_desc">Создание адреса, отправка RAM.</p>
+                    <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/download/v1.0/RamcoinWallet.exe" class="btn btn-green" data-lang="download_btn">⬇️ СКАЧАТЬ</a>
+                </div>
+                <div class="download-card">
+                    <div class="dl-icon">📦</div>
+                    <h3 data-lang="node_title">Нода (опционально)</h3>
+                    <p data-lang="node_desc">Для тех, кто хочет свою ноду.</p>
+                    <a href="https://github.com/ramcoinnode-debug/ramcoin" class="btn btn-purple" data-lang="source_btn">💻 ИСХОДНЫЙ КОД</a>
+                </div>
+            </div>
+            <div class="success-box" style="margin-top:18px;">
+                <p data-lang="node_ready">✅ <strong>Нода уже работает!</strong> Скачайте майнер, запустите и начните добывать RAM.</p>
+            </div>
+        </div>
+
+        <!-- КАК НАЧАТЬ -->
+        <div class="card" id="start">
+            <h2 data-lang="howto_title">🚀 КАК НАЧАТЬ МАЙНИТЬ (3 ШАГА)</h2>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <p><strong data-lang="step1_title">Скачай майнер</strong></p>
+                    <p style="color:var(--text2);font-size:0.85em;" data-lang="step1_desc">Нажми кнопку выше. EXE файл, не требует Python.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
+                    <p><strong data-lang="step2_title">Создай кошелек</strong></p>
+                    <p style="color:var(--text2);font-size:0.85em;" data-lang="step2_desc">Запусти RamcoinWallet.exe и создай адрес RAM_.</p>
+                </div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
+                    <p><strong data-lang="step3_title">Запусти майнер</strong></p>
+                    <p style="color:var(--text2);font-size:0.85em;" data-lang="step3_desc">Введи адрес и начни добывать RAM каждые 30 секунд!</p>
+                </div>
+            </div>
+            <div class="success-box" style="margin-top:18px;">
+                <span data-lang="howto_ready">✅ <strong>Готово!</strong> Ты майнишь RAMCOIN. Блоки добываются каждые 30 секунд. Награда: 10 RAM.</span>
             </div>
         </div>
 
@@ -164,201 +232,315 @@
         <div class="stats-grid">
             <div class="stat-item">
                 <div class="icon">🔗</div>
-                <div class="value" id="blocks-value">20 321</div>
-                <div class="label">Блоков добыто</div>
+                <div class="value">20 321+</div>
+                <div class="label" data-lang="stat_blocks">БЛОКОВ ДОБЫТО</div>
             </div>
             <div class="stat-item">
                 <div class="icon">💰</div>
-                <div class="value" id="supply-value">200 870</div>
-                <div class="label">RAM в сети</div>
+                <div class="value">200 870+</div>
+                <div class="label" data-lang="stat_supply">RAM В СЕТИ</div>
             </div>
             <div class="stat-item">
                 <div class="icon">⏱️</div>
                 <div class="value">~30 сек</div>
-                <div class="label">Время блока</div>
+                <div class="label" data-lang="stat_time">ВРЕМЯ БЛОКА</div>
             </div>
             <div class="stat-item">
                 <div class="icon">👥</div>
                 <div class="value">5+</div>
-                <div class="label">Майнеров</div>
+                <div class="label" data-lang="stat_miners">МАЙНЕРОВ</div>
             </div>
             <div class="stat-item">
                 <div class="icon">💎</div>
                 <div class="value">10 RAM</div>
-                <div class="label">Награда</div>
+                <div class="label" data-lang="stat_reward">НАГРАДА</div>
             </div>
             <div class="stat-item">
                 <div class="icon">🔒</div>
                 <div class="value">17.5M</div>
-                <div class="label">Макс. эмиссия</div>
-            </div>
-        </div>
-
-        <!-- ПОЧЕМУ БАРАН -->
-        <div class="card sheep-section">
-            <h2>🐏 ПОЧЕМУ RAMCOIN?</h2>
-            <div class="sheep-icon">🐏</div>
-            <p style="font-size:1.2em;margin:10px 0;"><strong>RAM = оперативная память</strong></p>
-            <p style="color:var(--text2);">Наш алгоритм требует 8 МБ RAM на майнер.<br>Это защита от ASIC-ферм — только честный CPU-майнинг.</p>
-            <p style="margin-top:14px;"><strong>Баран — упрямый. Сильный. Его не сдвинуть.</strong></p>
-            <p style="color:var(--text2);">Как и нашу сеть. RAMCOIN не остановить.</p>
-        </div>
-
-        <!-- КАК НАЧАТЬ -->
-        <div class="card" id="start">
-            <h2>🚀 ЗАПУСТИ НОДУ ЗА 5 МИНУТ</h2>
-            <div class="steps-grid">
-                <div class="step-card">
-                    <div class="step-number">1</div>
-                    <p><strong>Установи Python 3.9+</strong></p>
-                    <p style="color:var(--text2);font-size:0.85em;"><a href="https://python.org" target="_blank" style="color:var(--blue);">python.org</a> — бесплатно</p>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">2</div>
-                    <p><strong>Склонируй репозиторий</strong></p>
-                    <p style="color:var(--text2);font-size:0.85em;">
-                        <code style="background:rgba(0,0,0,0.3);padding:4px 8px;border-radius:4px;">git clone https://github.com/ramcoinnode-debug/ramcoin.git</code>
-                    </p>
-                </div>
-                <div class="step-card">
-                    <div class="step-number">3</div>
-                    <p><strong>Запусти ноду</strong></p>
-                    <p style="color:var(--text2);font-size:0.85em;">
-                        <code style="background:rgba(0,0,0,0.3);padding:4px 8px;border-radius:4px;">python ramcoin_full2.py</code>
-                    </p>
-                </div>
-            </div>
-            <div class="success-box" style="margin-top:18px;">
-                ✅ <strong>Готово!</strong> Твой компьютер стал частью сети RAMCOIN. Блоки добываются каждые 30 секунд.
-            </div>
-            <div class="info-box">
-                💡 <strong>Совет:</strong> После запуска ноды открой браузер и перейди на <code>http://localhost:5000/health</code> чтобы проверить статус.
-            </div>
-            <div class="btn-group" style="margin-top:14px;">
-                <a href="https://github.com/ramcoinnode-debug/ramcoin" class="btn btn-purple" target="_blank">💻 GitHub</a>
-                <a href="https://t.me/ramcoin_chat" class="btn btn-green" target="_blank">👥 Чат (поможем)</a>
+                <div class="label" data-lang="stat_max">МАКС. ЭМИССИЯ</div>
             </div>
         </div>
 
         <!-- ХАЛВИНГ -->
         <div class="card">
-            <h2>⏰ ХАЛВИНГ — ПОЧЕМУ ПЕРВЫЕ ПОЛУЧАЮТ БОЛЬШЕ</h2>
-            <p style="color:var(--text2);">Каждые 876 000 блоков награда за блок уменьшается вдвое.</p>
+            <h2 data-lang="halving_title">⏰ ХАЛВИНГ — ПОЧЕМУ ПЕРВЫЕ ПОЛУЧАЮТ БОЛЬШЕ</h2>
+            <p style="color:var(--text2);" data-lang="halving_desc">Каждые 876 000 блоков награда за блок уменьшается вдвое.</p>
             <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;margin:16px 0">
                 <div style="padding:16px;background:rgba(16,185,129,0.1);border-radius:12px;border:1px solid rgba(16,185,129,0.3)">
                     <div style="font-size:1.8em;font-weight:900;color:var(--green)">10 RAM</div>
-                    <div style="color:var(--text2);font-size:0.8em;margin-top:4px;">Сейчас</div>
+                    <div style="color:var(--text2);font-size:0.8em;margin-top:4px;" data-lang="halving_now">Сейчас</div>
                 </div>
                 <div style="padding:16px;background:rgba(56,189,248,0.1);border-radius:12px;border:1px solid rgba(56,189,248,0.3)">
                     <div style="font-size:1.8em;font-weight:900;color:var(--blue)">5 RAM</div>
-                    <div style="color:var(--text2);font-size:0.8em;margin-top:4px;">1-й халвинг</div>
+                    <div style="color:var(--text2);font-size:0.8em;margin-top:4px;" data-lang="halving_1st">1-й халвинг</div>
                 </div>
                 <div style="padding:16px;background:rgba(168,120,250,0.1);border-radius:12px;border:1px solid rgba(168,120,250,0.3)">
                     <div style="font-size:1.8em;font-weight:900;color:var(--purple)">2.5 RAM</div>
-                    <div style="color:var(--text2);font-size:0.8em;margin-top:4px;">2-й халвинг</div>
+                    <div style="color:var(--text2);font-size:0.8em;margin-top:4px;" data-lang="halving_2nd">2-й халвинг</div>
                 </div>
             </div>
             <div class="warning-box">
-                🎯 <strong>Биткоин в 2009 давал 50 BTC за блок. Сейчас — 3.125 BTC.</strong><br>
-                RAMCOIN сейчас — как биткоин тогда. Первые майнеры получают максимум.
+                <span data-lang="halving_warning">🎯 <strong>Биткоин в 2009 давал 50 BTC за блок. Сейчас — 3.125 BTC.</strong><br>RAMCOIN сейчас — как биткоин тогда. Первые майнеры получают максимум.</span>
             </div>
         </div>
 
-        <!-- ТЕХНИЧЕСКИЕ ХАРАКТЕРИСТИКИ -->
+        <!-- ХАРАКТЕРИСТИКИ -->
         <div class="card">
-            <h2>⚙️ ХАРАКТЕРИСТИКИ</h2>
+            <h2 data-lang="specs_title">⚙️ ХАРАКТЕРИСТИКИ</h2>
             <div class="specs">
-                <p class="spec-label">⚡ Алгоритм:</p><p class="spec-value">Memory-hard PoW (SHA-256)</p>
-                <p class="spec-label">💎 Макс. эмиссия:</p><p class="spec-value">17 500 000 RAM</p>
-                <p class="spec-label">⏱️ Время блока:</p><p class="spec-value">~30 секунд</p>
-                <p class="spec-label">🔒 Защита:</p><p class="spec-value">8 MB scratchpad × 8 224 итераций</p>
-                <p class="spec-label">🌐 Сеть:</p><p class="spec-value">P2P • ChaCha20-Poly1305 • ECDH</p>
-                <p class="spec-label">🖥️ Потоки:</p><p class="spec-value">4 на майнер (честно для всех)</p>
-                <p class="spec-label">🔥 Халвинг:</p><p class="spec-value">Каждые 876 000 блоков</p>
-                <p class="spec-label">💰 Награда:</p><p class="spec-value">10 RAM/блок</p>
+                <p class="spec-label" data-lang="spec_algo">⚡ Алгоритм:</p><p class="spec-value">Memory-hard PoW (SHA-256)</p>
+                <p class="spec-label" data-lang="spec_max">💎 Макс. эмиссия:</p><p class="spec-value">17 500 000 RAM</p>
+                <p class="spec-label" data-lang="spec_time">⏱️ Время блока:</p><p class="spec-value">~30 секунд</p>
+                <p class="spec-label" data-lang="spec_defense">🔒 Защита:</p><p class="spec-value">8 MB scratchpad × 8 224 итераций</p>
+                <p class="spec-label" data-lang="spec_net">🌐 Сеть:</p><p class="spec-value">P2P • ChaCha20-Poly1305 • ECDH</p>
+                <p class="spec-label" data-lang="spec_threads">🖥️ Потоки:</p><p class="spec-value">4 на майнер (честно для всех)</p>
+                <p class="spec-label" data-lang="spec_halving">🔥 Халвинг:</p><p class="spec-value">Каждые 876 000 блоков</p>
+                <p class="spec-label" data-lang="spec_reward">💰 Награда:</p><p class="spec-value">10 RAM/блок</p>
             </div>
         </div>
 
         <!-- NFT -->
         <div class="card">
-            <h2>🎨 УНИКАЛЬНЫЕ NFT</h2>
-            <p style="color:var(--text2);">Каждый майнер получает уникальный NFT. Сгенерирован из хеша блока. Невозможно подделать.</p>
+            <h2 data-lang="nft_title">🎨 УНИКАЛЬНЫЕ NFT</h2>
+            <p style="color:var(--text2);" data-lang="nft_desc">Каждый майнер получает уникальный NFT. Сгенерирован из хеша блока. Невозможно подделать.</p>
             <div class="nft-preview" style="margin-top:16px;">
-                <div class="nft-card" title="Common NFT">
-                    <div class="nft-icon">🟢</div>
-                    <div class="nft-name">COMMON</div>
-                </div>
-                <div class="nft-card" title="Rare NFT">
-                    <div class="nft-icon">🔵</div>
-                    <div class="nft-name">RARE</div>
-                </div>
-                <div class="nft-card" title="Epic NFT">
-                    <div class="nft-icon">🟣</div>
-                    <div class="nft-name">EPIC</div>
-                </div>
-                <div class="nft-card" title="Legendary NFT">
-                    <div class="nft-icon">🟡</div>
-                    <div class="nft-name">LEGENDARY</div>
-                </div>
-                <div class="nft-card" title="Mythic NFT">
-                    <div class="nft-icon">🔴</div>
-                    <div class="nft-name">MYTHIC</div>
-                </div>
-                <div class="nft-card" title="Divine NFT">
-                    <div class="nft-icon">👑</div>
-                    <div class="nft-name">DIVINE</div>
-                </div>
-            </div>
-            <div class="success-box" style="margin-top:16px;">
-                🎨 NFT раздаются через тапалку <strong>@ramcoin_tap_bot</strong> — получи свой!
+                <div class="nft-card"><div class="nft-icon">🟢</div><div class="nft-name">COMMON</div></div>
+                <div class="nft-card"><div class="nft-icon">🔵</div><div class="nft-name">RARE</div></div>
+                <div class="nft-card"><div class="nft-icon">🟣</div><div class="nft-name">EPIC</div></div>
+                <div class="nft-card"><div class="nft-icon">🟡</div><div class="nft-name">LEGENDARY</div></div>
+                <div class="nft-card"><div class="nft-icon">🔴</div><div class="nft-name">MYTHIC</div></div>
+                <div class="nft-card"><div class="nft-icon">👑</div><div class="nft-name">DIVINE</div></div>
             </div>
         </div>
 
-        <!-- ПРИСОЕДИНЯЙСЯ -->
+        <!-- СОЦСЕТИ -->
         <div class="card" style="text-align:center;">
-            <h2>🔥 ПРИСОЕДИНЯЙСЯ К СЕТИ</h2>
-            <p style="font-size:1.2em;">98% монет ещё не добыто. Ты на старте.</p>
+            <h2 data-lang="social_title">🔥 ПРИСОЕДИНЯЙСЯ К СЕТИ</h2>
+            <p style="font-size:1.2em;" data-lang="social_subtitle">98% монет ещё не добыто. Ты на старте.</p>
             <div class="social">
-                <a href="https://t.me/ramcoin_pow" target="_blank">📢 Telegram канал</a>
-                <a href="https://t.me/ramcoin_chat" target="_blank">👥 Чат сообщества</a>
-                <a href="https://t.me/ramcoin_tap_bot" target="_blank">🎮 Тапалка</a>
+                <a href="https://t.me/ramcoin_pow" target="_blank">📢 Telegram</a>
+                <a href="https://t.me/ramcoin_chat" target="_blank">👥 Чат</a>
                 <a href="https://github.com/ramcoinnode-debug/ramcoin" target="_blank">💻 GitHub</a>
-                <a href="https://tiktok.com/@ramcoin_pow" target="_blank">🎬 TikTok</a>
-                <a href="https://instagram.com/ramcoin.node" target="_blank">📸 Instagram</a>
-                <a href="https://youtube.com/@ramcoin_node" target="_blank">▶️ YouTube</a>
-                <a href="https://rutube.ru/channel/ramcoin" target="_blank">🟢 Rutube</a>
-                <a href="https://kick.com/ramcoin" target="_blank">🟣 Kick</a>
+                <a href="https://t.me/ramcoin_tap_bot" target="_blank">🎮 Тапалка</a>
             </div>
         </div>
 
         <div class="footer">
-            <p>🌐 <strong>Ноды:</strong></p>
+            <p>🌐 <strong data-lang="footer_nodes">Ноды:</strong></p>
             <p>
                 <code>90.188.115.169:8333</code> 
-                <button class="copy-btn" onclick="copyToClipboard('90.188.115.169:8333')">📋 Копировать</button>
-            </p>
-            <p>
-                <code>188.225.31.168:8333</code> 
-                <button class="copy-btn" onclick="copyToClipboard('188.225.31.168:8333')">📋 Копировать</button>
+                <button class="copy-btn" onclick="copyToClipboard('90.188.115.169:8333')">📋</button>
             </p>
             <p style="margin-top:12px;">RAMCOIN v10.3.0 — P2P Blockchain Network</p>
             <p>© 2026 <a href="https://t.me/ramcoin_pow" target="_blank">RAMCOIN Community</a></p>
-            <p style="margin-top:10px;font-size:0.75em;">Свой блокчейн. Честный майнинг. Ограниченная эмиссия.</p>
         </div>
     </div>
 
     <script>
-        // Копирование в буфер обмена
+        // Переводы
+        const translations = {
+            ru: {
+                node_status: '● НОДА РАБОТАЕТ',
+                hero_badge: '⚡ ЗАПУЩЕН • РАБОТАЕТ 24/7',
+                hero_subtitle: 'Свой блокчейн. Честный майнинг. Ограниченная эмиссия.',
+                hero_desc: 'Не токен. Не игра. Настоящая криптовалюта с собственной нодой.<br>Один разработчик. Открытый код. Живая сеть.',
+                start_btn: '🚀 НАЧАТЬ МАЙНИТЬ',
+                announcement_title: '⚡ НОДА УЖЕ РАБОТАЕТ!',
+                announcement_text: 'Вам не нужно запускать свою ноду. Достаточно скачать майнер и кошелек, подключиться к нашей ноде и начать майнить!',
+                announcement_detail: '🌐 <strong>Публичная нода:</strong> <code>90.188.115.169:5000</code> (API) | <code>90.188.115.169:8333</code> (P2P)<br>✅ Нода работает 24/7. Просто скачайте майнер и кошелек ниже.',
+                download_title: '📥 СКАЧАТЬ',
+                download_subtitle: 'Всё необходимое для майнинга. Нода уже работает.',
+                miner_title: 'Майнер',
+                miner_desc: 'CPU-майнер. 4 потока. Windows/Linux.',
+                wallet_title: 'Кошелек',
+                wallet_desc: 'Создание адреса, отправка RAM.',
+                node_title: 'Нода (опционально)',
+                node_desc: 'Для тех, кто хочет свою ноду.',
+                download_btn: '⬇️ СКАЧАТЬ',
+                source_btn: '💻 ИСХОДНЫЙ КОД',
+                node_ready: '✅ <strong>Нода уже работает!</strong> Скачайте майнер, запустите и начните добывать RAM.',
+                howto_title: '🚀 КАК НАЧАТЬ МАЙНИТЬ (3 ШАГА)',
+                step1_title: 'Скачай майнер',
+                step1_desc: 'Нажми кнопку выше. EXE файл, не требует Python.',
+                step2_title: 'Создай кошелек',
+                step2_desc: 'Запусти RamcoinWallet.exe и создай адрес RAM_.',
+                step3_title: 'Запусти майнер',
+                step3_desc: 'Введи адрес и начни добывать RAM каждые 30 секунд!',
+                howto_ready: '✅ <strong>Готово!</strong> Ты майнишь RAMCOIN. Блоки добываются каждые 30 секунд. Награда: 10 RAM.',
+                stat_blocks: 'БЛОКОВ ДОБЫТО',
+                stat_supply: 'RAM В СЕТИ',
+                stat_time: 'ВРЕМЯ БЛОКА',
+                stat_miners: 'МАЙНЕРОВ',
+                stat_reward: 'НАГРАДА',
+                stat_max: 'МАКС. ЭМИССИЯ',
+                halving_title: '⏰ ХАЛВИНГ — ПОЧЕМУ ПЕРВЫЕ ПОЛУЧАЮТ БОЛЬШЕ',
+                halving_desc: 'Каждые 876 000 блоков награда за блок уменьшается вдвое.',
+                halving_now: 'Сейчас',
+                halving_1st: '1-й халвинг',
+                halving_2nd: '2-й халвинг',
+                halving_warning: '🎯 <strong>Биткоин в 2009 давал 50 BTC за блок. Сейчас — 3.125 BTC.</strong><br>RAMCOIN сейчас — как биткоин тогда. Первые майнеры получают максимум.',
+                specs_title: '⚙️ ХАРАКТЕРИСТИКИ',
+                spec_algo: '⚡ Алгоритм:',
+                spec_max: '💎 Макс. эмиссия:',
+                spec_time: '⏱️ Время блока:',
+                spec_defense: '🔒 Защита:',
+                spec_net: '🌐 Сеть:',
+                spec_threads: '🖥️ Потоки:',
+                spec_halving: '🔥 Халвинг:',
+                spec_reward: '💰 Награда:',
+                nft_title: '🎨 УНИКАЛЬНЫЕ NFT',
+                nft_desc: 'Каждый майнер получает уникальный NFT. Сгенерирован из хеша блока. Невозможно подделать.',
+                social_title: '🔥 ПРИСОЕДИНЯЙСЯ К СЕТИ',
+                social_subtitle: '98% монет ещё не добыто. Ты на старте.',
+                footer_nodes: 'Ноды:'
+            },
+            en: {
+                node_status: '● NODE IS RUNNING',
+                hero_badge: '⚡ LAUNCHED • RUNNING 24/7',
+                hero_subtitle: 'Own blockchain. Fair mining. Limited supply.',
+                hero_desc: 'Not a token. Not a game. Real cryptocurrency with its own node.<br>One developer. Open source. Live network.',
+                start_btn: '🚀 START MINING',
+                announcement_title: '⚡ NODE IS ALREADY RUNNING!',
+                announcement_text: 'You don\'t need to run your own node. Just download the miner and wallet, connect to our node and start mining!',
+                announcement_detail: '🌐 <strong>Public node:</strong> <code>90.188.115.169:5000</code> (API) | <code>90.188.115.169:8333</code> (P2P)<br>✅ Node runs 24/7. Just download the miner and wallet below.',
+                download_title: '📥 DOWNLOAD',
+                download_subtitle: 'Everything you need for mining. Node is already running.',
+                miner_title: 'Miner',
+                miner_desc: 'CPU miner. 4 threads. Windows/Linux.',
+                wallet_title: 'Wallet',
+                wallet_desc: 'Create address, send RAM.',
+                node_title: 'Node (optional)',
+                node_desc: 'For those who want their own node.',
+                download_btn: '⬇️ DOWNLOAD',
+                source_btn: '💻 SOURCE CODE',
+                node_ready: '✅ <strong>Node is already running!</strong> Download miner, launch and start mining RAM.',
+                howto_title: '🚀 HOW TO START MINING (3 STEPS)',
+                step1_title: 'Download miner',
+                step1_desc: 'Click the button above. EXE file, no Python needed.',
+                step2_title: 'Create wallet',
+                step2_desc: 'Run RamcoinWallet.exe and create a RAM_ address.',
+                step3_title: 'Start miner',
+                step3_desc: 'Enter your address and start mining RAM every 30 seconds!',
+                howto_ready: '✅ <strong>Done!</strong> You are mining RAMCOIN. Blocks every 30 seconds. Reward: 10 RAM.',
+                stat_blocks: 'BLOCKS MINED',
+                stat_supply: 'RAM IN NETWORK',
+                stat_time: 'BLOCK TIME',
+                stat_miners: 'MINERS',
+                stat_reward: 'REWARD',
+                stat_max: 'MAX SUPPLY',
+                halving_title: '⏰ HALVING — WHY EARLY MINERS GET MORE',
+                halving_desc: 'Every 876,000 blocks the block reward is cut in half.',
+                halving_now: 'Now',
+                halving_1st: '1st halving',
+                halving_2nd: '2nd halving',
+                halving_warning: '🎯 <strong>Bitcoin in 2009 gave 50 BTC per block. Now — 3.125 BTC.</strong><br>RAMCOIN now is like Bitcoin back then. Early miners get the most.',
+                specs_title: '⚙️ SPECIFICATIONS',
+                spec_algo: '⚡ Algorithm:',
+                spec_max: '💎 Max supply:',
+                spec_time: '⏱️ Block time:',
+                spec_defense: '🔒 Defense:',
+                spec_net: '🌐 Network:',
+                spec_threads: '🖥️ Threads:',
+                spec_halving: '🔥 Halving:',
+                spec_reward: '💰 Reward:',
+                nft_title: '🎨 UNIQUE NFTs',
+                nft_desc: 'Every miner gets a unique NFT. Generated from block hash. Impossible to forge.',
+                social_title: '🔥 JOIN THE NETWORK',
+                social_subtitle: '98% of coins not yet mined. You are early.',
+                footer_nodes: 'Nodes:'
+            },
+            zh: {
+                node_status: '● 节点运行中',
+                hero_badge: '⚡ 已启动 • 24/7运行',
+                hero_subtitle: '自有区块链。公平挖矿。限量供应。',
+                hero_desc: '不是代币。不是游戏。拥有自己节点的真正加密货币。<br>一个开发者。开源代码。实时网络。',
+                start_btn: '🚀 开始挖矿',
+                announcement_title: '⚡ 节点已在运行！',
+                announcement_text: '您无需运行自己的节点。只需下载矿工和钱包，连接到我们的节点即可开始挖矿！',
+                announcement_detail: '🌐 <strong>公共节点：</strong> <code>90.188.115.169:5000</code> (API) | <code>90.188.115.169:8333</code> (P2P)<br>✅ 节点24/7运行。只需下载下面的矿工和钱包。',
+                download_title: '📥 下载',
+                download_subtitle: '挖矿所需的一切。节点已在运行。',
+                miner_title: '矿工',
+                miner_desc: 'CPU矿工。4线程。Windows/Linux。',
+                wallet_title: '钱包',
+                wallet_desc: '创建地址，发送RAM。',
+                node_title: '节点（可选）',
+                node_desc: '适合想要自己节点的用户。',
+                download_btn: '⬇️ 下载',
+                source_btn: '💻 源代码',
+                node_ready: '✅ <strong>节点已在运行！</strong>下载矿工，启动并开始挖RAM。',
+                howto_title: '🚀 如何开始挖矿（3步）',
+                step1_title: '下载矿工',
+                step1_desc: '点击上方按钮。EXE文件，无需Python。',
+                step2_title: '创建钱包',
+                step2_desc: '运行RamcoinWallet.exe并创建RAM_地址。',
+                step3_title: '启动矿工',
+                step3_desc: '输入您的地址，每30秒开始挖RAM！',
+                howto_ready: '✅ <strong>完成！</strong>您正在挖RAMCOIN。每30秒出块。奖励：10 RAM。',
+                stat_blocks: '已挖区块',
+                stat_supply: '网络中的RAM',
+                stat_time: '出块时间',
+                stat_miners: '矿工数',
+                stat_reward: '奖励',
+                stat_max: '最大供应量',
+                halving_title: '⏰ 减半 — 为什么早期矿工获得更多',
+                halving_desc: '每876,000个区块，区块奖励减半。',
+                halving_now: '现在',
+                halving_1st: '第一次减半',
+                halving_2nd: '第二次减半',
+                halving_warning: '🎯 <strong>2009年比特币每区块50 BTC。现在 — 3.125 BTC。</strong><br>RAMCOIN现在就像当年的比特币。早期矿工获得最多。',
+                specs_title: '⚙️ 规格',
+                spec_algo: '⚡ 算法：',
+                spec_max: '💎 最大供应量：',
+                spec_time: '⏱️ 出块时间：',
+                spec_defense: '🔒 防御：',
+                spec_net: '🌐 网络：',
+                spec_threads: '🖥️ 线程：',
+                spec_halving: '🔥 减半：',
+                spec_reward: '💰 奖励：',
+                nft_title: '🎨 独特的NFT',
+                nft_desc: '每个矿工获得独特的NFT。由区块哈希生成。无法伪造。',
+                social_title: '🔥 加入网络',
+                social_subtitle: '98%的代币尚未挖出。您是早期参与者。',
+                footer_nodes: '节点：'
+            }
+        };
+
+        let currentLang = 'ru';
+
+        function setLang(lang) {
+            currentLang = lang;
+            
+            // Обновляем кнопки
+            document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
+            document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
+            
+            // Обновляем все элементы с data-lang
+            document.querySelectorAll('[data-lang]').forEach(el => {
+                const key = el.getAttribute('data-lang');
+                if (translations[lang] && translations[lang][key]) {
+                    el.innerHTML = translations[lang][key];
+                }
+            });
+
+            // Сохраняем выбор
+            localStorage.setItem('ramcoin_lang', lang);
+        }
+
+        // Загружаем сохраненный язык
+        const savedLang = localStorage.getItem('ramcoin_lang') || 'ru';
+        setLang(savedLang);
+
         function copyToClipboard(text) {
             navigator.clipboard.writeText(text).then(() => {
-                // Можно добавить уведомление
-                alert('Скопировано: ' + text);
+                alert('Copied: ' + text);
             }).catch(err => {
-                console.error('Ошибка копирования:', err);
+                console.error('Copy error:', err);
             });
         }
 
-        // Плавная прокрутка для всех якорных ссылок
+        // Плавная прокрутка
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
             anchor.addEventListener('click', function (e) {
                 e.preventDefault();
@@ -369,7 +551,7 @@
             });
         });
 
-        // Анимация появления элементов при прокрутке
+        // Анимация появления
         const observer = new IntersectionObserver((entries) => {
             entries.forEach(entry => {
                 if (entry.isIntersecting) {
@@ -385,9 +567,6 @@
             el.style.transition = 'opacity 0.6s, transform 0.6s';
             observer.observe(el);
         });
-
-        // Автоматический год в футере
-        document.querySelector('.footer p:last-child').innerHTML += ' | ' + new Date().getFullYear();
     </script>
 </body>
 </html>
