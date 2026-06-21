@@ -38,7 +38,7 @@
         .lang-btn:hover { border-color: var(--blue); color: var(--blue); }
         .lang-btn.active { background: rgba(56,189,248,0.15); border-color: var(--blue); color: var(--blue); }
         
-        .network-status { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(16,185,129,0.1); border-radius: 50px; border: 1px solid rgba(16,185,129,0.3); font-size: 0.75em; font-weight: 700; }
+        .network-status { display: inline-flex; align-items: center; gap: 8px; padding: 6px 14px; background: rgba(16,185,129,0.1); border-radius: 50px; border: 1px solid rgba(16,185,129,0.3); font-size: 0.75em; font-weight: 700; white-space: nowrap; }
         .status-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
         @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
         
@@ -70,6 +70,7 @@
         .card:hover::before { opacity: 1; }
         h2 { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
             margin-bottom: 16px; font-size: clamp(1.1em, 3vw, 1.4em); font-weight: 900; }
+        h3 { margin: 12px 0; font-size: 1em; color: var(--blue); font-weight: 700; }
         
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 12px 0; }
         .btn { display: inline-block; padding: 14px 28px; border-radius: 12px; font-weight: 800; text-decoration: none; 
@@ -109,12 +110,19 @@
         .copy-btn { cursor: pointer; background: var(--bg-card); border: 1px solid var(--border); color: var(--blue); padding: 6px 12px; border-radius: 6px; font-size: 0.8em; transition: all 0.2s; margin-left: 8px; }
         .copy-btn:hover { background: rgba(56,189,248,0.1); border-color: var(--blue); }
         
-        .download-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 16px; margin-top: 16px; }
+        .download-section { display: grid; grid-template-columns: repeat(auto-fit, minmax(280px, 1fr)); gap: 16px; margin-top: 16px; }
         .download-card { background: rgba(0,0,0,0.3); border: 2px solid var(--border); border-radius: 16px; padding: 24px; text-align: center; transition: all 0.3s; }
         .download-card:hover { border-color: var(--green); transform: translateY(-5px); box-shadow: 0 15px 40px rgba(0,0,0,0.4); }
         .download-card .dl-icon { font-size: 3em; margin-bottom: 10px; }
         .download-card h3 { color: var(--text); margin-bottom: 8px; }
         .download-card p { color: var(--text2); font-size: 0.85em; margin-bottom: 14px; }
+        .download-card .file-list { text-align: left; background: rgba(0,0,0,0.3); border-radius: 8px; padding: 12px; margin: 10px 0; font-size: 0.8em; }
+        .download-card .file-list code { color: var(--blue); }
+        .download-card .important { color: var(--gold); font-weight: 700; }
+        
+        .api-key-box { background: rgba(0,0,0,0.4); border: 2px dashed var(--gold); border-radius: 12px; padding: 16px; margin: 14px 0; text-align: center; }
+        .api-key-box .key-label { color: var(--gold); font-weight: 700; font-size: 0.8em; text-transform: uppercase; letter-spacing: 1px; }
+        .api-key-box code { background: rgba(0,0,0,0.5); padding: 8px 16px; border-radius: 6px; color: var(--green); font-size: 0.9em; word-break: break-all; display: inline-block; margin: 8px 0; }
         
         .nft-preview { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
         .nft-card { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 14px; text-align: center; border: 1px solid var(--border); transition: all 0.3s; cursor: pointer; }
@@ -156,50 +164,58 @@
             <p class="subtitle" data-lang="hero_subtitle">Свой блокчейн. Честный майнинг. Ограниченная эмиссия.</p>
             <p class="desc" data-lang="hero_desc">Не токен. Не игра. Настоящая криптовалюта с собственной нодой.<br>Один разработчик. Открытый код. Живая сеть.</p>
             <div style="margin-top:25px;">
-                <a href="#start" class="btn btn-primary" style="font-size:1.2em;padding:18px 40px;" data-lang="start_btn">🚀 НАЧАТЬ МАЙНИТЬ</a>
+                <a href="#downloads" class="btn btn-primary" style="font-size:1.2em;padding:18px 40px;" data-lang="start_btn">🚀 СКАЧАТЬ И НАЧАТЬ МАЙНИТЬ</a>
             </div>
         </div>
 
-        <!-- ВАЖНОЕ ОБЪЯВЛЕНИЕ -->
+        <!-- ГЛАВНОЕ: НОДА РАБОТАЕТ -->
         <div class="card" style="text-align:center;">
-            <h2 data-lang="announcement_title">⚡ НОДА УЖЕ РАБОТАЕТ!</h2>
+            <h2 data-lang="announcement_title">⚡ НОДА УЖЕ РАБОТАЕТ! ВАМ НЕ НУЖНО ЗАПУСКАТЬ СВОЮ</h2>
             <p style="font-size:1.1em;margin:10px 0;" data-lang="announcement_text">
-                Вам не нужно запускать свою ноду. Достаточно скачать майнер и кошелек, подключиться к нашей ноде и начать майнить!
+                Достаточно <strong>скачать майнер и кошелек</strong> с GitHub. В архиве уже есть файл <code>api_key.txt</code> для подключения к нашей ноде.
             </p>
             <div class="info-box">
                 <p data-lang="announcement_detail">
                     🌐 <strong>Публичная нода:</strong> <code>90.188.115.169:5000</code> (API) | <code>90.188.115.169:8333</code> (P2P)<br>
-                    ✅ Нода работает 24/7. Просто скачайте майнер и кошелек ниже.
+                    ✅ Нода работает 24/7. Вам нужно только скачать архив и запустить майнер.
                 </p>
             </div>
         </div>
 
         <!-- СКАЧАТЬ -->
         <div class="card" id="downloads">
-            <h2 data-lang="download_title">📥 СКАЧАТЬ</h2>
-            <p style="text-align:center;color:var(--text2);margin-bottom:16px;" data-lang="download_subtitle">Всё необходимое для майнинга. Нода уже работает.</p>
+            <h2 data-lang="download_title">📥 СКАЧАТЬ МАЙНЕР И КОШЕЛЕК</h2>
+            <p style="text-align:center;color:var(--text2);margin-bottom:16px;" data-lang="download_subtitle">
+                Всё в одном архиве. Нода уже работает, просто запустите майнер.
+            </p>
+            
             <div class="download-section">
+                <!-- Майнер -->
                 <div class="download-card">
                     <div class="dl-icon">⛏️</div>
-                    <h3 data-lang="miner_title">Майнер</h3>
-                    <p data-lang="miner_desc">CPU-майнер. 4 потока. Windows/Linux.</p>
-                    <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/download/v1.0/RamcoinMiner.exe" class="btn btn-primary" data-lang="download_btn">⬇️ СКАЧАТЬ</a>
-                </div>
-                <div class="download-card">
-                    <div class="dl-icon">👛</div>
-                    <h3 data-lang="wallet_title">Кошелек</h3>
-                    <p data-lang="wallet_desc">Создание адреса, отправка RAM.</p>
-                    <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/download/v1.0/RamcoinWallet.exe" class="btn btn-green" data-lang="download_btn">⬇️ СКАЧАТЬ</a>
-                </div>
-                <div class="download-card">
-                    <div class="dl-icon">📦</div>
-                    <h3 data-lang="node_title">Нода (опционально)</h3>
-                    <p data-lang="node_desc">Для тех, кто хочет свою ноду.</p>
-                    <a href="https://github.com/ramcoinnode-debug/ramcoin" class="btn btn-purple" data-lang="source_btn">💻 ИСХОДНЫЙ КОД</a>
+                    <h3>RamcoinMiner.exe</h3>
+                    <p data-lang="miner_desc">CPU-майнер. 4 потока. Добывает RAM каждые 30 сек.</p>
+                    <div class="file-list">
+                        <div data-lang="archive_contents">📁 В архиве:</div>
+                        <div>⛏️ <code>RamcoinMiner.exe</code> — <span data-lang="miner_file">майнер</span></div>
+                        <div>👛 <code>RamcoinWallet.exe</code> — <span data-lang="wallet_file">кошелек</span></div>
+                        <div>🔑 <code>api_key.txt</code> — <span class="important" data-lang="apikey_file">ОБЯЗАТЕЛЬНО! Ключ для ноды</span></div>
+                        <div>📖 <code>README.txt</code> — <span data-lang="readme_file">инструкция</span></div>
+                    </div>
+                    <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/latest" class="btn btn-primary" data-lang="download_btn">⬇️ СКАЧАТЬ С GITHUB</a>
                 </div>
             </div>
-            <div class="success-box" style="margin-top:18px;">
-                <p data-lang="node_ready">✅ <strong>Нода уже работает!</strong> Скачайте майнер, запустите и начните добывать RAM.</p>
+
+            <!-- ВАЖНО: API KEY -->
+            <div class="api-key-box">
+                <div class="key-label">🔑 ВАЖНО: файл api_key.txt уже в архиве!</div>
+                <p style="color:var(--text2);font-size:0.85em;margin:8px 0;" data-lang="apikey_info">
+                    Архив содержит готовый файл <code>api_key.txt</code> с ключом для подключения к ноде.<br>
+                    <strong>Не удаляйте и не изменяйте этот файл!</strong> Без него майнер не сможет отправлять блоки.
+                </p>
+                <div class="warning-box" style="margin-top:10px;">
+                    <span data-lang="apikey_warning">⚠️ <strong>api_key.txt должен лежать в одной папке с майнером!</strong><br>Если файла нет — майнер не подключится к ноде.</span>
+                </div>
             </div>
         </div>
 
@@ -209,22 +225,34 @@
             <div class="steps-grid">
                 <div class="step-card">
                     <div class="step-number">1</div>
-                    <p><strong data-lang="step1_title">Скачай майнер</strong></p>
-                    <p style="color:var(--text2);font-size:0.85em;" data-lang="step1_desc">Нажми кнопку выше. EXE файл, не требует Python.</p>
+                    <p><strong data-lang="step1_title">Скачай архив</strong></p>
+                    <p style="color:var(--text2);font-size:0.85em;" data-lang="step1_desc">
+                        Скачай ZIP с GitHub Releases.<br>
+                        Внутри: майнер, кошелек, api_key.txt
+                    </p>
                 </div>
                 <div class="step-card">
                     <div class="step-number">2</div>
-                    <p><strong data-lang="step2_title">Создай кошелек</strong></p>
-                    <p style="color:var(--text2);font-size:0.85em;" data-lang="step2_desc">Запусти RamcoinWallet.exe и создай адрес RAM_.</p>
+                    <p><strong data-lang="step2_title">Распакуй и создай кошелек</strong></p>
+                    <p style="color:var(--text2);font-size:0.85em;" data-lang="step2_desc">
+                        Запусти <code>RamcoinWallet.exe</code><br>
+                        Создай адрес (начинается с RAM_)
+                    </p>
                 </div>
                 <div class="step-card">
                     <div class="step-number">3</div>
                     <p><strong data-lang="step3_title">Запусти майнер</strong></p>
-                    <p style="color:var(--text2);font-size:0.85em;" data-lang="step3_desc">Введи адрес и начни добывать RAM каждые 30 секунд!</p>
+                    <p style="color:var(--text2);font-size:0.85em;" data-lang="step3_desc">
+                        Запусти <code>RamcoinMiner.exe</code><br>
+                        Введи свой адрес и начни майнить!
+                    </p>
                 </div>
             </div>
             <div class="success-box" style="margin-top:18px;">
-                <span data-lang="howto_ready">✅ <strong>Готово!</strong> Ты майнишь RAMCOIN. Блоки добываются каждые 30 секунд. Награда: 10 RAM.</span>
+                <span data-lang="howto_ready">✅ <strong>Готово!</strong> Ты майнишь RAMCOIN. Блоки каждые 30 секунд. Награда: 10 RAM за блок.</span>
+            </div>
+            <div class="info-box">
+                <span data-lang="howto_note">💡 <strong>Важно:</strong> Не удаляй <code>api_key.txt</code> из папки с майнером. Этот файл уже настроен на подключение к работающей ноде.</span>
             </div>
         </div>
 
@@ -232,23 +260,18 @@
         <div class="stats-grid">
             <div class="stat-item">
                 <div class="icon">🔗</div>
-                <div class="value">20 321+</div>
+                <div class="value" id="stat-blocks">...загрузка</div>
                 <div class="label" data-lang="stat_blocks">БЛОКОВ ДОБЫТО</div>
             </div>
             <div class="stat-item">
                 <div class="icon">💰</div>
-                <div class="value">200 870+</div>
+                <div class="value" id="stat-supply">...</div>
                 <div class="label" data-lang="stat_supply">RAM В СЕТИ</div>
             </div>
             <div class="stat-item">
                 <div class="icon">⏱️</div>
                 <div class="value">~30 сек</div>
                 <div class="label" data-lang="stat_time">ВРЕМЯ БЛОКА</div>
-            </div>
-            <div class="stat-item">
-                <div class="icon">👥</div>
-                <div class="value">5+</div>
-                <div class="label" data-lang="stat_miners">МАЙНЕРОВ</div>
             </div>
             <div class="stat-item">
                 <div class="icon">💎</div>
@@ -259,6 +282,11 @@
                 <div class="icon">🔒</div>
                 <div class="value">17.5M</div>
                 <div class="label" data-lang="stat_max">МАКС. ЭМИССИЯ</div>
+            </div>
+            <div class="stat-item">
+                <div class="icon">🟢</div>
+                <div class="value" style="color:var(--green);" data-lang="node_online">ОНЛАЙН</div>
+                <div class="label" data-lang="stat_node">НОДА</div>
             </div>
         </div>
 
@@ -293,28 +321,13 @@
                 <p class="spec-label" data-lang="spec_max">💎 Макс. эмиссия:</p><p class="spec-value">17 500 000 RAM</p>
                 <p class="spec-label" data-lang="spec_time">⏱️ Время блока:</p><p class="spec-value">~30 секунд</p>
                 <p class="spec-label" data-lang="spec_defense">🔒 Защита:</p><p class="spec-value">8 MB scratchpad × 8 224 итераций</p>
-                <p class="spec-label" data-lang="spec_net">🌐 Сеть:</p><p class="spec-value">P2P • ChaCha20-Poly1305 • ECDH</p>
                 <p class="spec-label" data-lang="spec_threads">🖥️ Потоки:</p><p class="spec-value">4 на майнер (честно для всех)</p>
                 <p class="spec-label" data-lang="spec_halving">🔥 Халвинг:</p><p class="spec-value">Каждые 876 000 блоков</p>
                 <p class="spec-label" data-lang="spec_reward">💰 Награда:</p><p class="spec-value">10 RAM/блок</p>
             </div>
         </div>
 
-        <!-- NFT -->
-        <div class="card">
-            <h2 data-lang="nft_title">🎨 УНИКАЛЬНЫЕ NFT</h2>
-            <p style="color:var(--text2);" data-lang="nft_desc">Каждый майнер получает уникальный NFT. Сгенерирован из хеша блока. Невозможно подделать.</p>
-            <div class="nft-preview" style="margin-top:16px;">
-                <div class="nft-card"><div class="nft-icon">🟢</div><div class="nft-name">COMMON</div></div>
-                <div class="nft-card"><div class="nft-icon">🔵</div><div class="nft-name">RARE</div></div>
-                <div class="nft-card"><div class="nft-icon">🟣</div><div class="nft-name">EPIC</div></div>
-                <div class="nft-card"><div class="nft-icon">🟡</div><div class="nft-name">LEGENDARY</div></div>
-                <div class="nft-card"><div class="nft-icon">🔴</div><div class="nft-name">MYTHIC</div></div>
-                <div class="nft-card"><div class="nft-icon">👑</div><div class="nft-name">DIVINE</div></div>
-            </div>
-        </div>
-
-        <!-- СОЦСЕТИ -->
+        <!-- ПРИСОЕДИНЯЙСЯ -->
         <div class="card" style="text-align:center;">
             <h2 data-lang="social_title">🔥 ПРИСОЕДИНЯЙСЯ К СЕТИ</h2>
             <p style="font-size:1.2em;" data-lang="social_subtitle">98% монет ещё не добыто. Ты на старте.</p>
@@ -328,12 +341,10 @@
 
         <div class="footer">
             <p>🌐 <strong data-lang="footer_nodes">Ноды:</strong></p>
-            <p>
-                <code>90.188.115.169:8333</code> 
-                <button class="copy-btn" onclick="copyToClipboard('90.188.115.169:8333')">📋</button>
-            </p>
+            <p><code>90.188.115.169:8333</code> <button class="copy-btn" onclick="copyToClipboard('90.188.115.169:8333')">📋</button></p>
             <p style="margin-top:12px;">RAMCOIN v10.3.0 — P2P Blockchain Network</p>
             <p>© 2026 <a href="https://t.me/ramcoin_pow" target="_blank">RAMCOIN Community</a></p>
+            <p style="margin-top:8px;font-size:0.75em;" data-lang="footer_tagline">Свой блокчейн. Честный майнинг. Ограниченная эмиссия.</p>
         </div>
     </div>
 
@@ -345,35 +356,37 @@
                 hero_badge: '⚡ ЗАПУЩЕН • РАБОТАЕТ 24/7',
                 hero_subtitle: 'Свой блокчейн. Честный майнинг. Ограниченная эмиссия.',
                 hero_desc: 'Не токен. Не игра. Настоящая криптовалюта с собственной нодой.<br>Один разработчик. Открытый код. Живая сеть.',
-                start_btn: '🚀 НАЧАТЬ МАЙНИТЬ',
-                announcement_title: '⚡ НОДА УЖЕ РАБОТАЕТ!',
-                announcement_text: 'Вам не нужно запускать свою ноду. Достаточно скачать майнер и кошелек, подключиться к нашей ноде и начать майнить!',
-                announcement_detail: '🌐 <strong>Публичная нода:</strong> <code>90.188.115.169:5000</code> (API) | <code>90.188.115.169:8333</code> (P2P)<br>✅ Нода работает 24/7. Просто скачайте майнер и кошелек ниже.',
-                download_title: '📥 СКАЧАТЬ',
-                download_subtitle: 'Всё необходимое для майнинга. Нода уже работает.',
-                miner_title: 'Майнер',
-                miner_desc: 'CPU-майнер. 4 потока. Windows/Linux.',
-                wallet_title: 'Кошелек',
-                wallet_desc: 'Создание адреса, отправка RAM.',
-                node_title: 'Нода (опционально)',
-                node_desc: 'Для тех, кто хочет свою ноду.',
-                download_btn: '⬇️ СКАЧАТЬ',
-                source_btn: '💻 ИСХОДНЫЙ КОД',
-                node_ready: '✅ <strong>Нода уже работает!</strong> Скачайте майнер, запустите и начните добывать RAM.',
+                start_btn: '🚀 СКАЧАТЬ И НАЧАТЬ МАЙНИТЬ',
+                announcement_title: '⚡ НОДА УЖЕ РАБОТАЕТ! ВАМ НЕ НУЖНО ЗАПУСКАТЬ СВОЮ',
+                announcement_text: 'Достаточно <strong>скачать майнер и кошелек</strong> с GitHub. В архиве уже есть файл <code>api_key.txt</code> для подключения к нашей ноде.',
+                announcement_detail: '🌐 <strong>Публичная нода:</strong> <code>90.188.115.169:5000</code> (API) | <code>90.188.115.169:8333</code> (P2P)<br>✅ Нода работает 24/7. Вам нужно только скачать архив и запустить майнер.',
+                download_title: '📥 СКАЧАТЬ МАЙНЕР И КОШЕЛЕК',
+                download_subtitle: 'Всё в одном архиве. Нода уже работает, просто запустите майнер.',
+                miner_desc: 'CPU-майнер. 4 потока. Добывает RAM каждые 30 сек.',
+                archive_contents: '📁 В архиве:',
+                miner_file: 'майнер',
+                wallet_file: 'кошелек',
+                apikey_file: 'ОБЯЗАТЕЛЬНО! Ключ для ноды',
+                readme_file: 'инструкция',
+                download_btn: '⬇️ СКАЧАТЬ С GITHUB',
+                apikey_info: 'Архив содержит готовый файл <code>api_key.txt</code> с ключом для подключения к ноде.<br><strong>Не удаляйте и не изменяйте этот файл!</strong> Без него майнер не сможет отправлять блоки.',
+                apikey_warning: '⚠️ <strong>api_key.txt должен лежать в одной папке с майнером!</strong><br>Если файла нет — майнер не подключится к ноде.',
                 howto_title: '🚀 КАК НАЧАТЬ МАЙНИТЬ (3 ШАГА)',
-                step1_title: 'Скачай майнер',
-                step1_desc: 'Нажми кнопку выше. EXE файл, не требует Python.',
-                step2_title: 'Создай кошелек',
-                step2_desc: 'Запусти RamcoinWallet.exe и создай адрес RAM_.',
+                step1_title: 'Скачай архив',
+                step1_desc: 'Скачай ZIP с GitHub Releases.<br>Внутри: майнер, кошелек, api_key.txt',
+                step2_title: 'Распакуй и создай кошелек',
+                step2_desc: 'Запусти <code>RamcoinWallet.exe</code><br>Создай адрес (начинается с RAM_)',
                 step3_title: 'Запусти майнер',
-                step3_desc: 'Введи адрес и начни добывать RAM каждые 30 секунд!',
-                howto_ready: '✅ <strong>Готово!</strong> Ты майнишь RAMCOIN. Блоки добываются каждые 30 секунд. Награда: 10 RAM.',
+                step3_desc: 'Запусти <code>RamcoinMiner.exe</code><br>Введи свой адрес и начни майнить!',
+                howto_ready: '✅ <strong>Готово!</strong> Ты майнишь RAMCOIN. Блоки каждые 30 секунд. Награда: 10 RAM за блок.',
+                howto_note: '💡 <strong>Важно:</strong> Не удаляй <code>api_key.txt</code> из папки с майнером. Этот файл уже настроен на подключение к работающей ноде.',
                 stat_blocks: 'БЛОКОВ ДОБЫТО',
                 stat_supply: 'RAM В СЕТИ',
                 stat_time: 'ВРЕМЯ БЛОКА',
-                stat_miners: 'МАЙНЕРОВ',
                 stat_reward: 'НАГРАДА',
                 stat_max: 'МАКС. ЭМИССИЯ',
+                stat_node: 'НОДА',
+                node_online: 'ОНЛАЙН',
                 halving_title: '⏰ ХАЛВИНГ — ПОЧЕМУ ПЕРВЫЕ ПОЛУЧАЮТ БОЛЬШЕ',
                 halving_desc: 'Каждые 876 000 блоков награда за блок уменьшается вдвое.',
                 halving_now: 'Сейчас',
@@ -385,50 +398,50 @@
                 spec_max: '💎 Макс. эмиссия:',
                 spec_time: '⏱️ Время блока:',
                 spec_defense: '🔒 Защита:',
-                spec_net: '🌐 Сеть:',
                 spec_threads: '🖥️ Потоки:',
                 spec_halving: '🔥 Халвинг:',
                 spec_reward: '💰 Награда:',
-                nft_title: '🎨 УНИКАЛЬНЫЕ NFT',
-                nft_desc: 'Каждый майнер получает уникальный NFT. Сгенерирован из хеша блока. Невозможно подделать.',
                 social_title: '🔥 ПРИСОЕДИНЯЙСЯ К СЕТИ',
                 social_subtitle: '98% монет ещё не добыто. Ты на старте.',
-                footer_nodes: 'Ноды:'
+                footer_nodes: 'Ноды:',
+                footer_tagline: 'Свой блокчейн. Честный майнинг. Ограниченная эмиссия.'
             },
             en: {
                 node_status: '● NODE IS RUNNING',
                 hero_badge: '⚡ LAUNCHED • RUNNING 24/7',
                 hero_subtitle: 'Own blockchain. Fair mining. Limited supply.',
                 hero_desc: 'Not a token. Not a game. Real cryptocurrency with its own node.<br>One developer. Open source. Live network.',
-                start_btn: '🚀 START MINING',
-                announcement_title: '⚡ NODE IS ALREADY RUNNING!',
-                announcement_text: 'You don\'t need to run your own node. Just download the miner and wallet, connect to our node and start mining!',
-                announcement_detail: '🌐 <strong>Public node:</strong> <code>90.188.115.169:5000</code> (API) | <code>90.188.115.169:8333</code> (P2P)<br>✅ Node runs 24/7. Just download the miner and wallet below.',
-                download_title: '📥 DOWNLOAD',
-                download_subtitle: 'Everything you need for mining. Node is already running.',
-                miner_title: 'Miner',
-                miner_desc: 'CPU miner. 4 threads. Windows/Linux.',
-                wallet_title: 'Wallet',
-                wallet_desc: 'Create address, send RAM.',
-                node_title: 'Node (optional)',
-                node_desc: 'For those who want their own node.',
-                download_btn: '⬇️ DOWNLOAD',
-                source_btn: '💻 SOURCE CODE',
-                node_ready: '✅ <strong>Node is already running!</strong> Download miner, launch and start mining RAM.',
+                start_btn: '🚀 DOWNLOAD AND START MINING',
+                announcement_title: '⚡ NODE IS ALREADY RUNNING! YOU DON\'T NEED TO RUN YOUR OWN',
+                announcement_text: 'Just <strong>download miner and wallet</strong> from GitHub. The archive already contains <code>api_key.txt</code> to connect to our node.',
+                announcement_detail: '🌐 <strong>Public node:</strong> <code>90.188.115.169:5000</code> (API) | <code>90.188.115.169:8333</code> (P2P)<br>✅ Node runs 24/7. Just download the archive and start the miner.',
+                download_title: '📥 DOWNLOAD MINER AND WALLET',
+                download_subtitle: 'Everything in one archive. Node is already running, just start the miner.',
+                miner_desc: 'CPU miner. 4 threads. Mines RAM every 30 sec.',
+                archive_contents: '📁 Archive contains:',
+                miner_file: 'miner',
+                wallet_file: 'wallet',
+                apikey_file: 'REQUIRED! Node connection key',
+                readme_file: 'instructions',
+                download_btn: '⬇️ DOWNLOAD FROM GITHUB',
+                apikey_info: 'The archive contains a ready-to-use <code>api_key.txt</code> file with the key to connect to the node.<br><strong>Do not delete or modify this file!</strong> Without it, the miner cannot submit blocks.',
+                apikey_warning: '⚠️ <strong>api_key.txt must be in the same folder as the miner!</strong><br>If the file is missing, the miner won\'t connect to the node.',
                 howto_title: '🚀 HOW TO START MINING (3 STEPS)',
-                step1_title: 'Download miner',
-                step1_desc: 'Click the button above. EXE file, no Python needed.',
-                step2_title: 'Create wallet',
-                step2_desc: 'Run RamcoinWallet.exe and create a RAM_ address.',
+                step1_title: 'Download archive',
+                step1_desc: 'Download ZIP from GitHub Releases.<br>Contains: miner, wallet, api_key.txt',
+                step2_title: 'Extract and create wallet',
+                step2_desc: 'Run <code>RamcoinWallet.exe</code><br>Create an address (starts with RAM_)',
                 step3_title: 'Start miner',
-                step3_desc: 'Enter your address and start mining RAM every 30 seconds!',
-                howto_ready: '✅ <strong>Done!</strong> You are mining RAMCOIN. Blocks every 30 seconds. Reward: 10 RAM.',
+                step3_desc: 'Run <code>RamcoinMiner.exe</code><br>Enter your address and start mining!',
+                howto_ready: '✅ <strong>Done!</strong> You\'re mining RAMCOIN. Blocks every 30 seconds. Reward: 10 RAM per block.',
+                howto_note: '💡 <strong>Important:</strong> Do not delete <code>api_key.txt</code> from the miner folder. This file is already configured to connect to the running node.',
                 stat_blocks: 'BLOCKS MINED',
                 stat_supply: 'RAM IN NETWORK',
                 stat_time: 'BLOCK TIME',
-                stat_miners: 'MINERS',
                 stat_reward: 'REWARD',
                 stat_max: 'MAX SUPPLY',
+                stat_node: 'NODE',
+                node_online: 'ONLINE',
                 halving_title: '⏰ HALVING — WHY EARLY MINERS GET MORE',
                 halving_desc: 'Every 876,000 blocks the block reward is cut in half.',
                 halving_now: 'Now',
@@ -440,50 +453,50 @@
                 spec_max: '💎 Max supply:',
                 spec_time: '⏱️ Block time:',
                 spec_defense: '🔒 Defense:',
-                spec_net: '🌐 Network:',
                 spec_threads: '🖥️ Threads:',
                 spec_halving: '🔥 Halving:',
                 spec_reward: '💰 Reward:',
-                nft_title: '🎨 UNIQUE NFTs',
-                nft_desc: 'Every miner gets a unique NFT. Generated from block hash. Impossible to forge.',
                 social_title: '🔥 JOIN THE NETWORK',
                 social_subtitle: '98% of coins not yet mined. You are early.',
-                footer_nodes: 'Nodes:'
+                footer_nodes: 'Nodes:',
+                footer_tagline: 'Own blockchain. Fair mining. Limited supply.'
             },
             zh: {
                 node_status: '● 节点运行中',
                 hero_badge: '⚡ 已启动 • 24/7运行',
                 hero_subtitle: '自有区块链。公平挖矿。限量供应。',
                 hero_desc: '不是代币。不是游戏。拥有自己节点的真正加密货币。<br>一个开发者。开源代码。实时网络。',
-                start_btn: '🚀 开始挖矿',
-                announcement_title: '⚡ 节点已在运行！',
-                announcement_text: '您无需运行自己的节点。只需下载矿工和钱包，连接到我们的节点即可开始挖矿！',
-                announcement_detail: '🌐 <strong>公共节点：</strong> <code>90.188.115.169:5000</code> (API) | <code>90.188.115.169:8333</code> (P2P)<br>✅ 节点24/7运行。只需下载下面的矿工和钱包。',
-                download_title: '📥 下载',
-                download_subtitle: '挖矿所需的一切。节点已在运行。',
-                miner_title: '矿工',
-                miner_desc: 'CPU矿工。4线程。Windows/Linux。',
-                wallet_title: '钱包',
-                wallet_desc: '创建地址，发送RAM。',
-                node_title: '节点（可选）',
-                node_desc: '适合想要自己节点的用户。',
-                download_btn: '⬇️ 下载',
-                source_btn: '💻 源代码',
-                node_ready: '✅ <strong>节点已在运行！</strong>下载矿工，启动并开始挖RAM。',
+                start_btn: '🚀 下载并开始挖矿',
+                announcement_title: '⚡ 节点已在运行！您无需运行自己的节点',
+                announcement_text: '只需从GitHub<strong>下载矿工和钱包</strong>。压缩包中已包含连接我们节点的<code>api_key.txt</code>文件。',
+                announcement_detail: '🌐 <strong>公共节点：</strong> <code>90.188.115.169:5000</code> (API) | <code>90.188.115.169:8333</code> (P2P)<br>✅ 节点24/7运行。只需下载压缩包并启动矿工。',
+                download_title: '📥 下载矿工和钱包',
+                download_subtitle: '全部在一个压缩包中。节点已在运行，只需启动矿工。',
+                miner_desc: 'CPU矿工。4线程。每30秒挖RAM。',
+                archive_contents: '📁 压缩包含：',
+                miner_file: '矿工',
+                wallet_file: '钱包',
+                apikey_file: '必需！节点连接密钥',
+                readme_file: '说明',
+                download_btn: '⬇️ 从GITHUB下载',
+                apikey_info: '压缩包含有即用的<code>api_key.txt</code>文件，用于连接节点。<br><strong>不要删除或修改此文件！</strong>没有它，矿工无法提交区块。',
+                apikey_warning: '⚠️ <strong>api_key.txt必须与矿工在同一文件夹中！</strong><br>如果文件丢失，矿工将无法连接到节点。',
                 howto_title: '🚀 如何开始挖矿（3步）',
-                step1_title: '下载矿工',
-                step1_desc: '点击上方按钮。EXE文件，无需Python。',
-                step2_title: '创建钱包',
-                step2_desc: '运行RamcoinWallet.exe并创建RAM_地址。',
+                step1_title: '下载压缩包',
+                step1_desc: '从GitHub Releases下载ZIP。<br>包含：矿工、钱包、api_key.txt',
+                step2_title: '解压并创建钱包',
+                step2_desc: '运行<code>RamcoinWallet.exe</code><br>创建地址（以RAM_开头）',
                 step3_title: '启动矿工',
-                step3_desc: '输入您的地址，每30秒开始挖RAM！',
-                howto_ready: '✅ <strong>完成！</strong>您正在挖RAMCOIN。每30秒出块。奖励：10 RAM。',
+                step3_desc: '运行<code>RamcoinMiner.exe</code><br>输入您的地址并开始挖矿！',
+                howto_ready: '✅ <strong>完成！</strong>您正在挖RAMCOIN。每30秒出块。奖励：每块10 RAM。',
+                howto_note: '💡 <strong>重要：</strong>不要从矿工文件夹中删除<code>api_key.txt</code>。此文件已配置为连接到运行中的节点。',
                 stat_blocks: '已挖区块',
                 stat_supply: '网络中的RAM',
                 stat_time: '出块时间',
-                stat_miners: '矿工数',
                 stat_reward: '奖励',
                 stat_max: '最大供应量',
+                stat_node: '节点',
+                node_online: '在线',
                 halving_title: '⏰ 减半 — 为什么早期矿工获得更多',
                 halving_desc: '每876,000个区块，区块奖励减半。',
                 halving_now: '现在',
@@ -495,15 +508,13 @@
                 spec_max: '💎 最大供应量：',
                 spec_time: '⏱️ 出块时间：',
                 spec_defense: '🔒 防御：',
-                spec_net: '🌐 网络：',
                 spec_threads: '🖥️ 线程：',
                 spec_halving: '🔥 减半：',
                 spec_reward: '💰 奖励：',
-                nft_title: '🎨 独特的NFT',
-                nft_desc: '每个矿工获得独特的NFT。由区块哈希生成。无法伪造。',
                 social_title: '🔥 加入网络',
                 social_subtitle: '98%的代币尚未挖出。您是早期参与者。',
-                footer_nodes: '节点：'
+                footer_nodes: '节点：',
+                footer_tagline: '自有区块链。公平挖矿。限量供应。'
             }
         };
 
@@ -511,20 +522,14 @@
 
         function setLang(lang) {
             currentLang = lang;
-            
-            // Обновляем кнопки
             document.querySelectorAll('.lang-btn').forEach(btn => btn.classList.remove('active'));
             document.querySelector(`.lang-btn[onclick="setLang('${lang}')"]`).classList.add('active');
-            
-            // Обновляем все элементы с data-lang
             document.querySelectorAll('[data-lang]').forEach(el => {
                 const key = el.getAttribute('data-lang');
                 if (translations[lang] && translations[lang][key]) {
                     el.innerHTML = translations[lang][key];
                 }
             });
-
-            // Сохраняем выбор
             localStorage.setItem('ramcoin_lang', lang);
         }
 
@@ -539,6 +544,24 @@
                 console.error('Copy error:', err);
             });
         }
+
+        // Загрузка живой статистики с ноды
+        async function loadStats() {
+            try {
+                const response = await fetch('http://90.188.115.169:5000/stats');
+                const data = await response.json();
+                
+                document.getElementById('stat-blocks').textContent = (data.height || data.length || '...').toLocaleString();
+                document.getElementById('stat-supply').textContent = ((data.total_supply || 0).toLocaleString());
+            } catch (e) {
+                document.getElementById('stat-blocks').textContent = '20 321+';
+                document.getElementById('stat-supply').textContent = '200 870+';
+            }
+        }
+
+        // Загружаем при открытии и обновляем каждые 30 секунд
+        loadStats();
+        setInterval(loadStats, 30000);
 
         // Плавная прокрутка
         document.querySelectorAll('a[href^="#"]').forEach(anchor => {
