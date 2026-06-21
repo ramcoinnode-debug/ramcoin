@@ -7,6 +7,10 @@
     <meta name="description" content="RAMCOIN — криптовалюта с собственным блокчейном и CPU-майнингом. 17.5 млн монет всего. Первый халвинг впереди.">
     <meta property="og:title" content="RAMCOIN — Блокчейн нового поколения">
     <meta property="og:description" content="Свой блокчейн. Честный майнинг. Ограниченная эмиссия. Присоединяйся!">
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://ramcoin.network">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐏</text></svg>">
     <style>
         :root {
             --bg: #02040a; --bg-card: #0a0f1a; --border: #1a2030;
@@ -15,7 +19,8 @@
             --gradient: linear-gradient(135deg, #38bdf8, #a78bfa);
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        body { font-family: 'Segoe UI', system-ui, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; }
+        html { scroll-behavior: smooth; }
+        body { font-family: 'Segoe UI', system-ui, -apple-system, sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; overflow-x: hidden; line-height: 1.6; }
         
         body::before {
             content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
@@ -27,93 +32,119 @@
         
         nav { background: rgba(2,4,10,0.95); backdrop-filter: blur(20px); border-bottom: 1px solid var(--border); 
               padding: 12px 20px; display: flex; justify-content: space-between; align-items: center; 
-              flex-wrap: wrap; gap: 8px; position: sticky; top: 0; z-index: 100; }
-        nav .logo { font-size: 1.6em; font-weight: 900; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
-        nav .badge { background: rgba(16,185,129,0.2); color: var(--green); padding: 5px 12px; border-radius: 50px; 
-                    font-weight: 700; font-size: 0.75em; border: 1px solid rgba(16,185,129,0.3); animation: pulse 2s infinite; }
-        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.5; } }
+              flex-wrap: wrap; gap: 10px; position: sticky; top: 0; z-index: 100; }
+        nav .logo { font-size: 1.6em; font-weight: 900; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        nav .badge { background: rgba(16,185,129,0.2); color: var(--green); padding: 6px 14px; border-radius: 50px; 
+                    font-weight: 700; font-size: 0.75em; border: 1px solid rgba(16,185,129,0.3); animation: pulse 2s infinite; white-space: nowrap; }
+        @keyframes pulse { 0%,100% { opacity:1; } 50% { opacity:0.6; } }
         
-        .container { max-width: 1000px; margin: 0 auto; padding: 15px; }
+        .container { max-width: 1000px; margin: 0 auto; padding: 15px 20px; }
         
-        .hero { text-align: center; padding: 40px 15px 30px; }
+        .hero { text-align: center; padding: 50px 15px 40px; }
         .hero-badge { display: inline-block; background: rgba(239,68,68,0.12); color: var(--red); 
-                     border: 2px solid rgba(239,68,68,0.4); padding: 8px 22px; border-radius: 50px; 
+                     border: 2px solid rgba(239,68,68,0.4); padding: 10px 24px; border-radius: 50px; 
                      font-weight: 900; font-size: 0.9em; margin: 15px 0; text-transform: uppercase; 
-                     letter-spacing: 1px; }
-        .hero h1 { font-size: 3.5em; font-weight: 900; line-height: 1.1; 
-                  background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent;
-                  text-shadow: 0 0 60px rgba(56,189,248,0.3); }
-        .hero .subtitle { color: var(--text); font-size: 1.3em; margin: 12px 0; font-weight: 600; }
-        .hero .desc { color: var(--text2); font-size: 1em; max-width: 550px; margin: 0 auto; }
+                     letter-spacing: 1px; animation: glow 2s infinite; }
+        @keyframes glow { 0%,100% { box-shadow: 0 0 10px rgba(239,68,68,0.3); } 50% { box-shadow: 0 0 25px rgba(239,68,68,0.6); } }
+        .hero h1 { font-size: clamp(2.5em, 8vw, 4em); font-weight: 900; line-height: 1.1; 
+                  background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+                  text-shadow: 0 0 60px rgba(56,189,248,0.3); margin: 10px 0; }
+        .hero .subtitle { color: var(--text); font-size: clamp(1em, 3vw, 1.4em); margin: 12px 0; font-weight: 600; }
+        .hero .desc { color: var(--text2); font-size: 1em; max-width: 600px; margin: 0 auto; }
         
-        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 8px; margin: 15px 0; }
-        .stat-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 18px 12px; text-align: center; transition: all 0.3s; }
-        .stat-item:hover { border-color: var(--blue); transform: translateY(-3px); }
-        .stat-item .icon { font-size: 1.6em; margin-bottom: 5px; }
-        .stat-item .value { font-size: 1.2em; font-weight: 900; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin: 20px 0; }
+        .stat-item { background: var(--bg-card); border: 1px solid var(--border); border-radius: 14px; padding: 20px 14px; text-align: center; transition: all 0.3s; cursor: default; }
+        .stat-item:hover { border-color: var(--blue); transform: translateY(-4px); box-shadow: 0 10px 30px rgba(0,0,0,0.3); }
+        .stat-item .icon { font-size: 1.8em; margin-bottom: 8px; }
+        .stat-item .value { font-size: clamp(1em, 2.5vw, 1.3em); font-weight: 900; background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
         .stat-item .label { color: var(--text2); font-size: 0.7em; margin-top: 4px; text-transform: uppercase; letter-spacing: 1px; }
         
-        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 24px; margin: 14px 0; 
+        .card { background: var(--bg-card); border: 1px solid var(--border); border-radius: 18px; padding: 28px; margin: 16px 0; 
                transition: all 0.3s; position: relative; overflow: hidden; }
         .card::before { content: ''; position: absolute; top: 0; left: 0; width: 100%; height: 2px; 
                        background: var(--gradient); opacity: 0; transition: opacity 0.3s; }
         .card:hover::before { opacity: 1; }
-        h2 { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; 
-            margin-bottom: 14px; font-size: 1.3em; font-weight: 900; }
-        h3 { margin: 10px 0; font-size: 1em; color: var(--blue); }
+        h2 { background: var(--gradient); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text;
+            margin-bottom: 16px; font-size: clamp(1.1em, 3vw, 1.4em); font-weight: 900; }
+        h3 { margin: 12px 0; font-size: 1em; color: var(--blue); font-weight: 700; }
         
-        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 8px 0; }
+        .btn-group { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 12px 0; }
         .btn { display: inline-block; padding: 14px 28px; border-radius: 12px; font-weight: 800; text-decoration: none; 
                border: none; cursor: pointer; font-size: 0.95em; text-align: center; transition: all 0.3s; 
-               text-transform: uppercase; letter-spacing: 1px; }
-        .btn:hover { transform: translateY(-2px); box-shadow: 0 8px 25px rgba(0,0,0,0.4); }
+               text-transform: uppercase; letter-spacing: 1px; position: relative; overflow: hidden; }
+        .btn::after { content: ''; position: absolute; top: 50%; left: 50%; width: 0; height: 0; background: rgba(255,255,255,0.2); border-radius: 50%; transform: translate(-50%, -50%); transition: width 0.6s, height 0.6s; }
+        .btn:active::after { width: 300px; height: 300px; }
+        .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
         .btn-primary { background: #0284c7; color: white; font-size: 1.1em; }
         .btn-green { background: #059669; color: white; font-size: 1.1em; }
         .btn-purple { background: #7c3aed; color: white; }
         .btn-gold { background: #b45309; color: white; }
+        .btn-outline { background: transparent; border: 2px solid var(--blue); color: var(--blue); }
+        .btn-outline:hover { background: rgba(56,189,248,0.1); }
         
-        .specs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9em; }
+        .specs { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; font-size: 0.9em; }
         .specs .spec-label { color: var(--text2); }
         .specs .spec-value { font-weight: 700; color: var(--blue); }
         
-        .social { display: flex; justify-content: center; gap: 8px; flex-wrap: wrap; margin: 15px 0; }
-        .social a { background: var(--bg-card); border: 2px solid var(--border); padding: 10px 18px; 
-                   border-radius: 10px; color: var(--text); text-decoration: none; font-weight: 700; 
-                   font-size: 0.85em; transition: all 0.3s; }
-        .social a:hover { border-color: var(--blue); color: var(--blue); }
+        .social { display: flex; justify-content: center; gap: 10px; flex-wrap: wrap; margin: 18px 0; }
+        .social a { background: var(--bg-card); border: 2px solid var(--border); padding: 12px 20px; 
+                   border-radius: 12px; color: var(--text); text-decoration: none; font-weight: 700; 
+                   font-size: 0.85em; transition: all 0.3s; display: flex; align-items: center; gap: 6px; }
+        .social a:hover { border-color: var(--blue); color: var(--blue); transform: translateY(-2px); box-shadow: 0 5px 20px rgba(56,189,248,0.2); }
         
-        .footer { text-align: center; color: var(--text2); font-size: 0.75em; padding: 25px; border-top: 1px solid var(--border); margin-top: 15px; }
-        .footer a { color: var(--blue); text-decoration: none; }
+        .footer { text-align: center; color: var(--text2); font-size: 0.8em; padding: 30px 20px; border-top: 1px solid var(--border); margin-top: 20px; }
+        .footer a { color: var(--blue); text-decoration: none; font-weight: 600; }
+        .footer a:hover { text-decoration: underline; }
         
         .success-box { background: rgba(16,185,129,0.08); border: 2px solid rgba(16,185,129,0.3); 
-                      padding: 14px; border-radius: 12px; margin: 12px 0; font-size: 0.9em; text-align: center; }
+                      padding: 16px; border-radius: 12px; margin: 14px 0; font-size: 0.9em; text-align: center; }
         .warning-box { background: rgba(251,191,36,0.08); border: 2px solid rgba(251,191,36,0.3); 
-                      padding: 14px; border-radius: 12px; margin: 12px 0; font-size: 0.9em; text-align: center; }
+                      padding: 16px; border-radius: 12px; margin: 14px 0; font-size: 0.9em; text-align: center; }
+        .info-box { background: rgba(56,189,248,0.08); border: 2px solid rgba(56,189,248,0.3); 
+                   padding: 16px; border-radius: 12px; margin: 14px 0; font-size: 0.9em; }
         
-        .sheep-section { text-align: center; padding: 15px 0; }
-        .sheep-section .sheep-icon { font-size: 4em; animation: bounce 1s infinite; }
-        @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-15px); } }
+        .sheep-section { text-align: center; padding: 20px 0; }
+        .sheep-section .sheep-icon { font-size: 5em; animation: bounce 1s infinite; display: inline-block; }
+        @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-20px); } }
         
-        .nft-preview { display: grid; grid-template-columns: repeat(auto-fit, minmax(120px, 1fr)); gap: 10px; }
-        .nft-card { background: rgba(0,0,0,0.3); border-radius: 10px; padding: 10px; text-align: center; border: 1px solid var(--border); }
-        .nft-card .nft-icon { font-size: 2.5em; }
-        .nft-card .nft-name { color: var(--gold); font-weight: 700; font-size: 0.8em; margin-top: 4px; }
+        .nft-preview { display: grid; grid-template-columns: repeat(auto-fit, minmax(130px, 1fr)); gap: 10px; }
+        .nft-card { background: rgba(0,0,0,0.3); border-radius: 12px; padding: 14px; text-align: center; border: 1px solid var(--border); transition: all 0.3s; cursor: pointer; }
+        .nft-card:hover { border-color: var(--gold); transform: translateY(-5px); }
+        .nft-card .nft-icon { font-size: 3em; }
+        .nft-card .nft-name { color: var(--gold); font-weight: 700; font-size: 0.85em; margin-top: 6px; }
         
-        @media (max-width: 600px) {
-            .hero h1 { font-size: 2.5em; }
+        .copy-btn { cursor: pointer; background: var(--bg-card); border: 1px solid var(--border); color: var(--blue); padding: 6px 12px; border-radius: 6px; font-size: 0.8em; transition: all 0.2s; }
+        .copy-btn:hover { background: rgba(56,189,248,0.1); border-color: var(--blue); }
+        .copied { color: var(--green) !important; }
+        
+        .steps-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 14px; text-align: center; }
+        .step-card { padding: 22px; background: rgba(56,189,248,0.04); border-radius: 14px; border: 1px solid var(--border); transition: all 0.3s; }
+        .step-card:hover { border-color: var(--blue); background: rgba(56,189,248,0.08); }
+        .step-number { font-size: 3em; font-weight: 900; color: var(--blue); }
+        
+        .network-status { display: inline-flex; align-items: center; gap: 8px; padding: 8px 16px; background: rgba(16,185,129,0.1); border-radius: 50px; border: 1px solid rgba(16,185,129,0.3); }
+        .status-dot { width: 8px; height: 8px; background: var(--green); border-radius: 50%; animation: pulse 2s infinite; }
+        
+        @media (max-width: 768px) {
+            .hero h1 { font-size: 2.2em; }
             .btn { width: 100%; }
             .specs { grid-template-columns: 1fr; }
             .btn-group { flex-direction: column; }
+            .card { padding: 20px; }
+            .social a { width: 100%; justify-content: center; }
         }
     </style>
 </head>
 <body>
     <nav>
         <span class="logo">⚡ RAMCOIN</span>
-        <span class="badge">● LIVE — СЕТЬ РАБОТАЕТ</span>
-        <div style="display:flex;gap:6px;flex-wrap:wrap">
-            <a href="https://t.me/ramcoin_pow" class="btn btn-primary" style="padding:8px 14px;font-size:0.75em;">📢 Канал</a>
-            <a href="https://t.me/ramcoin_chat" class="btn btn-green" style="padding:8px 14px;font-size:0.75em;">👥 Чат</a>
+        <div class="network-status">
+            <span class="status-dot"></span>
+            <span class="badge">● LIVE — СЕТЬ РАБОТАЕТ</span>
+        </div>
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+            <a href="https://t.me/ramcoin_pow" class="btn btn-primary" style="padding:8px 16px;font-size:0.8em;">📢 Канал</a>
+            <a href="https://t.me/ramcoin_chat" class="btn btn-green" style="padding:8px 16px;font-size:0.8em;">👥 Чат</a>
         </div>
     </nav>
     
@@ -124,8 +155,8 @@
             <h1>RAMCOIN</h1>
             <p class="subtitle">Свой блокчейн. Честный майнинг. Ограниченная эмиссия.</p>
             <p class="desc">Не токен. Не игра. Настоящая криптовалюта с собственной нодой.<br>Один разработчик. Открытый код. Живая сеть.</p>
-            <div style="margin-top:20px;">
-                <a href="#start" class="btn btn-primary" style="font-size:1.2em;padding:18px 36px;">🚀 КАК ЗАПУСТИТЬ НОДУ</a>
+            <div style="margin-top:25px;">
+                <a href="#start" class="btn btn-primary" style="font-size:1.2em;padding:18px 40px;">🚀 КАК ЗАПУСТИТЬ НОДУ</a>
             </div>
         </div>
 
@@ -133,12 +164,12 @@
         <div class="stats-grid">
             <div class="stat-item">
                 <div class="icon">🔗</div>
-                <div class="value">18 800+</div>
+                <div class="value" id="blocks-value">20 321</div>
                 <div class="label">Блоков добыто</div>
             </div>
             <div class="stat-item">
                 <div class="icon">💰</div>
-                <div class="value">186 000+</div>
+                <div class="value" id="supply-value">200 870</div>
                 <div class="label">RAM в сети</div>
             </div>
             <div class="stat-item">
@@ -148,7 +179,7 @@
             </div>
             <div class="stat-item">
                 <div class="icon">👥</div>
-                <div class="value">5</div>
+                <div class="value">5+</div>
                 <div class="label">Майнеров</div>
             </div>
             <div class="stat-item">
@@ -167,38 +198,45 @@
         <div class="card sheep-section">
             <h2>🐏 ПОЧЕМУ RAMCOIN?</h2>
             <div class="sheep-icon">🐏</div>
-            <p style="font-size:1.1em;margin:8px 0;"><strong>RAM = оперативная память</strong></p>
+            <p style="font-size:1.2em;margin:10px 0;"><strong>RAM = оперативная память</strong></p>
             <p style="color:var(--text2);">Наш алгоритм требует 8 МБ RAM на майнер.<br>Это защита от ASIC-ферм — только честный CPU-майнинг.</p>
-            <p style="margin-top:10px;"><strong>Баран — упрямый. Сильный. Его не сдвинуть.</strong></p>
+            <p style="margin-top:14px;"><strong>Баран — упрямый. Сильный. Его не сдвинуть.</strong></p>
             <p style="color:var(--text2);">Как и нашу сеть. RAMCOIN не остановить.</p>
         </div>
 
         <!-- КАК НАЧАТЬ -->
         <div class="card" id="start">
             <h2>🚀 ЗАПУСТИ НОДУ ЗА 5 МИНУТ</h2>
-            <div style="display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px;text-align:center">
-                <div style="padding:18px;background:rgba(56,189,248,0.04);border-radius:14px;border:1px solid var(--border)">
-                    <div style="font-size:2.5em;font-weight:900;color:var(--blue)">1</div>
-                    <p><strong>Скачай Python 3.9+</strong></p>
-                    <p style="color:var(--text2);font-size:0.85em">python.org — бесплатно</p>
+            <div class="steps-grid">
+                <div class="step-card">
+                    <div class="step-number">1</div>
+                    <p><strong>Установи Python 3.9+</strong></p>
+                    <p style="color:var(--text2);font-size:0.85em;"><a href="https://python.org" target="_blank" style="color:var(--blue);">python.org</a> — бесплатно</p>
                 </div>
-                <div style="padding:18px;background:rgba(56,189,248,0.04);border-radius:14px;border:1px solid var(--border)">
-                    <div style="font-size:2.5em;font-weight:900;color:var(--blue)">2</div>
+                <div class="step-card">
+                    <div class="step-number">2</div>
                     <p><strong>Склонируй репозиторий</strong></p>
-                    <p style="color:var(--text2);font-size:0.85em">github.com/ramcoinnode-debug</p>
+                    <p style="color:var(--text2);font-size:0.85em;">
+                        <code style="background:rgba(0,0,0,0.3);padding:4px 8px;border-radius:4px;">git clone https://github.com/ramcoinnode-debug/ramcoin.git</code>
+                    </p>
                 </div>
-                <div style="padding:18px;background:rgba(56,189,248,0.04);border-radius:14px;border:1px solid var(--border)">
-                    <div style="font-size:2.5em;font-weight:900;color:var(--blue)">3</div>
+                <div class="step-card">
+                    <div class="step-number">3</div>
                     <p><strong>Запусти ноду</strong></p>
-                    <p style="color:var(--text2);font-size:0.85em">python ramcoin_full2.py</p>
+                    <p style="color:var(--text2);font-size:0.85em;">
+                        <code style="background:rgba(0,0,0,0.3);padding:4px 8px;border-radius:4px;">python ramcoin_full2.py</code>
+                    </p>
                 </div>
             </div>
-            <div class="success-box" style="margin-top:15px;">
+            <div class="success-box" style="margin-top:18px;">
                 ✅ <strong>Готово!</strong> Твой компьютер стал частью сети RAMCOIN. Блоки добываются каждые 30 секунд.
             </div>
-            <div class="btn-group" style="margin-top:10px;">
-                <a href="https://github.com/ramcoinnode-debug/ramcoin" class="btn btn-purple">💻 GitHub</a>
-                <a href="https://t.me/ramcoin_chat" class="btn btn-green">👥 Чат (поможем)</a>
+            <div class="info-box">
+                💡 <strong>Совет:</strong> После запуска ноды открой браузер и перейди на <code>http://localhost:5000/health</code> чтобы проверить статус.
+            </div>
+            <div class="btn-group" style="margin-top:14px;">
+                <a href="https://github.com/ramcoinnode-debug/ramcoin" class="btn btn-purple" target="_blank">💻 GitHub</a>
+                <a href="https://t.me/ramcoin_chat" class="btn btn-green" target="_blank">👥 Чат (поможем)</a>
             </div>
         </div>
 
@@ -206,18 +244,18 @@
         <div class="card">
             <h2>⏰ ХАЛВИНГ — ПОЧЕМУ ПЕРВЫЕ ПОЛУЧАЮТ БОЛЬШЕ</h2>
             <p style="color:var(--text2);">Каждые 876 000 блоков награда за блок уменьшается вдвое.</p>
-            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:8px;text-align:center;margin:12px 0">
-                <div style="padding:10px;background:rgba(16,185,129,0.08);border-radius:10px">
-                    <div style="font-size:1.5em;font-weight:900;color:var(--green)">10 RAM</div>
-                    <div style="color:var(--text2);font-size:0.75em">Сейчас</div>
+            <div style="display:grid;grid-template-columns:repeat(3,1fr);gap:12px;text-align:center;margin:16px 0">
+                <div style="padding:16px;background:rgba(16,185,129,0.1);border-radius:12px;border:1px solid rgba(16,185,129,0.3)">
+                    <div style="font-size:1.8em;font-weight:900;color:var(--green)">10 RAM</div>
+                    <div style="color:var(--text2);font-size:0.8em;margin-top:4px;">Сейчас</div>
                 </div>
-                <div style="padding:10px;background:rgba(56,189,248,0.08);border-radius:10px">
-                    <div style="font-size:1.5em;font-weight:900;color:var(--blue)">5 RAM</div>
-                    <div style="color:var(--text2);font-size:0.75em">1-й халвинг</div>
+                <div style="padding:16px;background:rgba(56,189,248,0.1);border-radius:12px;border:1px solid rgba(56,189,248,0.3)">
+                    <div style="font-size:1.8em;font-weight:900;color:var(--blue)">5 RAM</div>
+                    <div style="color:var(--text2);font-size:0.8em;margin-top:4px;">1-й халвинг</div>
                 </div>
-                <div style="padding:10px;background:rgba(168,120,250,0.08);border-radius:10px">
-                    <div style="font-size:1.5em;font-weight:900;color:var(--purple)">2.5 RAM</div>
-                    <div style="color:var(--text2);font-size:0.75em">2-й халвинг</div>
+                <div style="padding:16px;background:rgba(168,120,250,0.1);border-radius:12px;border:1px solid rgba(168,120,250,0.3)">
+                    <div style="font-size:1.8em;font-weight:900;color:var(--purple)">2.5 RAM</div>
+                    <div style="color:var(--text2);font-size:0.8em;margin-top:4px;">2-й халвинг</div>
                 </div>
             </div>
             <div class="warning-box">
@@ -233,7 +271,7 @@
                 <p class="spec-label">⚡ Алгоритм:</p><p class="spec-value">Memory-hard PoW (SHA-256)</p>
                 <p class="spec-label">💎 Макс. эмиссия:</p><p class="spec-value">17 500 000 RAM</p>
                 <p class="spec-label">⏱️ Время блока:</p><p class="spec-value">~30 секунд</p>
-                <p class="spec-label">🔒 Защита:</p><p class="spec-value">8 MB scratchpad × 8224 итераций</p>
+                <p class="spec-label">🔒 Защита:</p><p class="spec-value">8 MB scratchpad × 8 224 итераций</p>
                 <p class="spec-label">🌐 Сеть:</p><p class="spec-value">P2P • ChaCha20-Poly1305 • ECDH</p>
                 <p class="spec-label">🖥️ Потоки:</p><p class="spec-value">4 на майнер (честно для всех)</p>
                 <p class="spec-label">🔥 Халвинг:</p><p class="spec-value">Каждые 876 000 блоков</p>
@@ -245,33 +283,33 @@
         <div class="card">
             <h2>🎨 УНИКАЛЬНЫЕ NFT</h2>
             <p style="color:var(--text2);">Каждый майнер получает уникальный NFT. Сгенерирован из хеша блока. Невозможно подделать.</p>
-            <div class="nft-preview" style="margin-top:12px;">
-                <div class="nft-card">
+            <div class="nft-preview" style="margin-top:16px;">
+                <div class="nft-card" title="Common NFT">
                     <div class="nft-icon">🟢</div>
                     <div class="nft-name">COMMON</div>
                 </div>
-                <div class="nft-card">
+                <div class="nft-card" title="Rare NFT">
                     <div class="nft-icon">🔵</div>
                     <div class="nft-name">RARE</div>
                 </div>
-                <div class="nft-card">
+                <div class="nft-card" title="Epic NFT">
                     <div class="nft-icon">🟣</div>
                     <div class="nft-name">EPIC</div>
                 </div>
-                <div class="nft-card">
+                <div class="nft-card" title="Legendary NFT">
                     <div class="nft-icon">🟡</div>
                     <div class="nft-name">LEGENDARY</div>
                 </div>
-                <div class="nft-card">
+                <div class="nft-card" title="Mythic NFT">
                     <div class="nft-icon">🔴</div>
                     <div class="nft-name">MYTHIC</div>
                 </div>
-                <div class="nft-card">
+                <div class="nft-card" title="Divine NFT">
                     <div class="nft-icon">👑</div>
                     <div class="nft-name">DIVINE</div>
                 </div>
             </div>
-            <div class="success-box">
+            <div class="success-box" style="margin-top:16px;">
                 🎨 NFT раздаются через тапалку <strong>@ramcoin_tap_bot</strong> — получи свой!
             </div>
         </div>
@@ -279,26 +317,77 @@
         <!-- ПРИСОЕДИНЯЙСЯ -->
         <div class="card" style="text-align:center;">
             <h2>🔥 ПРИСОЕДИНЯЙСЯ К СЕТИ</h2>
-            <p style="font-size:1.1em;">98% монет ещё не добыто. Ты на старте.</p>
+            <p style="font-size:1.2em;">98% монет ещё не добыто. Ты на старте.</p>
             <div class="social">
-                <a href="https://t.me/ramcoin_pow">📢 Telegram канал</a>
-                <a href="https://t.me/ramcoin_chat">👥 Чат сообщества</a>
-                <a href="https://t.me/ramcoin_tap_bot">🎮 Тапалка</a>
-                <a href="https://github.com/ramcoinnode-debug/ramcoin">💻 GitHub</a>
-                <a href="https://tiktok.com/@ramcoin_pow">🎬 TikTok</a>
-                <a href="https://instagram.com/ramcoin.node">📸 Instagram</a>
-                <a href="https://youtube.com/@ramcoin_node">▶️ YouTube</a>
-                <a href="https://rutube.ru/channel/ramcoin">🟢 Rutube</a>
-                <a href="https://kick.com/ramcoin">🟣 Kick</a>
+                <a href="https://t.me/ramcoin_pow" target="_blank">📢 Telegram канал</a>
+                <a href="https://t.me/ramcoin_chat" target="_blank">👥 Чат сообщества</a>
+                <a href="https://t.me/ramcoin_tap_bot" target="_blank">🎮 Тапалка</a>
+                <a href="https://github.com/ramcoinnode-debug/ramcoin" target="_blank">💻 GitHub</a>
+                <a href="https://tiktok.com/@ramcoin_pow" target="_blank">🎬 TikTok</a>
+                <a href="https://instagram.com/ramcoin.node" target="_blank">📸 Instagram</a>
+                <a href="https://youtube.com/@ramcoin_node" target="_blank">▶️ YouTube</a>
+                <a href="https://rutube.ru/channel/ramcoin" target="_blank">🟢 Rutube</a>
+                <a href="https://kick.com/ramcoin" target="_blank">🟣 Kick</a>
             </div>
         </div>
 
         <div class="footer">
-            <p>🌐 Ноды: <strong>90.188.115.169:8333</strong> | <strong>188.225.31.168:8333</strong></p>
-            <p>RAMCOIN v10.2.0 — P2P Blockchain Network</p>
-            <p>© 2026 <a href="https://t.me/ramcoin_pow">RAMCOIN Community</a></p>
-            <p style="margin-top:8px;font-size:0.7em;">Свой блокчейн. Честный майнинг. Ограниченная эмиссия.</p>
+            <p>🌐 <strong>Ноды:</strong></p>
+            <p>
+                <code>90.188.115.169:8333</code> 
+                <button class="copy-btn" onclick="copyToClipboard('90.188.115.169:8333')">📋 Копировать</button>
+            </p>
+            <p>
+                <code>188.225.31.168:8333</code> 
+                <button class="copy-btn" onclick="copyToClipboard('188.225.31.168:8333')">📋 Копировать</button>
+            </p>
+            <p style="margin-top:12px;">RAMCOIN v10.3.0 — P2P Blockchain Network</p>
+            <p>© 2026 <a href="https://t.me/ramcoin_pow" target="_blank">RAMCOIN Community</a></p>
+            <p style="margin-top:10px;font-size:0.75em;">Свой блокчейн. Честный майнинг. Ограниченная эмиссия.</p>
         </div>
     </div>
+
+    <script>
+        // Копирование в буфер обмена
+        function copyToClipboard(text) {
+            navigator.clipboard.writeText(text).then(() => {
+                // Можно добавить уведомление
+                alert('Скопировано: ' + text);
+            }).catch(err => {
+                console.error('Ошибка копирования:', err);
+            });
+        }
+
+        // Плавная прокрутка для всех якорных ссылок
+        document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+            anchor.addEventListener('click', function (e) {
+                e.preventDefault();
+                const target = document.querySelector(this.getAttribute('href'));
+                if (target) {
+                    target.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }
+            });
+        });
+
+        // Анимация появления элементов при прокрутке
+        const observer = new IntersectionObserver((entries) => {
+            entries.forEach(entry => {
+                if (entry.isIntersecting) {
+                    entry.target.style.opacity = '1';
+                    entry.target.style.transform = 'translateY(0)';
+                }
+            });
+        }, { threshold: 0.1 });
+
+        document.querySelectorAll('.card, .stat-item').forEach(el => {
+            el.style.opacity = '0';
+            el.style.transform = 'translateY(20px)';
+            el.style.transition = 'opacity 0.6s, transform 0.6s';
+            observer.observe(el);
+        });
+
+        // Автоматический год в футере
+        document.querySelector('.footer p:last-child').innerHTML += ' | ' + new Date().getFullYear();
+    </script>
 </body>
 </html>
