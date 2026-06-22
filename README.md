@@ -1,60 +1,46 @@
 # RAMCOIN v11 — Parasite Protocol
 
-Децентрализованная криптовалюта с нулевой инфраструктурой.
+Decentralized blockchain. Zero infrastructure. No servers. No mining. No white IPs.
 
 ---
 
-## Что это
+## Download
 
-RAMCOIN — полностью автономный блокчейн. Без серверов. Без майнинга. Без белых IP.
-
-Сеть работает через публичные каналы связи. Трафик неотличим от обычного интернета. Заблокировать невозможно.
-
-Каждая нода самостоятельна. Разработчик может исчезнуть — сеть продолжит работать.
+👉 [Latest Release](https://github.com/ramcoinnode-debug/ramcoin/releases/latest)
 
 ---
 
-## Характеристики
+## Quick Start
 
-| Параметр | Значение |
+1. Download ZIP from releases
+2. Unpack
+3. Run `ramcoin_v11_node.exe` — enter your RAM address
+4. Run `ramcoin_v11_wallet.exe` — create or open wallet
+5. Done. You're in the network.
+
+---
+
+## Specifications
+
+| Parameter | Value |
 |---|---|
-| Блок | 20 секунд |
-| Награда | 10 RAM |
-| Халвинг | каждые 876 000 блоков (~203 дня) |
-| Макс. эмиссия | 17.5M RAM |
-| Сжигание | 1% с каждого блока |
-| Комиссия | 0.001 RAM |
-| Консенсус | Proof-of-Relay |
+| Block time | 20 seconds |
+| Reward | 10 RAM |
+| Halving | every 876,000 blocks (~203 days) |
+| Max supply | 17.5M RAM |
+| Burn | 1% per block |
+| Fee | 0.001 RAM |
+| Consensus | Proof-of-Relay |
+| Transport | P2P Gossip |
 
 ---
 
-## Скачать
+## Links
 
-👉 [Последняя версия](https://github.com/ramcoinnode-debug/ramcoin/releases/latest)
-
----
-
-## Быстрый старт
-
-1. Скачай ZIP
-2. Распакуй в любую папку
-3. Запусти `ramcoin_v11_node.exe`
-4. Запусти `ramcoin_v11_wallet.exe`
-5. Создай кошелёк (запиши 12 слов)
-6. Готово. Ты в сети.
-
----
-
-## Для разработчиков
-
-```bash
-pip install aiohttp cryptography
-python ramcoin_v11_node.py
-python ramcoin_v11_wallet.py
-## Ссылки
-
-🌐 [Сайт](https://ramcoinnode-debug.github.io/ramcoin)
+🌐 [Website](https://ramcoinnode-debug.github.io/ramcoin)
 📢 [Telegram](https://t.me/ramcoin_pow)
-👥 [Чат](https://t.me/ramcoin_chat)
+👥 [Chat](https://t.me/ramcoin_chat)
 
-RAMCOIN v11 — блокчейн, который невозможно остановить.
+---
+
+**RAMCOIN v11 — blockchain that cannot be stopped.**
