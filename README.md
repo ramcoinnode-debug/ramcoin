@@ -1,12 +1,12 @@
 # RAMCOIN v1.0.0 — Genesis Edition
 
-Decentralized CPU-mined blockchain. Memory-hard algorithm. No ASIC. No GPU. Fair launch.
+CPU-mined cryptocurrency. Memory-hard algorithm. No ASIC. No GPU. Fair launch.
 
 ---
 
 ## Download
 
-👉 [Latest Release](https://github.com/ramcoin/ramcoin/releases/latest)
+👉 [Latest Release](https://github.com/ramcoinnode-debug/ramcoin/releases/latest)
 
 ---
 
@@ -16,7 +16,8 @@ Decentralized CPU-mined blockchain. Memory-hard algorithm. No ASIC. No GPU. Fair
 2. Unpack
 3. Run `RAMCOIN_Wallet_v1.0.0.exe` — create or open wallet
 4. Run `RAMCOIN_Miner_v1.0.0.exe` — enter your RAM address and start mining
-5. Done. You're mining RAMCOIN.
+5. Open `ramcoin_explorer.html` in browser to see blocks
+6. Done. You're mining RAMCOIN.
 
 ---
 
@@ -33,16 +34,21 @@ Decentralized CPU-mined blockchain. Memory-hard algorithm. No ASIC. No GPU. Fair
 | Dev fund | 5% (transparent, in code) |
 | Fee | 0.001 RAM |
 | Consensus | Proof-of-Work (CPU + RAM) |
-| Transport | P2P + Peer Exchange |
 | Security | ChaCha20-Poly1305 + ECDH + ECDSA |
+| Network | P2P + Peer Exchange |
 
 ---
 
 ## Links
 
-📢 [Telegram](https://t.me/ramcoin)
-👥 [Chat](https://t.me/ramcoin_chat)
+🌐 [Website](https://ramcoinnode-debug.github.io/ramcoin)
+📢 [Telegram](https://t.me/ramcoin_pow)
+💻 [GitHub](https://github.com/ramcoinnode-debug/ramcoin)
 
 ---
 
-**RAMCOIN v1.0.0 — Fair launch. CPU only. No premine.**
+## Run Node (for operators)
+
+```bash
+pip install -r requirements.txt
+python ramcoin_node.py
