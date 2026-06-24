@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAMCOIN Explorer v1.0.0</title>
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            background: #0a0a1a; color: #e0e0e0;
+            font-family: 'Courier New', monospace;
+            min-height: 100vh;
+        }
+        .header {
+            background: linear-gradient(135deg, #1a1a3e, #0d0d2b);
+            padding: 20px; text-align: center;
+            border-bottom: 2px solid #2a2a5e;
+        }
+        .header h1 { color: #00ff88; font-size: 28px; letter-spacing: 3px; }
+        .header .sub { color: #8888cc; font-size: 12px; margin-top: 5px; }
+        .stats {
+            display: flex; flex-wrap: wrap; gap: 15px;
+            padding: 20px; justify-content: center;
+        }
+        .stat-card {
+            background: #111133; border: 1px solid #2a2a5e;
+            border-radius: 10px; padding: 15px 25px;
+            text-align: center; min-width: 140px;
+        }
+        .stat-card .val { font-size: 24px; color: #00ff88; font-weight: bold; }
+        .stat-card .lbl { font-size: 11px; color: #8888cc; margin-top: 5px; text-transform: uppercase; }
+        .section {
+            max-width: 1100px; margin: 0 auto; padding: 20px;
+        }
+        .section h2 {
+            color: #00ccff; font-size: 18px;
+            border-bottom: 1px solid #2a2a5e;
+            padding-bottom: 10px; margin-bottom: 15px;
+        }
+        .block-row, .tx-row {
+            background: #111133; border: 1px solid #1a1a4e;
+            border-radius: 8px; padding: 12px 18px; margin-bottom: 8px;
+            font-size: 13px; word-break: break-all;
+        }
+        .block-row:hover, .tx-row:hover { border-color: #00ff88; }
+        .hash { color: #ffaa00; }
+        .addr { color: #00ccff; }
+        .amount { color: #00ff88; }
+        .height { color: #ff6688; font-weight: bold; }
+        .fees { color: #ffaa44; }
+        .badge {
+            display: inline-block; padding: 2px 8px;
+            border-radius: 4px; font-size: 10px; font-weight: bold;
+        }
+        .badge-solo { background: #00ff881a; color: #00ff88; }
+        .badge-pool { background: #00ccff1a; color: #00ccff; }
+        .search {
+            display: flex; gap: 10px; padding: 20px;
+            max-width: 600px; margin: 0 auto;
+        }
+        .search input {
+            flex: 1; background: #111133; border: 1px solid #2a2a5e;
+            color: #e0e0e0; padding: 10px 15px; border-radius: 8px;
+            font-family: 'Courier New', monospace; font-size: 14px;
+        }
+        .search button {
+            background: #00ff88; color: #0a0a1a; border: none;
+            padding: 10px 20px; border-radius: 8px; cursor: pointer;
+            font-weight: bold; font-family: 'Courier New', monospace;
+        }
+        .search button:hover { background: #00cc66; }
+        .error { color: #ff4466; text-align: center; padding: 20px; }
+        .loading { text-align: center; padding: 40px; color: #8888cc; }
+        .footer {
+            text-align: center; padding: 20px;
+            color: #444466; font-size: 11px;
+        }
+        .footer a { color: #8888cc; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>⛏️ RAMCOIN EXPLORER</h1>
+        <div class="sub">v1.0.0 Genesis Edition | Memory-Hard CPU Mining</div>
+    </div>
+
+    <div class="search">
+        <input type="text" id="searchInput" placeholder="Поиск: высота блока, хеш, адрес RAM_...">
+        <button onclick="doSearch()">🔍 Искать</button>
+    </div>
+
+    <div class="stats" id="stats"></div>
+    <div class="section" id="content"></div>
+    <div class="footer">
+        RAMCOIN © 2024 | <span id="nodeUrl"></span> |
+        <a href="/coininfo" target="_blank">Инфо</a>
+    </div>
+
+    <script>
+        const API = window.location.origin.replace('5500', '5000') || 'http://127.0.0.1:5000';
+        document.getElementById('nodeUrl').textContent = API;
+
+        async function api(path) {
+            try {
+                const r = await fetch(`${API}${path}`);
+                return await r.json();
+            } catch(e) {
+                return null;
+            }
+        }
+
+        async function loadStats() {
+            const data = await api('/chain');
+            if (!data) {
+                document.getElementById('stats').innerHTML = '<div class="error">❌ Нода недоступна</div>';
+                return;
+            }
+            const stats = [
+                { val: '#' + (data.height || data.length || '?'), lbl: 'Высота' },
+                { val: data.difficulty || '?', lbl: 'Сложность' },
+                { val: (data.reward || 0) + ' RAM', lbl: 'Награда' },
+                { val: data.peers || 0, lbl: 'Пиры' },
+                { val: data.mempool || 0, lbl: 'Mempool' },
+                { val: data.accounts || 0, lbl: 'Аккаунтов' },
+                { val: data.transactions || 0, lbl: 'Транзакций' },
+                { val: (data.total_supply || 0).toFixed(2) + ' RAM', lbl: 'Эмиссия' },
+            ];
+            document.getElementById('stats').innerHTML = stats.map(s =>
+                `<div class="stat-card"><div class="val">${s.val}</div><div class="lbl">${s.lbl}</div></div>`
+            ).join('');
+        }
+
+        async function loadBlocks() {
+            const data = await api('/chain');
+            if (!data || !data.chain) {
+                document.getElementById('content').innerHTML = '<div class="error">Нет данных</div>';
+                return;
+            }
+            const blocks = data.chain.reverse().slice(0, 15);
+            let html = '<h2>📦 ПОСЛЕДНИЕ БЛОКИ</h2>';
+            blocks.forEach(b => {
+                const isPool = b.pool_block ? 'badge-pool' : 'badge-solo';
+                const mode = b.pool_block ? 'POOL' : 'SOLO';
+                html += `
+                <div class="block-row">
+                    <span class="height">#${b.index}</span>
+                    <span class="badge ${isPool}">${mode}</span>
+                    <span class="hash">${(b.hash || '').substring(0, 16)}...</span>
+                    <span class="fees">Fees: ${(b.total_fees || 0) / 100000000} RAM</span>
+                    <br><span style="font-size:11px;color:#666">
+                    ⏱ ${new Date((b.timestamp || 0) * 1000).toLocaleString()}
+                    | Miner: <span class="addr">${(b.miner_payout_address || '').substring(0, 14)}...</span>
+                    | Txs: ${(b.transactions || []).length}
+                    </span>
+                </div>`;
+            });
+            document.getElementById('content').innerHTML += html;
+        }
+
+        async function loadTxs() {
+            const txs = await api('/pending');
+            if (!txs || txs.length === 0) {
+                document.getElementById('content').innerHTML += '<h2>📝 MEMPOOL</h2><p style="color:#666">Пусто</p>';
+                return;
+            }
+            let html = '<h2>📝 MEMPOOL (' + txs.length + ')</h2>';
+            txs.slice(0, 20).forEach(tx => {
+                html += `
+                <div class="tx-row">
+                    <span class="addr">${(tx.sender || '').substring(0, 14)}...</span>
+                    → <span class="addr">${(tx.recipient || '').substring(0, 14)}...</span>
+                    <span class="amount">${(tx.amount || 0) / 100000000} RAM</span>
+                    <span style="color:#666">Nonce: ${tx.nonce}</span>
+                </div>`;
+            });
+            document.getElementById('content').innerHTML += html;
+        }
+
+        async function doSearch() {
+            const q = document.getElementById('searchInput').value.trim();
+            if (!q) return;
+            document.getElementById('content').innerHTML = '<div class="loading">🔍 Поиск...</div>';
+
+            // Поиск по высоте
+            if (/^\d+$/.test(q)) {
+                const block = await api(`/block/${q}`);
+                if (block && !block.error) {
+                    document.getElementById('content').innerHTML = `
+                        <h2>📦 Блок #${block.index}</h2>
+                        <div class="block-row">
+                            <pre style="font-size:11px;max-height:400px;overflow-y:auto">${JSON.stringify(block, null, 2)}</pre>
+                        </div>`;
+                    return;
+                }
+            }
+
+            // Поиск по адресу
+            if (q.startsWith('RAM_')) {
+                const addr = await api(`/address/${q}`);
+                if (addr && !addr.error) {
+                    document.getElementById('content').innerHTML = `
+                        <h2>💼 Адрес</h2>
+                        <div class="block-row">
+                            <span class="addr">${addr.address}</span><br>
+                            <span class="amount">Баланс: ${addr.balance} RAM</span><br>
+                            <span style="color:#666">Nonce: ${addr.nonce}</span>
+                        </div>`;
+                    return;
+                }
+            }
+
+            document.getElementById('content').innerHTML = '<div class="error">❌ Ничего не найдено</div>';
+        }
+
+        async function init() {
+            document.getElementById('content').innerHTML = '<div class="loading">⏳ Загрузка...</div>';
+            await loadStats();
+            document.getElementById('content').innerHTML = '';
+            await loadBlocks();
+            await loadTxs();
+        }
+
+        init();
+        setInterval(init, 30000);
+    </script>
+</body>
+</html>
