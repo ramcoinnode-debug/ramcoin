@@ -1,17 +1,23 @@
+
+---
+
+## index.html
+
+```html
 <!DOCTYPE html>
 <html lang="ru">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>RAMCOIN v1.0.0 — Genesis Edition. CPU Mining. Fair Launch.</title>
-    <meta name="description" content="RAMCOIN v1.0.0 — децентрализованная криптовалюта с CPU-майнингом. Memory-hard алгоритм. Честный запуск без премайна.">
+    <title>RAMCOIN v1.0.0 — Genesis Edition</title>
+    <meta name="description" content="RAMCOIN v1.0.0 — децентрализованная криптовалюта с CPU-майнингом. Memory-hard алгоритм Ramhash v7. Честный запуск.">
     <meta property="og:title" content="RAMCOIN v1.0.0 — Genesis Edition">
-    <meta property="og:description" content="Криптовалюта с CPU-майнингом. Никаких ASIC, никаких GPU. Честный запуск.">
+    <meta property="og:description" content="CPU-майнинг криптовалюта. Никаких ASIC, никаких GPU. Честный запуск.">
     <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🐏</text></svg>">
     <style>
         :root {
             --bg: #02040a; --bg-card: #0a0f1a; --border: #1a2030;
-            --blue: #38bdf8; --green: #10b981; --gold: #fbbf24; --purple: #a78bfa;
+            --green: #10b981; --blue: #38bdf8; --gold: #fbbf24;
             --text: #f1f5f9; --text2: #94a3b8;
             --gradient: linear-gradient(135deg, #10b981, #38bdf8);
         }
@@ -48,8 +54,8 @@
         .btn-group { display: flex; gap: 10px; flex-wrap: wrap; justify-content: center; margin: 12px 0; }
         .btn { display: inline-block; padding: 14px 28px; border-radius: 12px; font-weight: 800; text-decoration: none; border: none; cursor: pointer; font-size: 0.95em; text-align: center; transition: all 0.3s; text-transform: uppercase; letter-spacing: 1px; }
         .btn:hover { transform: translateY(-3px); box-shadow: 0 10px 30px rgba(0,0,0,0.4); }
-        .btn-primary { background: #0284c7; color: white; font-size: 1.1em; }
         .btn-green { background: #059669; color: white; font-size: 1.1em; }
+        .btn-primary { background: #0284c7; color: white; font-size: 1.1em; }
         .specs { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; font-size: 0.9em; }
         .specs .spec-label { color: var(--text2); }
         .specs .spec-value { font-weight: 700; color: var(--green); }
@@ -76,7 +82,7 @@
         <span class="logo">🐏 RAMCOIN v1.0.0</span>
         <div class="network-status">
             <span class="status-dot"></span>
-            <span>● СЕТЬ РАБОТАЕТ</span>
+            <span>● NETWORK ONLINE</span>
         </div>
     </nav>
     
@@ -85,95 +91,95 @@
         <div class="hero">
             <span class="hero-badge">⛏️ GENESIS EDITION • v1.0.0</span>
             <h1>RAMCOIN</h1>
-            <p class="subtitle">CPU-майнинг. Честный запуск. Никаких ASIC.</p>
-            <p class="desc">Первая криптовалюта с memory-hard алгоритмом Ramhash v7.<br>Майнинг на процессоре + оперативная память.</p>
+            <p class="subtitle">CPU Mining. Fair Launch. No ASIC.</p>
+            <p class="desc">Cryptocurrency with memory-hard algorithm Ramhash v7.<br>CPU + RAM mining. Truly decentralized.</p>
             <div style="margin-top:25px;">
-                <a href="#download" class="btn btn-green" style="font-size:1.2em;padding:18px 40px;">🚀 СКАЧАТЬ</a>
+                <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/latest" class="btn btn-green" style="font-size:1.2em;padding:18px 40px;">🚀 DOWNLOAD</a>
             </div>
         </div>
 
-        <!-- СТАТИСТИКА -->
+        <!-- STATS -->
         <div class="stats-grid">
-            <div class="stat-item"><div class="icon">📦</div><div class="value" id="stat-height">...</div><div class="label">БЛОКОВ</div></div>
-            <div class="stat-item"><div class="icon">💰</div><div class="value" id="stat-supply">...</div><div class="label">RAM В СЕТИ</div></div>
-            <div class="stat-item"><div class="icon">⏱️</div><div class="value">30 сек</div><div class="label">ВРЕМЯ БЛОКА</div></div>
-            <div class="stat-item"><div class="icon">💎</div><div class="value">10 RAM</div><div class="label">НАГРАДА</div></div>
-            <div class="stat-item"><div class="icon">♾️</div><div class="value">~17.5M</div><div class="label">ЭМИССИЯ</div></div>
-            <div class="stat-item"><div class="icon">🟢</div><div class="value" style="color:var(--green);">ОНЛАЙН</div><div class="label">СЕТЬ</div></div>
+            <div class="stat-item"><div class="icon">📦</div><div class="value" id="stat-height">...</div><div class="label">BLOCKS</div></div>
+            <div class="stat-item"><div class="icon">💰</div><div class="value" id="stat-supply">...</div><div class="label">RAM SUPPLY</div></div>
+            <div class="stat-item"><div class="icon">⏱️</div><div class="value">30 sec</div><div class="label">BLOCK TIME</div></div>
+            <div class="stat-item"><div class="icon">💎</div><div class="value">10 RAM</div><div class="label">REWARD</div></div>
+            <div class="stat-item"><div class="icon">♾️</div><div class="value">~17.5M</div><div class="label">MAX SUPPLY</div></div>
+            <div class="stat-item"><div class="icon">🟢</div><div class="value" style="color:var(--green);">ONLINE</div><div class="label">NETWORK</div></div>
         </div>
 
-        <!-- ЧТО ТАКОЕ -->
+        <!-- WHAT IS -->
         <div class="card">
-            <h2>⛏️ ЧТО ТАКОЕ RAMCOIN</h2>
-            <p style="color:var(--text2);">RAMCOIN — децентрализованная криптовалюта с CPU-майнингом на алгоритме Ramhash v7. Основана на памяти (memory-hard). Никаких ASIC и GPU — только процессор и оперативная память.</p>
+            <h2>⛏️ WHAT IS RAMCOIN</h2>
+            <p style="color:var(--text2);">RAMCOIN is a decentralized cryptocurrency with CPU mining on Ramhash v7 algorithm. Memory-hard — requires RAM, not ASIC or GPU.</p>
             <div class="info-box">
-                <strong>🧠 Memory-Hard:</strong> Майнинг требует оперативную память. Нельзя майнить на видеокартах. Настоящая децентрализация.
+                <strong>🧠 Memory-Hard:</strong> Mining requires RAM. No GPU mining possible. True decentralization.
             </div>
             <div class="info-box">
-                <strong>🔒 Защита:</strong> ChaCha20-Poly1305 + ECDH + ECDSA. Промышленный уровень шифрования.
+                <strong>🔒 Security:</strong> ChaCha20-Poly1305 + ECDH + ECDSA. Enterprise-grade encryption.
             </div>
         </div>
 
-        <!-- КАК НАЧАТЬ -->
+        <!-- HOW TO START -->
         <div class="card" id="download">
-            <h2>🚀 КАК НАЧАТЬ (3 ШАГА)</h2>
+            <h2>🚀 HOW TO START (3 STEPS)</h2>
             <div class="steps-grid">
                 <div class="step-card">
                     <div class="step-number">1</div>
-                    <p><strong>Скачай</strong></p>
-                    <p style="color:var(--text2);font-size:0.85em;">Скачай ZIP с GitHub Releases</p>
+                    <p><strong>Download</strong></p>
+                    <p style="color:var(--text2);font-size:0.85em;">Get ZIP from GitHub Releases</p>
                 </div>
                 <div class="step-card">
                     <div class="step-number">2</div>
-                    <p><strong>Кошелёк</strong></p>
-                    <p style="color:var(--text2);font-size:0.85em;">Запусти <code>RAMCOIN_Wallet.exe</code></p>
+                    <p><strong>Wallet</strong></p>
+                    <p style="color:var(--text2);font-size:0.85em;">Run <code>RAMCOIN_Wallet.exe</code></p>
                 </div>
                 <div class="step-card">
                     <div class="step-number">3</div>
-                    <p><strong>Майнер</strong></p>
-                    <p style="color:var(--text2);font-size:0.85em;">Запусти <code>RAMCOIN_Miner.exe</code></p>
+                    <p><strong>Miner</strong></p>
+                    <p style="color:var(--text2);font-size:0.85em;">Run <code>RAMCOIN_Miner.exe</code></p>
                 </div>
             </div>
             <div class="success-box">
-                ✅ <strong>Готово!</strong> Ты в сети. Майнер добывает блоки. Кошелёк хранит RAM.
+                ✅ <strong>Done!</strong> You're mining RAMCOIN. Blocks every 30 seconds.
             </div>
             <div class="btn-group">
-                <a href="https://github.com/ramcoin/ramcoin/releases" class="btn btn-green">💻 GitHub Releases</a>
-                <a href="https://t.me/ramcoin" class="btn btn-primary">📢 Telegram</a>
+                <a href="https://github.com/ramcoinnode-debug/ramcoin/releases/latest" class="btn btn-green">💻 DOWNLOAD</a>
+                <a href="https://t.me/ramcoin_pow" class="btn btn-primary">📢 TELEGRAM</a>
             </div>
         </div>
 
-        <!-- ХАРАКТЕРИСТИКИ -->
+        <!-- SPECS -->
         <div class="card">
-            <h2>⚙️ ХАРАКТЕРИСТИКИ</h2>
+            <h2>⚙️ SPECIFICATIONS</h2>
             <div class="specs">
-                <p class="spec-label">⛏️ Алгоритм:</p><p class="spec-value">Ramhash v7 (Memory-hard)</p>
-                <p class="spec-label">⏱️ Время блока:</p><p class="spec-value">30 секунд</p>
-                <p class="spec-label">💰 Награда:</p><p class="spec-value">10 RAM</p>
-                <p class="spec-label">🔄 Халвинг:</p><p class="spec-value">Каждые 876 000 блоков</p>
-                <p class="spec-label">♾️ Мин. награда:</p><p class="spec-value">0.6 RAM (tail emission)</p>
-                <p class="spec-label">💎 Макс. эмиссия:</p><p class="spec-value">~17 500 000 RAM</p>
-                <p class="spec-label">🏗️ Dev Fund:</p><p class="spec-value">5% (прозрачно)</p>
-                <p class="spec-label">⛽ Комиссия:</p><p class="spec-value">0.001 RAM</p>
-                <p class="spec-label">🔒 Консенсус:</p><p class="spec-value">Proof-of-Work (CPU+RAM)</p>
-                <p class="spec-label">🌐 Сеть:</p><p class="spec-value">P2P + Peer Exchange</p>
+                <p class="spec-label">⛏️ Algorithm:</p><p class="spec-value">Ramhash v7 (Memory-hard)</p>
+                <p class="spec-label">⏱️ Block time:</p><p class="spec-value">30 seconds</p>
+                <p class="spec-label">💰 Reward:</p><p class="spec-value">10 RAM</p>
+                <p class="spec-label">🔄 Halving:</p><p class="spec-value">Every 876,000 blocks</p>
+                <p class="spec-label">♾️ Min reward:</p><p class="spec-value">0.6 RAM (tail emission)</p>
+                <p class="spec-label">💎 Max supply:</p><p class="spec-value">~17,500,000 RAM</p>
+                <p class="spec-label">🏗️ Dev Fund:</p><p class="spec-value">5% (transparent)</p>
+                <p class="spec-label">⛽ Fee:</p><p class="spec-value">0.001 RAM</p>
+                <p class="spec-label">🔒 Consensus:</p><p class="spec-value">Proof-of-Work (CPU+RAM)</p>
+                <p class="spec-label">🌐 Network:</p><p class="spec-value">P2P + Peer Exchange</p>
             </div>
         </div>
 
-        <!-- ПРИСОЕДИНЯЙСЯ -->
+        <!-- JOIN -->
         <div class="card" style="text-align:center;">
-            <h2>🔥 ПРИСОЕДИНЯЙСЯ</h2>
-            <p style="font-size:1.2em;">Сеть запущена. Майнинг работает. Присоединяйся сейчас.</p>
+            <h2>🔥 JOIN THE NETWORK</h2>
+            <p style="font-size:1.2em;">Network is live. Mining is working. Join now.</p>
             <div class="social">
-                <a href="https://t.me/ramcoin" target="_blank">📢 Telegram</a>
-                <a href="https://github.com/ramcoin/ramcoin" target="_blank">💻 GitHub</a>
+                <a href="https://t.me/ramcoin_pow" target="_blank">📢 Telegram</a>
+                <a href="https://github.com/ramcoinnode-debug/ramcoin" target="_blank">💻 GitHub</a>
             </div>
         </div>
 
         <div class="footer">
             <p>RAMCOIN v1.0.0 — Genesis Edition</p>
-            <p>© 2026 <a href="https://github.com/ramcoin/ramcoin" target="_blank">RAMCOIN</a></p>
-            <p style="margin-top:8px;font-size:0.75em;">CPU-майнинг. Честный запуск. Никаких ASIC.</p>
+            <p>© 2026 <a href="https://github.com/ramcoinnode-debug/ramcoin" target="_blank">RAMCOIN</a></p>
+            <p style="margin-top:8px;font-size:0.75em;">CPU Mining. Fair Launch. No ASIC.</p>
         </div>
     </div>
 
