@@ -91,8 +91,7 @@ MAX_SCRATCHPAD_SIZE = 8388608
 EXPECTED_MODS = SCRATCHPAD_ITER + (SCRATCHPAD_ITER // 256) + (SCRATCHPAD_ITER // 50000)
 
 FIXED_FEE = int(0.001 * COIN)
-DEV_FUND_START = 175_200
-DEV_FUND_SHARE = 15
+DEV_FUND_SHARE = 5
 POOL_FEE = 0.01
 BURN_FEE = 0.01
 POOL_DIFF_FACTOR = 100
@@ -663,9 +662,7 @@ class Blockchain:
         return max(base, MINIMUM_REWARD)
 
     def dev_fund_share(self, h: int, reward: int) -> int:
-        if h < DEV_FUND_START:
-            return int(reward * DEV_FUND_SHARE / 100)
-        return 0
+        return int(reward * DEV_FUND_SHARE / 100)
 
     def verify_block_signature(self, block: dict) -> bool:
         if block.get("pool_block", False):
@@ -924,7 +921,7 @@ class Blockchain:
             "minimum_reward": MINIMUM_REWARD / COIN,
             "pool": {"shares": self.pool_total, "miners": len(self.pool_shares)},
             "burn": self.accounts.get(BURN_ADDR, 0) / COIN, "current_target": self.target,
-            "dev_fund_active": self.height < DEV_FUND_START,
+            "dev_fund_active": True,
             "dev_fund_share": f"{DEV_FUND_SHARE}%",
             "chain": self.chain[-10:], "length": self.height
         }
@@ -1336,7 +1333,7 @@ async def handle_coininfo(request):
         "height": bc.height, "difficulty": bc.fmt_diff(),
         "peers": len(p2p.connections) if p2p else 0,
         "protocol": PROTOCOL, "version": VERSION, "halving": HALVING,
-        "dev_fund_active": bc.height < DEV_FUND_START,
+        "dev_fund_active": True,
         "dev_fund_share": f"{DEV_FUND_SHARE}%",
         "fixed_fee": FIXED_FEE / COIN
     })
@@ -1438,7 +1435,7 @@ class Node:
 ║   📦 H: {self.bc.height}    💰 Reward: {self.bc.reward_at(self.bc.height) / COIN} RAM                 ║
 ║   🔒 Security: MAXIMUM                            ║
 ║   🌐 Peer Exchange: ON                            ║
-║   💱 Dev Fund: {DEV_FUND_SHARE}% (первые {DEV_FUND_START} блоков)          ║
+║   ║   💱 Dev Fund: {DEV_FUND_SHARE}% (навсегда)          ║
 ║   ♾️  Tail Emission: {MINIMUM_REWARD / COIN} RAM                        ║
 ╚════════════════════════════════════════════════════╝
         """)
