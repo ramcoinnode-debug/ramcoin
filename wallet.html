@@ -1,0 +1,262 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>RAMCOIN Wallet</title>
+    <link rel="manifest" href="manifest.json">
+    <meta name="theme-color" content="#10b981">
+    <style>
+        :root { --bg: #02040a; --card: #0a0f1a; --green: #10b981; --text: #f1f5f9; --text2: #94a3b8; }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body { font-family: 'Segoe UI', sans-serif; background: var(--bg); color: var(--text); min-height: 100vh; padding: 15px; }
+        .header { text-align: center; padding: 20px 0; }
+        .header h1 { color: var(--green); font-size: 1.5em; }
+        .card { background: var(--card); border-radius: 14px; padding: 20px; margin: 12px 0; }
+        .balance { text-align: center; font-size: 2em; font-weight: bold; color: var(--green); }
+        .address { color: var(--text2); font-size: 0.75em; word-break: break-all; text-align: center; margin-top: 8px; }
+        .btn { display: block; width: 100%; padding: 14px; border-radius: 10px; border: none; font-weight: bold; font-size: 1em; cursor: pointer; margin: 8px 0; }
+        .btn-green { background: #059669; color: white; }
+        .btn-blue { background: #0284c7; color: white; }
+        .btn-outline { background: transparent; border: 2px solid var(--green); color: var(--green); }
+        .btn-red { background: transparent; border: 2px solid #ff4466; color: #ff4466; }
+        input { width: 100%; padding: 12px; border-radius: 8px; border: 1px solid #1a2030; background: #02040a; color: var(--text); font-size: 0.9em; margin: 6px 0; }
+        .label { color: var(--text2); font-size: 0.8em; margin-bottom: 4px; }
+        .hidden { display: none; }
+        .error { color: #ff4466; font-size: 0.85em; text-align: center; }
+        .success { color: var(--green); font-size: 0.85em; text-align: center; }
+        .info { color: var(--text2); font-size: 0.8em; text-align: center; margin-top: 8px; }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <h1>🐏 RAMCOIN Wallet</h1>
+        <p class="info" id="status">Подключение...</p>
+    </div>
+
+    <!-- Главный экран -->
+    <div class="card" id="startSection">
+        <p style="text-align:center;margin-bottom:12px;">Добро пожаловать в RAMCOIN Wallet</p>
+        <button class="btn btn-green" onclick="createWallet()">🆕 Создать кошелёк</button>
+        <button class="btn btn-blue" onclick="showImport()">📥 Импортировать (приватный ключ)</button>
+    </div>
+
+    <!-- Импорт -->
+    <div class="card hidden" id="importSection">
+        <p style="text-align:center;margin-bottom:12px;">Импорт кошелька</p>
+        <p class="label">Вставьте приватный ключ (64 символа) из файла ramcoin_wallet.json</p>
+        <input type="text" id="importKey" placeholder="a1b2c3d4e5f6...">
+        <button class="btn btn-blue" onclick="importWallet()">📥 Импортировать</button>
+        <button class="btn btn-outline" onclick="goBack()">← Назад</button>
+        <p class="error hidden" id="importError"></p>
+    </div>
+
+    <!-- Мнемоника -->
+    <div class="card hidden" id="mnemonicSection">
+        <p style="text-align:center;color:#fbbf24;font-size:1.1em;">⚠️ СОХРАНИТЕ ЭТИ 12 СЛОВ!</p>
+        <p style="text-align:center;font-size:0.9em;word-break:break-all;background:#0a0f1a;padding:12px;border-radius:8px;" id="mnemonic"></p>
+        <p class="info">Без них вы потеряете доступ к кошельку навсегда</p>
+        <button class="btn btn-green" onclick="walletReady()">✅ Я сохранил, продолжить</button>
+    </div>
+
+    <!-- Кошелёк -->
+    <div class="card hidden" id="walletSection">
+        <div class="balance" id="balance">0 RAM</div>
+        <div class="address" id="address"></div>
+        <div style="text-align:center;margin:10px 0;">
+            <button class="btn btn-outline" onclick="copyAddress()">📋 Копировать адрес</button>
+        </div>
+    </div>
+
+    <!-- Отправить -->
+    <div class="card hidden" id="sendSection">
+        <p class="label">Адрес получателя</p>
+        <input type="text" id="recipient" placeholder="RAM_...">
+        <p class="label">Сумма (RAM)</p>
+        <input type="number" id="amount" placeholder="0.01" step="0.001" min="0.001">
+        <button class="btn btn-green" onclick="sendTx()">📤 Отправить</button>
+        <button class="btn btn-red" onclick="logout()">🚪 Выйти из кошелька</button>
+        <p class="error hidden" id="sendError"></p>
+        <p class="success hidden" id="sendSuccess"></p>
+    </div>
+
+    <script>
+        const API = 'http://90.188.115.169:5000';
+        let wallet = null;
+
+        // Проверка ноды
+        async function checkNode() {
+            try {
+                const r = await fetch(`${API}/health`);
+                const d = await r.json();
+                document.getElementById('status').textContent = `● Сеть онлайн | Блоков: ${d.height}`;
+            } catch(e) {
+                document.getElementById('status').textContent = '○ Нода недоступна';
+            }
+        }
+        checkNode();
+        setInterval(checkNode, 30000);
+
+        function generateWallet() {
+            const words = ['abandon','ability','able','about','above','absent','absorb','abstract','absurd','abuse','access','accident','account','accuse','achieve','acid','acoustic','acquire','across','act','action','actor','actress','actual','adapt','add','addict','address','adjust','admit','adult','advance'];
+            const mnemonic = [];
+            for (let i = 0; i < 12; i++) {
+                mnemonic.push(words[Math.floor(Math.random() * words.length)]);
+            }
+            let hash = '';
+            for (let i = 0; i < 64; i++) {
+                hash += Math.floor(Math.random() * 16).toString(16);
+            }
+            return {
+                mnemonic: mnemonic.join(' '),
+                address: 'RAM_' + hash + hash,
+                privateKey: hash
+            };
+        }
+
+        function createWallet() {
+            wallet = generateWallet();
+            document.getElementById('mnemonic').textContent = wallet.mnemonic;
+            document.getElementById('startSection').classList.add('hidden');
+            document.getElementById('mnemonicSection').classList.remove('hidden');
+        }
+
+        function showImport() {
+            document.getElementById('startSection').classList.add('hidden');
+            document.getElementById('importSection').classList.remove('hidden');
+        }
+
+        function goBack() {
+            document.getElementById('importSection').classList.add('hidden');
+            document.getElementById('startSection').classList.remove('hidden');
+        }
+
+        function importWallet() {
+            const key = document.getElementById('importKey').value.trim();
+            document.getElementById('importError').classList.add('hidden');
+
+            if (key.length !== 64) {
+                document.getElementById('importError').textContent = 'Должно быть ровно 64 символа';
+                document.getElementById('importError').classList.remove('hidden');
+                return;
+            }
+            if (!/^[0-9a-fA-F]+$/.test(key)) {
+                document.getElementById('importError').textContent = 'Только hex символы (0-9, a-f)';
+                document.getElementById('importError').classList.remove('hidden');
+                return;
+            }
+
+            let addr = 'RAM_';
+            for (let i = 0; i < 130; i++) {
+                addr += Math.floor(Math.random() * 16).toString(16);
+            }
+
+            wallet = {
+                mnemonic: 'импортирован',
+                address: addr,
+                privateKey: key
+            };
+
+            walletReady();
+        }
+
+        function walletReady() {
+            localStorage.setItem('ramcoin_wallet', JSON.stringify(wallet));
+            document.getElementById('mnemonicSection').classList.add('hidden');
+            document.getElementById('importSection').classList.add('hidden');
+            document.getElementById('startSection').classList.add('hidden');
+            document.getElementById('walletSection').classList.remove('hidden');
+            document.getElementById('sendSection').classList.remove('hidden');
+            document.getElementById('address').textContent = wallet.address;
+            loadBalance();
+        }
+
+        async function loadBalance() {
+            if (!wallet) return;
+            try {
+                const r = await fetch(`${API}/address/${wallet.address}`);
+                const d = await r.json();
+                if (d.balance !== undefined) {
+                    document.getElementById('balance').textContent = d.balance + ' RAM';
+                }
+            } catch(e) {}
+        }
+
+        function copyAddress() {
+            navigator.clipboard.writeText(wallet.address);
+            alert('Адрес скопирован!');
+        }
+
+        async function sendTx() {
+            const recipient = document.getElementById('recipient').value.trim();
+            const amount = parseFloat(document.getElementById('amount').value);
+
+            document.getElementById('sendError').classList.add('hidden');
+            document.getElementById('sendSuccess').classList.add('hidden');
+
+            if (!recipient.startsWith('RAM_')) {
+                document.getElementById('sendError').textContent = 'Неверный адрес';
+                document.getElementById('sendError').classList.remove('hidden');
+                return;
+            }
+            if (!amount || amount <= 0) {
+                document.getElementById('sendError').textContent = 'Неверная сумма';
+                document.getElementById('sendError').classList.remove('hidden');
+                return;
+            }
+
+            const tx = {
+                sender: wallet.address,
+                recipient: recipient,
+                amount: Math.floor(amount * 100000000),
+                fee: 100000,
+                nonce: 0,
+                timestamp: Math.floor(Date.now() / 1000),
+                signature: wallet.privateKey
+            };
+
+            try {
+                const r = await fetch(`${API}/tx`, {
+                    method: 'POST',
+                    headers: {'Content-Type': 'application/json'},
+                    body: JSON.stringify(tx)
+                });
+                const d = await r.json();
+                if (d.status === 'ok') {
+                    document.getElementById('sendSuccess').textContent = 'Транзакция отправлена!';
+                    document.getElementById('sendSuccess').classList.remove('hidden');
+                    document.getElementById('recipient').value = '';
+                    document.getElementById('amount').value = '';
+                    setTimeout(loadBalance, 3000);
+                } else {
+                    document.getElementById('sendError').textContent = d.reason || 'Ошибка';
+                    document.getElementById('sendError').classList.remove('hidden');
+                }
+            } catch(e) {
+                document.getElementById('sendError').textContent = 'Нет связи с нодой';
+                document.getElementById('sendError').classList.remove('hidden');
+            }
+        }
+
+        function logout() {
+            localStorage.removeItem('ramcoin_wallet');
+            wallet = null;
+            document.getElementById('walletSection').classList.add('hidden');
+            document.getElementById('sendSection').classList.add('hidden');
+            document.getElementById('startSection').classList.remove('hidden');
+            document.getElementById('balance').textContent = '0 RAM';
+        }
+
+        // Загрузка сохранённого
+        const saved = localStorage.getItem('ramcoin_wallet');
+        if (saved) {
+            wallet = JSON.parse(saved);
+            document.getElementById('startSection').classList.add('hidden');
+            document.getElementById('walletSection').classList.remove('hidden');
+            document.getElementById('sendSection').classList.remove('hidden');
+            document.getElementById('address').textContent = wallet.address;
+            loadBalance();
+        }
+    </script>
+</body>
+</html>
