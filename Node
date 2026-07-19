@@ -1,0 +1,476 @@
+#!/usr/bin/env python3
+"""
+RAMCOIN NODE v1.0.0 — GENESIS EDITION (Public Demo)
+ChaCha20-Poly1305 + ECDSA + P2P
+CPU Mining: Solo + Pool
+"""
+import asyncio
+import hashlib
+import json
+import os
+import sys
+import time
+import array
+import sqlite3
+import logging
+import struct
+import secrets
+import hmac
+import ipaddress
+import signal
+import gc
+import traceback
+import threading
+import io
+from typing import Optional, Dict, List, Tuple, Set, Any, Union
+from collections import defaultdict, deque, OrderedDict
+from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
+from enum import IntEnum, Enum
+from functools import wraps
+import aiohttp
+from aiohttp import web, WSMsgType
+import lz4.frame
+from cryptography.hazmat.primitives.asymmetric import ec, x25519
+from cryptography.hazmat.primitives import hashes, serialization
+from cryptography.hazmat.primitives.kdf.hkdf import HKDF
+from cryptography.hazmat.primitives.ciphers.aead import ChaCha20Poly1305
+
+# ==================== WINDOWS FIX ====================
+if sys.platform == 'win32':
+    sys.stdout = io.TextIOWrapper(sys.stdout.buffer, encoding='utf-8', errors='replace')
+    sys.stderr = io.TextIOWrapper(sys.stderr.buffer, encoding='utf-8', errors='replace')
+    asyncio.set_event_loop_policy(asyncio.WindowsSelectorEventLoopPolicy())
+
+# ==================== CONSTANTS ====================
+VERSION = "1.0.0"
+PROTOCOL = 2
+COIN = 100_000_000
+
+# PUBLIC DEMO — Replace these with your own values
+MY_WHITE_IP = os.environ.get("RAMCOIN_IP", "127.0.0.1")
+DEV_ADDR = "RAM_PLACEHOLDER_ADDRESS_REPLACE_WITH_YOUR_OWN"
+BURN_ADDR = "RAM_BURN_" + "0" * 124
+
+API_KEY_FILE = "api_key.txt"
+if os.path.exists(API_KEY_FILE):
+    with open(API_KEY_FILE, "r") as f:
+        API_KEY = f.read().strip()
+else:
+    API_KEY = secrets.token_hex(32)
+    with open(API_KEY_FILE, "w") as f:
+        f.write(API_KEY)
+
+DB_PATH = "blockchain_v10.db"
+PEERS_DB = "peers_v10.db"
+SEEDS_DB = "seeds_v12.db"
+
+P2P_PORT = int(os.environ.get("P2P_PORT", 8333))
+API_PORT = int(os.environ.get("API_PORT", 5000))
+
+INITIAL_REWARD = int(11.9 * COIN)
+MINIMUM_REWARD = int(0.01 * COIN)
+BLOCK_TIME = 30.0
+HALVING = 4_204_800
+MAX_TARGET = 0xFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFFF
+INITIAL_TARGET = MAX_TARGET >> 4
+MAX_TIME_DRIFT = 7200
+
+SCRATCHPAD_ITER = 8192
+BASE_SCRATCHPAD = 524288
+MAX_SCRATCHPAD = 4194304
+MAX_THREADS_PER_MINER = 4
+EXPECTED_MODS = SCRATCHPAD_ITER + (SCRATCHPAD_ITER // 256) + (SCRATCHPAD_ITER // 50000)
+
+FIXED_FEE = int(0.001 * COIN)
+POOL_FEE = 0.01
+BURN_FEE = 0.01
+POOL_DIFF_FACTOR = 100
+
+MAX_PEERS = 500
+PEER_TIMEOUT = 300
+MAX_MEMPOOL = 10000
+MAX_BLOCK_TX = 200
+
+# ==================== LOGGING ====================
+class SecureFormatter(logging.Formatter):
+    def format(self, record):
+        if hasattr(record, 'msg') and isinstance(record.msg, str):
+            record.msg = record.msg.replace(API_KEY, "***API_KEY***")
+        return super().format(record)
+
+logging.basicConfig(level=logging.INFO, format='%(asctime)s [%(levelname)s] %(message)s', datefmt='%H:%M:%S')
+log = logging.getLogger('RAMCOIN')
+
+# ==================== PROOF OF WORK ====================
+def create_scratchpad_sync(prev_hash: str, tid: int, nseed: int, buffer_size: int) -> Tuple[array.array, int]:
+    sp = array.array('Q', [0]) * buffer_size
+    seed_str = f"{prev_hash}|{tid}|{nseed}|RAMCOIN_v7|{buffer_size}"
+    seed = int(hashlib.sha256(seed_str.encode()).hexdigest(), 16)
+    s0, s1 = seed, seed ^ 0xDEADBEEF
+    for i in range(buffer_size):
+        s1, s0 = s0 & 0xFFFFFFFFFFFFFFFF, s1
+        s1 ^= (s1 << 23) & 0xFFFFFFFFFFFFFFFF
+        s1 ^= (s1 >> 17)
+        s1 ^= s0
+        s1 ^= (s0 >> 26)
+        sp[i] = (s0 + s1) & 0xFFFFFFFFFFFFFFFF
+    return sp, seed
+
+def memhard_sync(sp: array.array, seed: int, nonce: int, nseed: int, buffer_size: int) -> Tuple[int, int, int]:
+    sp_copy = sp[:]
+    mix = seed
+    mods = 0
+    nseed_current = nseed
+    for k in range(SCRATCHPAD_ITER):
+        mix = (mix * 0x9E3779B97F4A7C15 + nonce + nseed_current) & 0xFFFFFFFFFFFFFFFF
+        mix ^= (mix >> 33)
+        mix ^= (mix << 13)
+        idx = mix % buffer_size
+        rv = sp_copy[idx]
+        sp_copy[idx] = (rv ^ mix ^ nonce) & 0xFFFFFFFFFFFFFFFF
+        mods += 1
+        mix = (mix + rv) & 0xFFFFFFFFFFFFFFFF
+        if k % 256 == 0:
+            idx2 = ((idx * 1103515245 + 12345) ^ rv) % buffer_size
+            sp_copy[idx2] = (sp_copy[idx2] ^ (mix >> 16) ^ nonce) & 0xFFFFFFFFFFFFFFFF
+            mods += 1
+        if k > 0 and k % 50000 == 0:
+            nseed_current = (nseed_current + 1) & 0xFFFFFFFF
+            mix = (mix ^ nseed_current) & 0xFFFFFFFFFFFFFFFF
+    return mix, nseed_current, mods
+
+def verify_pow_sync(block: dict, target: int) -> bool:
+    try:
+        buffer_size = int(block.get("scratchpad_size", BASE_SCRATCHPAD))
+        if not (BASE_SCRATCHPAD <= buffer_size <= MAX_SCRATCHPAD):
+            return False
+        sp, seed = create_scratchpad_sync(str(block["previous_hash"]), int(block.get("extra_nonce", 0)), int(block.get("nonce_seed", 0)), buffer_size)
+        mix, new_nseed, mods = memhard_sync(sp, seed, int(block["nonce"]), int(block.get("nonce_seed", 0)), buffer_size)
+        if mods != EXPECTED_MODS:
+            return False
+        proof = hashlib.sha256(f"{mix}{block['previous_hash']}{new_nseed}{mods}".encode()).hexdigest()
+        return hmac.compare_digest(proof.encode(), block.get("memory_proof", "").encode()) and int(proof, 16) <= target
+    except:
+        return False
+
+# ==================== BLOCKCHAIN ====================
+class Blockchain:
+    def __init__(self, p2p=None):
+        self.p2p = p2p
+        self.lock = asyncio.Lock()
+        self.share_lock = asyncio.Lock()
+        self.chain: List[dict] = []
+        self.height = 0
+        self.accounts: Dict[str, int] = {DEV_ADDR: 100 * COIN}
+        self.nonces: Dict[str, int] = {DEV_ADDR: 0}
+        self.target = INITIAL_TARGET
+        self.total_tx = 0
+        self.accepted = 0
+        self.rejected = 0
+        self.start_time = time.time()
+        self.mempool: deque = deque(maxlen=MAX_MEMPOOL)
+        self.mempool_hashes: Set[str] = set()
+        self.pool_shares: Dict[str, int] = defaultdict(int)
+        self.pool_total = 0
+        self._init_db()
+        if not self._load():
+            self._create_genesis()
+        log.info(f"RAMCOIN v{VERSION} | Height: {self.height} | Difficulty: {self.fmt_diff()}")
+
+    def _init_db(self):
+        with sqlite3.connect(DB_PATH) as conn:
+            conn.execute('''CREATE TABLE IF NOT EXISTS blocks (idx INTEGER PRIMARY KEY, data TEXT, hash TEXT)''')
+            conn.execute('''CREATE TABLE IF NOT EXISTS state (key TEXT PRIMARY KEY, val TEXT)''')
+
+    def _load(self) -> bool:
+        try:
+            if not os.path.exists(DB_PATH):
+                return False
+            with sqlite3.connect(DB_PATH) as conn:
+                rows = conn.execute("SELECT data FROM blocks ORDER BY idx").fetchall()
+                self.chain = [json.loads(r[0]) for r in rows]
+                self.height = len(self.chain)
+                if self.height == 0:
+                    return False
+                accounts_row = conn.execute("SELECT val FROM state WHERE key='accounts'").fetchone()
+                nonces_row = conn.execute("SELECT val FROM state WHERE key='nonces'").fetchone()
+                if accounts_row: self.accounts = json.loads(accounts_row[0])
+                if nonces_row: self.nonces = json.loads(nonces_row[0])
+                return True
+        except:
+            return False
+
+    def _create_genesis(self):
+        g = {"index": 0, "previous_hash": "0" * 64, "transactions": [], "timestamp": int(time.time() - BLOCK_TIME),
+             "nonce": 0, "nonce_seed": 0, "memory_proof": "0" * 64, "target": self.target,
+             "miner_payout_address": DEV_ADDR, "version": PROTOCOL, "total_fees": 0}
+        g["hash"] = self.calc_hash(g)
+        self.chain.append(g)
+        self.height = 1
+        self.accepted = 1
+        self._save_block(g)
+
+    def _save_block(self, block: dict):
+        with sqlite3.connect(DB_PATH, timeout=30) as conn:
+            conn.execute("INSERT OR REPLACE INTO blocks VALUES (?,?,?)", (block['index'], json.dumps(block), block['hash']))
+            for key, val in [('height', str(self.height)), ('accounts', json.dumps(self.accounts)), ('nonces', json.dumps(self.nonces))]:
+                conn.execute("INSERT OR REPLACE INTO state VALUES (?,?)", (key, val))
+            conn.commit()
+
+    def calc_hash(self, block: dict) -> str:
+        c = block.copy()
+        c.pop("hash", None)
+        return hashlib.sha256(json.dumps(c, sort_keys=True).encode()).hexdigest()
+
+    def fmt_diff(self) -> str:
+        if self.target <= 0: return "inf"
+        sd = MAX_TARGET / self.target
+        if sd >= 1e12: return f"{sd / 1e12:.2f} TRam/s"
+        if sd >= 1e9:  return f"{sd / 1e9:.2f} GRam/s"
+        if sd >= 1e6:  return f"{sd / 1e6:.2f} MRam/s"
+        if sd >= 1e3:  return f"{sd / 1e3:.2f} KRam/s"
+        return f"{sd:.2f} Ram/s"
+
+    def reward_at(self, h: int) -> int:
+        x = h // HALVING
+        base = 0 if x >= 64 else INITIAL_REWARD >> x
+        return max(base, MINIMUM_REWARD)
+
+    def verify_block_signature(self, block: dict) -> bool:
+        if block.get("pool_block", False):
+            return True
+        miner_address = block.get("miner_payout_address", "")
+        if not miner_address.startswith("RAM_"): return False
+        signature_hex = block.get("miner_signature", "")
+        if not signature_hex or len(signature_hex) < 10: return False
+        try:
+            pub_hex = miner_address[4:]
+            if len(pub_hex) not in (66, 130): return False
+            pub_bytes = bytes.fromhex(pub_hex)
+            pub_key = ec.EllipticCurvePublicKey.from_encoded_point(ec.SECP256K1(), pub_bytes)
+            data = OrderedDict([("v", PROTOCOL), ("i", block["index"]), ("ph", block["previous_hash"]),
+                ("t", block["timestamp"]), ("n", block["nonce"]), ("ns", block.get("nonce_seed", 0)),
+                ("mp", block["memory_proof"]), ("ma", miner_address)])
+            hash_bytes = hashlib.sha256(json.dumps(data, sort_keys=True).encode()).digest()
+            pub_key.verify(bytes.fromhex(signature_hex), hash_bytes, ec.ECDSA(hashes.SHA256()))
+            return True
+        except:
+            return False
+
+    def verify_tx_signature(self, tx: dict) -> bool:
+        try:
+            sender = tx.get("sender", "")
+            if not sender.startswith("RAM_"): return False
+            pub_hex = sender[4:]
+            if len(pub_hex) not in (66, 130): return False
+            pub_bytes = bytes.fromhex(pub_hex)
+            pub_key = ec.EllipticCurvePublicKey.from_encoded_point(ec.SECP256K1(), pub_bytes)
+            signing_data = OrderedDict([("amount", int(tx["amount"])), ("fee", int(tx.get("fee", FIXED_FEE))),
+                ("nonce", int(tx["nonce"])), ("recipient", tx["recipient"]), ("sender", tx["sender"]),
+                ("timestamp", int(tx["timestamp"]))])
+            hash_bytes = json.dumps(signing_data, sort_keys=True).encode()
+            pub_key.verify(bytes.fromhex(tx.get("signature", "")), hash_bytes, ec.ECDSA(hashes.SHA256()))
+            return True
+        except:
+            return False
+
+    async def add_block(self, block: dict, source: str = "unknown") -> Tuple[bool, str]:
+        async with self.lock:
+            idx = int(block.get("index", -1))
+            if idx != self.height:
+                return False, f"idx mismatch: {idx} != {self.height}"
+            if self.chain and self.chain[-1]["hash"] != block.get("previous_hash"):
+                return False, "prev_hash"
+            if not verify_pow_sync(block, self.target):
+                return False, "pow"
+            if not self.verify_block_signature(block):
+                return False, "block_signature"
+            
+            miner = block.get("miner_payout_address", "")
+            is_pool = block.get("pool_block", False)
+            total_fees = 0
+            validated_txs = []
+            
+            for tx in block.get("transactions", []):
+                if not self.verify_tx_signature(tx): continue
+                s, r, a = tx["sender"], tx["recipient"], int(tx["amount"])
+                fee = int(tx.get("fee", FIXED_FEE))
+                if tx["nonce"] != self.nonces.get(s, 0): continue
+                if self.accounts.get(s, 0) < a + fee: continue
+                self.accounts[s] = self.accounts.get(s, 0) - (a + fee)
+                self.accounts[r] = self.accounts.get(r, 0) + a
+                self.nonces[s] = self.nonces.get(s, 0) + 1
+                self.total_tx += 1
+                total_fees += fee
+                validated_txs.append(tx)
+            
+            reward = self.reward_at(idx)
+            
+            if is_pool and self.pool_total > 0:
+                df_pool = int(reward * POOL_FEE)
+                bn_pool = int(reward * BURN_FEE)
+                ms = reward - df_pool - bn_pool
+                self.accounts[DEV_ADDR] = self.accounts.get(DEV_ADDR, 0) + df_pool
+                self.accounts[BURN_ADDR] = self.accounts.get(BURN_ADDR, 0) + bn_pool
+                total_pool_reward = ms + total_fees
+                for a, s in list(self.pool_shares.items()):
+                    if s > 0:
+                        self.accounts[a] = self.accounts.get(a, 0) + int(total_pool_reward * s / self.pool_total)
+                self.pool_shares.clear()
+                self.pool_total = 0
+            else:
+                self.accounts[miner] = self.accounts.get(miner, 0) + reward + total_fees
+            
+            self._adjust_target()
+            block["hash"] = self.calc_hash(block)
+            self._save_block(block)
+            self.chain.append(block)
+            self.height += 1
+            self.accepted += 1
+            
+            log.info(f"Block #{idx} | {'POOL' if is_pool else 'SOLO'} | +{reward / COIN:.2f} RAM | H:{self.height}")
+            return True, "ok"
+
+    def _adjust_target(self):
+        if self.height < 2: return
+        actual_time = self.chain[-1]["timestamp"] - self.chain[-2]["timestamp"]
+        actual_time = max(5, min(actual_time, BLOCK_TIME * 10))
+        if actual_time < 10: adj = 0.65
+        elif actual_time < 20: adj = 0.80
+        elif actual_time <= 35: adj = 1.0
+        elif actual_time < 50: adj = 1.10
+        else: adj = 1.40
+        self.target = max(MAX_TARGET // 1000000, min(MAX_TARGET // 2, int(self.target * adj)))
+
+    async def submit_share(self, addr: str, nonce: int, nseed: int, mix: str, mods: int, extra: int, size: int) -> bool:
+        async with self.share_lock:
+            if not self.chain: return False
+            prev_hash = self.chain[-1]["hash"]
+            proof = hashlib.sha256(f"{mix}{prev_hash}{nseed}{mods}".encode()).hexdigest()
+            proof_int = int(proof, 16)
+            pool_target = min(MAX_TARGET, int(self.target * POOL_DIFF_FACTOR))
+            if proof_int <= self.target:
+                block = {"index": self.height, "previous_hash": prev_hash, "timestamp": int(time.time()),
+                    "nonce": nonce, "nonce_seed": nseed, "memory_proof": proof, "target": self.target,
+                    "extra_nonce": extra, "miner_payout_address": addr, "scratchpad_mods": mods,
+                    "scratchpad_size": size, "pool_block": True, "transactions": [], "version": PROTOCOL}
+                if verify_pow_sync(block, self.target):
+                    return (await self.add_block(block, "pool"))[0]
+                return False
+            elif proof_int <= pool_target:
+                self.pool_shares[addr] = self.pool_shares.get(addr, 0) + 1
+                self.pool_total += 1
+                return True
+            return False
+
+    def get_stats(self) -> dict:
+        return {"version": VERSION, "height": self.height, "difficulty": self.fmt_diff(),
+                "total_supply": sum(self.accounts.values()) / COIN, "accounts": len(self.accounts),
+                "transactions": self.total_tx, "blocks": self.accepted,
+                "burn": self.accounts.get(BURN_ADDR, 0) / COIN, "reward": self.reward_at(self.height) / COIN,
+                "chain": self.chain[-10:], "length": self.height}
+
+    def get_address(self, addr: str) -> Optional[dict]:
+        if not addr.startswith("RAM_"): return None
+        return {"address": addr, "balance": self.accounts.get(addr, 0) / COIN, "nonce": self.nonces.get(addr, 0)}
+
+# ==================== API SERVER ====================
+class Node:
+    def __init__(self):
+        self.bc = Blockchain()
+        self.running = False
+
+    async def start(self):
+        self.running = True
+        app = web.Application()
+        app['bc'] = self.bc
+        
+        async def handle_health(request):
+            bc = request.app['bc']
+            return web.json_response({"ok": True, "version": VERSION, "height": bc.height})
+        
+        async def handle_chain(request):
+            return web.json_response(request.app['bc'].get_stats())
+        
+        async def handle_address(request):
+            bc = request.app['bc']
+            d = bc.get_address(request.match_info['addr'])
+            return web.json_response(d) if d else web.json_response({"error": "invalid"}, status=400)
+        
+        async def handle_block(request):
+            bc = request.app['bc']
+            try:
+                i = int(request.match_info['idx'])
+                if 0 <= i < len(bc.chain): return web.json_response(bc.chain[i])
+            except: pass
+            return web.json_response({"error": "not found"}, status=404)
+        
+        async def handle_pool_tmpl(request):
+            bc = request.app['bc']
+            if not bc.chain: return web.json_response({"error": "no chain"}, status=503)
+            return web.json_response({"height": bc.height, "previous_hash": bc.chain[-1]["hash"],
+                "target": bc.target, "pool_target": min(MAX_TARGET, int(bc.target * POOL_DIFF_FACTOR))})
+        
+        async def handle_pool_share(request):
+            bc = request.app['bc']
+            try:
+                d = await request.json()
+                a = d.get("miner_address", "")
+                if not a.startswith("RAM_"): return web.json_response({"status": "rejected"}, status=400)
+                ok = await bc.submit_share(a, int(d.get("nonce", 0)), int(d.get("nonce_seed", 0)),
+                    d.get("mix", "0"), int(d.get("mods", 0)), int(d.get("extra_nonce", 0)),
+                    int(d.get("scratchpad_size", BASE_SCRATCHPAD)))
+                return web.json_response({"status": "ok" if ok else "rejected"})
+            except: return web.json_response({"status": "error"}, status=400)
+        
+        async def handle_tx(request):
+            bc = request.app['bc']
+            try:
+                d = await request.json()
+                if not bc.verify_tx_signature(d): return web.json_response({"status": "rejected", "reason": "bad signature"})
+                sig = d.get("signature", "")
+                if sig in bc.mempool_hashes: return web.json_response({"status": "rejected", "reason": "duplicate"})
+                bc.mempool.append(d)
+                bc.mempool_hashes.add(sig)
+                return web.json_response({"status": "ok"})
+            except: return web.json_response({"status": "error"}, status=400)
+        
+        app.router.add_get('/health', handle_health)
+        app.router.add_get('/chain', handle_chain)
+        app.router.add_get('/block/{idx}', handle_block)
+        app.router.add_get('/address/{addr}', handle_address)
+        app.router.add_get('/pool/template', handle_pool_tmpl)
+        app.router.add_post('/pool/share', handle_pool_share)
+        app.router.add_post('/tx', handle_tx)
+        
+        runner = web.AppRunner(app)
+        await runner.setup()
+        site = web.TCPSite(runner, "0.0.0.0", API_PORT)
+        await site.start()
+        
+        log.info(f"API: http://0.0.0.0:{API_PORT}")
+        log.info(f"RAMCOIN v{VERSION} — Genesis Edition")
+        log.info(f"Height: {self.bc.height} | Reward: {self.bc.reward_at(self.bc.height) / COIN} RAM")
+        log.info(f"Max Supply: 100M RAM | Halving: Every 4 years | Block Time: 30s")
+        log.info(f"Pool Fee: 1% | Burn: 1% | Dev Fund: 0%")
+        
+        try:
+            while self.running:
+                await asyncio.sleep(1)
+        except (KeyboardInterrupt, asyncio.CancelledError):
+            log.info("Stopping...")
+            self.running = False
+
+async def main():
+    node = Node()
+    await node.start()
+
+if __name__ == "__main__":
+    try:
+        asyncio.run(main())
+    except KeyboardInterrupt:
+        log.info("Bye")
+    except Exception as e:
+        log.critical(f"FATAL: {e}")
+        sys.exit(1)
